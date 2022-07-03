@@ -1,0 +1,14 @@
+server:
+  port: 8521
+
+spring:
+  application:
+    name: debriServer
+
+#DB Config
+  datasource:
+    platform:
+    url:
+    username:
+    password:
+    driver-class-name:
