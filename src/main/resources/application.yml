@@ -1,0 +1,14 @@
+server:
+  port: 8521
+
+spring:
+  application:
+    name: debriServer
+
+#DB Config
+  datasource:
+    url: #TODO RDS Endpoint 주소 적어주세요
+    username: #TODO RDS username
+    password: #TODO RDS password
+    platform: mysql
+    driver-class-name: #TODO mysql jdbc dirver dependency -> mysql version 8
