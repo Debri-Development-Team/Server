@@ -1,0 +1,15 @@
+server:
+  port: 8521
+
+spring:
+  application:
+    name: debriServer
+
+#DB Config
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    platform: mysql
+    url: jdbc:mysql://debri-db.ckypat83jyyc.ap-northeast-2.rds.amazonaws.com:3306/Debri_DB
+    username: admin
+    password: debri0626
+
