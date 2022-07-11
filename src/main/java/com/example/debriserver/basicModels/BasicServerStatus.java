@@ -35,7 +35,17 @@ public enum BasicServerStatus {
     /**
      * 4000 : Response 오류
      * */
-    RESPONSE_ERROR(false, 4000,"Response Error");
+    RESPONSE_ERROR(false, 4000,"Response Error"),
+
+    /**
+     * 5000 : Jwt 오류
+     * */
+    JWT_NOT_EXIST(false, 5000, "AccessToken 이 없습니다."),
+    EXPIRED_TOKEN(false, 5001, "AccessToken Expired"),
+    INVALID_JWT(false, 5002, "Invalid Jwt Token"),
+    INVALID_SIGNATURE(false, 5003, "Invalid Jwt Signature"),
+    UNSUPPORTED_JWT(false, 5004, "Unsupported Jwt"),
+    EMPTY_JWT_CLAIMS_STRING(false, 5005, "Jwt Claims String Empty");
 
     private final boolean isSuccess;//
     private final int returnCode;

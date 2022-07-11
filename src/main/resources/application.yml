@@ -7,8 +7,17 @@ spring:
 
 #DB Config
   datasource:
-    url: #TODO RDS Endpoint 주소 적어주세요
-    username: #TODO RDS username
-    password: #TODO RDS password
+    url: jdbc:mysql://debri-db.ckypat83jyyc.ap-northeast-2.rds.amazonaws.com:3306/Debri_D
+    username: admin
+    password: debri0626
     platform: mysql
-    driver-class-name: #TODO mysql jdbc dirver dependency -> mysql version 8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+#Logger
+logging:
+  file:
+    name: ${user.dir}/log/test.log
+  logback:
+    rollingpolicy:
+      max-history: 7
+      max-file-size: 10MB
