@@ -31,6 +31,8 @@ public enum BasicServerStatus {
      * 3000 : Request 오류
      * */
     REQUEST_ERROR(false, 3000, "Request Error"),
+    COMMENT_TOO_LONG_ERROR(false, 3050, "내용의 길이가 너무 깁니다(최대 5000자)"),
+    COMMENT_NOT_EXIST_ERROR(false, 3051, "댓글이나 대댓글이 존재하지 않습니다."),
 
     /**
      * 4000 : Response 오류
