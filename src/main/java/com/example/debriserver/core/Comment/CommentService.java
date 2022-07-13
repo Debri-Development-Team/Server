@@ -72,4 +72,20 @@ public class CommentService {
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }
+
+    public boolean checkPostDeleted(int postIdx) throws BasicException {
+        try{
+            return commentDao.checkPostDeleted(postIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean checkCommentDeleted(int commentIdx) throws BasicException {
+        try{
+            return commentDao.checkCommentDeleted(commentIdx);
+        }catch (Exception exception) {
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
 }

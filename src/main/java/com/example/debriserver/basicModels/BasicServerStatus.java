@@ -33,6 +33,8 @@ public enum BasicServerStatus {
     REQUEST_ERROR(false, 3000, "Request Error"),
     COMMENT_TOO_LONG_ERROR(false, 3050, "내용의 길이가 너무 깁니다(최대 5000자)"),
     COMMENT_NOT_EXIST_ERROR(false, 3051, "댓글이나 대댓글이 존재하지 않습니다."),
+    COMMENT_POST_DELETED_ERROR(false, 3052, "게시물이 삭제되어 댓글 작성이 불가합니다."),
+    ROOT_COMMENT_DELETED_ERROR(false, 3053, "댓글이 삭제되어 대댓글 작성이 불가합니다."),
 
     /**
      * 4000 : Response 오류

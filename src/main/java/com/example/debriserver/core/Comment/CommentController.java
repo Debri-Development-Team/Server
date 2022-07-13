@@ -40,6 +40,9 @@ public class CommentController {
     public BasicResponse<PostReplyOnPostRes> createReplyOnPost(@RequestBody PostReplyOnPostReq postReplyOnPostReq){
 
         try{
+            if(commentService.checkPostDeleted(postReplyOnPostReq.getPostIdx())){
+                throw new BasicException(BasicServerStatus.COMMENT_POST_DELETED_ERROR);
+            }
             PostReplyOnPostRes postReplyOnPostRes = commentService.createReplyOnPost(postReplyOnPostReq);
 
             if(postReplyOnPostReq.getContent().length() > 5000){
@@ -60,6 +63,10 @@ public class CommentController {
     public BasicResponse<PostReplyOnReplyRes> createReplyOnReply(@RequestBody PostReplyOnReplyReq postReplyOnReplyReq){
 
         try{
+            if(commentService.checkCommentDeleted(postReplyOnReplyReq.getRootCommentIdx())){
+                throw new BasicException(BasicServerStatus.ROOT_COMMENT_DELETED_ERROR);
+            }
+
             PostReplyOnReplyRes postReplyOnReplyRes = commentService.createReplyOnReply(postReplyOnReplyReq);
 
             if(postReplyOnReplyReq.getContent().length() > 5000){

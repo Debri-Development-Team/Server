@@ -219,4 +219,22 @@ public class CommentDao {
         if(result == 0) return false;
         else return true;
     }
+
+    public boolean checkPostDeleted(int postIdx){
+        String checkPostDeletedQuery = "SELECT COUNT(*) FROM Post WHERE postIdx = ? and status = 'DELETE';";
+
+        int result = this.jdbcTemplate.queryForObject(checkPostDeletedQuery, int.class, postIdx);
+
+        if(result > 0) return true;
+        else return false;
+    }
+
+    public boolean checkCommentDeleted(int commentIdx){
+        String checkCommentDeletedQuery = "SELECT COUNT(*) FROM Comment WHERE commentIdx = ? and status = 'DELETE';";
+
+        int result = this.jdbcTemplate.queryForObject(checkCommentDeletedQuery, int.class, commentIdx);
+
+        if(result > 0) return true;
+        else return false;
+    }
 }
