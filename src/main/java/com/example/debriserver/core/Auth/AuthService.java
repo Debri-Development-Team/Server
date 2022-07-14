@@ -51,11 +51,13 @@ public class AuthService {
 //            throw new BasicException(BasicServerStatus.FAILED_TO_LOGIN);
 //        }
 
-        try{
+        if(user.getPassword().equals(postLoginReq.getPwd()))
+        {
             int userIdx = user.getUserIdx();
             String jwt = jwtUtility.createToken(userIdx);
             return new PostLoginRes(userIdx, jwt);
-        }catch (Exception exception)
+        }
+        else
         {
             throw new BasicException(BasicServerStatus.FAILED_TO_LOGIN);
         }

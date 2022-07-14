@@ -42,7 +42,7 @@ public class AuthController {
     {
         try{
             // 이메일 미입력시
-            if(postLoginReq.getEmail() == null)
+            if(postLoginReq.getEmail().equals(""))
             {
                 return new BasicResponse<>(BasicServerStatus.POST_USERS_EMPTY_EMAIL);
             }
@@ -54,7 +54,7 @@ public class AuthController {
             }
 
             // 비밀번호 미입력시
-            if(postLoginReq.getPwd() == null)
+            if(postLoginReq.getPwd().equals(""))
             {
                 return new BasicResponse<>(BasicServerStatus.POST_USERS_EMPTY_PASSWORD);
             }
