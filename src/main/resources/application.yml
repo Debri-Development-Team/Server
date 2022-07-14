@@ -7,7 +7,7 @@ spring:
 
 #DB Config
   datasource:
-    url: jdbc:mysql://debri-db.ckypat83jyyc.ap-northeast-2.rds.amazonaws.com:3306/Debri_D
+    url: jdbc:mysql://debri-db.ckypat83jyyc.ap-northeast-2.rds.amazonaws.com:3306/Debri_DB
     username: admin
     password: debri0626
     platform: mysql
