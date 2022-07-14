@@ -27,6 +27,10 @@ public enum BasicServerStatus {
      * */
     SERVER_ERROR(false, 2000, "Server Error"),
 
+    PASSWORD_ENCRYPTION_ERROR(false, 2010, "비밀번호 암호화에 실패하였습니다."),
+    PASSWORD_DECRYPTION_ERROR(false, 2011, "비밀번호 복호화에 실패하였습니다."),
+
+
     /**
      * 3000 : Request 오류
      * */
@@ -36,10 +40,20 @@ public enum BasicServerStatus {
     COMMENT_POST_DELETED_ERROR(false, 3052, "게시물이 삭제되어 댓글 작성이 불가합니다."),
     ROOT_COMMENT_DELETED_ERROR(false, 3053, "댓글이 삭제되어 대댓글 작성이 불가합니다."),
 
+    // [POST]
+    POST_USERS_EMPTY_EMAIL(false, 3020, "이메일을 입력해주세요."),
+    POST_USERS_EMPTY_PASSWORD(false, 3021, "비밀번호를 입력해주세요."),
+    POST_USERS_INVALID_EMAIL(false, 3022, "이메일 형식을 확인해주세요."),
+
+
     /**
      * 4000 : Response 오류
      * */
     RESPONSE_ERROR(false, 4000,"Response Error"),
+
+    // [POST]
+    FAILED_TO_LOGIN(false, 4010, "없는 아이디거나 비밀번호가 틀렸습니다."),
+
 
     /**
      * 5000 : Jwt 오류
