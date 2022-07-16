@@ -27,10 +27,17 @@ public enum BasicServerStatus {
      * */
     SERVER_ERROR(false, 2000, "Server Error"),
 
+    USERS_EMPTY_USER_ID(false, 2010, "유저 아이디를 확인해주세요."),
+
     /**
      * 3000 : Request 오류
      * */
     REQUEST_ERROR(false, 3000, "Request Error"),
+    POST_TOO_LONG_CONTENTS(false, 3030, "게시물 내용의 길이가 너무 깁니다.(최대 5000자)"),
+    POSTS_EMPTY_POST_ID(false, 3031, "게시물의 아이디를 확인해주세요."),
+
+    POST_EMPTY_IMG_URL(false, 3032, "게시물의 이미지를 넣어주세요."),
+    MODIFY_FAIL_POST(false, 3033, "게시물 수정 실패"),
 
     /**
      * 4000 : Response 오류
