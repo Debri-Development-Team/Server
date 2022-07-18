@@ -55,7 +55,8 @@ public class AuthService {
         {
             int userIdx = user.getUserIdx();
             String jwt = jwtUtility.createToken(userIdx);
-            return new PostLoginRes(userIdx, jwt);
+            String refreshToken = jwtUtility.createRefreshToken();
+            return new PostLoginRes(userIdx, jwt, refreshToken);
         }
         else
         {
