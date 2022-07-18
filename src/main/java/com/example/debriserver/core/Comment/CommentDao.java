@@ -211,6 +211,34 @@ public class CommentDao {
                 );
     }
 
+    public PatchModRes modifyComment(int commentIdx, PatchModReq patchModReq){
+        String modQuery = "UPDATE Comment SET commentContent=? WHERE commentIdx = ?;";
+
+        Object[] modCommentParameter = new Object[] {
+                patchModReq.getModContent(),
+                commentIdx
+        };
+
+        this.jdbcTemplate.update(modQuery, modCommentParameter);
+
+        String getCommentQuery = "SELECT commentIdx, commentContent, class, commentOrder, groupNum\n" +
+                "FROM Comment\n" +
+                "WHERE commentIdx = ?;";
+
+        PatchModRes patchModRes = this.jdbcTemplate.queryForObject(getCommentQuery,
+                (rs, rowNum) -> new PatchModRes
+                        (
+                                true,
+                                rs.getInt("commentIdx"),
+                                rs.getString("commentContent"),
+                                rs.getInt("class"),
+                                rs.getInt("commentOrder"),
+                                rs.getInt("groupNum")
+                        ), commentIdx);
+
+        return patchModRes;
+    }
+
     public boolean checkCommentExist(int postIdx){
         String checkQuery = "SELECT COUNT(*) FROM Comment WHERE postIdx = ?;";
 
@@ -236,5 +264,21 @@ public class CommentDao {
 
         if(result > 0) return true;
         else return false;
+    }
+
+    public boolean isAuthor(int userIdx, int commentIdx){
+        String query = "SELECT userIdx FROM Comment WHERE commentIdx = ?;";
+
+        int result = this.jdbcTemplate.queryForObject(query, int.class, commentIdx);
+
+        return result != userIdx;
+    }
+
+    public boolean isDeleted(int commentIdx){
+        String query = "SELECT status FROM Comment WHERE commentIdx = ?;";
+
+        String result = this.jdbcTemplate.queryForObject(query, String.class, commentIdx);
+
+        return result.equalsIgnoreCase("DELETE");
     }
 }

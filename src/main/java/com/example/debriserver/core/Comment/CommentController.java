@@ -138,4 +138,32 @@ public class CommentController {
             return new BasicResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 댓글/대댓글 수정 API
+     * [PATCH]: localhost:8521/api/comment/mod/{commentIdx}
+     * */
+    @PatchMapping("/mod/{commentIdx}")
+    public BasicResponse<PatchModRes> modifyComment(@PathVariable int commentIdx, @RequestBody PatchModReq patchModReq){
+
+        try{
+            //Jwt 인증이 되었는지
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+            //수정할 댓글의 길이가 5000자를 넘지는 않는지
+            if(patchModReq.getModContent().length() > 5000) throw new BasicException(BasicServerStatus.COMMENT_TOO_LONG_ERROR);
+            //일단 수정 시도하는 사람이 댓글 작성자인지
+            if(commentService.isAuthor(patchModReq.getUserIdx(), commentIdx)) throw new BasicException(BasicServerStatus.MODIFY_IT_IS_NOT_AUTHOR_ERROR);
+            //수정 시도하는 댓글이 삭제되어있지는 않은지
+            if(commentService.isDeleted(commentIdx)) throw  new BasicException(BasicServerStatus.MODIFY_ALREADY_DELETED_COMMENT);
+
+            PatchModRes patchModRes = commentService.modifyComment(commentIdx, patchModReq);
+
+            return new BasicResponse<>(patchModRes);
+
+        }catch(BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 }

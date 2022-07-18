@@ -43,6 +43,8 @@ public enum BasicServerStatus {
     COMMENT_NOT_EXIST_ERROR(false, 3051, "댓글이나 대댓글이 존재하지 않습니다."),
     COMMENT_POST_DELETED_ERROR(false, 3052, "게시물이 삭제되어 댓글 작성이 불가합니다."),
     ROOT_COMMENT_DELETED_ERROR(false, 3053, "댓글이 삭제되어 대댓글 작성이 불가합니다."),
+    MODIFY_IT_IS_NOT_AUTHOR_ERROR(false, 3054, "삭제를 시도한 유저 자신이 작성한 댓글이 아닙니다."),
+    MODIFY_ALREADY_DELETED_COMMENT(false, 3055, "댓글이 삭제되어 수정이 불가합니다."),
 
     // [POST]
     POST_USERS_EMPTY_EMAIL(false, 3020, "이메일을 입력해주세요."),
