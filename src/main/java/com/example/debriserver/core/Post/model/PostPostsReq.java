@@ -15,6 +15,6 @@ public class PostPostsReq {
     private int userIdx;
     private String postContent;
     private String postName;
-    private List<PostImgUrlReq> postImgUrls;
+    //private List<PostImgUrlReq> postImgUrls;
 
 }

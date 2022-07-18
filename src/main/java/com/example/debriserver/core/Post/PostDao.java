@@ -32,7 +32,7 @@ public class PostDao {
 
     }
 
-    public int insertPostsImgs(int postIdx, PostImgUrlReq postImgUrlReq){
+    /*public int insertPostsImgs(int postIdx, PostImgUrlReq postImgUrlReq){
         String insertPostImgsQuery = "INSERT INTO PostImage(postIdx, url) VALUES(?,?)";
         Object []insertPostImgsParams = new Object[]{postIdx, postImgUrlReq.getUrl()};
         this.jdbcTemplate.update(insertPostImgsQuery, insertPostImgsParams);
@@ -40,7 +40,7 @@ public class PostDao {
         String lastInsertIdxQuery = "select last_insert_id()";
         return this.jdbcTemplate.queryForObject(lastInsertIdxQuery, int.class);
 
-    }
+    }*/
 
     public int updatePost(int postIdx, String postContent){
         String updatePostQuery = "UPDATE Post SET postContent=? WHERE postIdx=?";

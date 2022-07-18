@@ -7,12 +7,14 @@ import com.example.debriserver.basicModels.BasicServerStatus;
 import com.example.debriserver.core.Post.model.PatchPostsReq;
 import com.example.debriserver.core.Post.model.PostPostsReq;
 import com.example.debriserver.core.Post.model.PostPostsRes;
+import com.example.debriserver.utility.jwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/post")
 public class PostController {
+    final jwtUtility jwt = new jwtUtility();
 
     @Autowired
     private final PostProvider postProvider;
@@ -28,14 +30,17 @@ public class PostController {
     @PostMapping("/create")
     public BasicResponse<PostPostsRes> createPosts(@RequestBody PostPostsReq postPostsReq) {
         try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             if (postPostsReq.getPostContent().length() > 5000) {
                 return new BasicResponse<>(BasicServerStatus.POST_TOO_LONG_CONTENTS);
             }
 
-            if (postPostsReq.getPostImgUrls().size() < 1) {
+            /*if (postPostsReq.getPostImgUrls().size() < 1) {
                 return new BasicResponse<>(BasicServerStatus.POST_EMPTY_IMG_URL);
-            }
+            }*/
 
             PostPostsRes postPostsRes = postService.createPosts(postPostsReq);
             return new BasicResponse<>(postPostsRes);
@@ -48,6 +53,10 @@ public class PostController {
     @PatchMapping("/{postIdx}")
     public BasicResponse<String> modifyPost(@PathVariable ("postIdx") int postIdx, @RequestBody PatchPostsReq patchPostsReq) {
         try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
             if (patchPostsReq.getPostContent().length() > 5000) {
                 return new BasicResponse<>(BasicServerStatus.POST_TOO_LONG_CONTENTS);
             }
@@ -64,6 +73,9 @@ public class PostController {
     @PatchMapping("/{postIdx}/status")
     public BasicResponse<String> deletePost(@PathVariable ("postIdx") int postIdx) {
         try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             postService.deletePost(postIdx);
             String result = "삭제를 성공했습니다.";

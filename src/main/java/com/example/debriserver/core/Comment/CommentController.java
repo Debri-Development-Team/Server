@@ -4,6 +4,7 @@ import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
 import com.example.debriserver.core.Comment.Model.*;
+import com.example.debriserver.utility.jwtUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.List;
 @RequestMapping("/api/comment")
 public class CommentController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
+    final jwtUtility jwt = new jwtUtility();
 
     @Autowired
     private final CommentService commentService;
@@ -40,6 +42,11 @@ public class CommentController {
     public BasicResponse<PostReplyOnPostRes> createReplyOnPost(@RequestBody PostReplyOnPostReq postReplyOnPostReq){
 
         try{
+
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
             if(commentService.checkPostDeleted(postReplyOnPostReq.getPostIdx())){
                 throw new BasicException(BasicServerStatus.COMMENT_POST_DELETED_ERROR);
             }
@@ -63,6 +70,10 @@ public class CommentController {
     public BasicResponse<PostReplyOnReplyRes> createReplyOnReply(@RequestBody PostReplyOnReplyReq postReplyOnReplyReq){
 
         try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
             if(commentService.checkCommentDeleted(postReplyOnReplyReq.getRootCommentIdx())){
                 throw new BasicException(BasicServerStatus.ROOT_COMMENT_DELETED_ERROR);
             }
@@ -87,6 +98,10 @@ public class CommentController {
     public BasicResponse<List<GetCommentRes>> getComment (@PathVariable int postIdx){
 
         try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
             if(!commentService.checkCommentExist(postIdx)){
                 throw new BasicException(BasicServerStatus.COMMENT_NOT_EXIST_ERROR);
             }
@@ -107,6 +122,10 @@ public class CommentController {
     public BasicResponse<PatchCommentRes> deleteComment (@PathVariable int commentIdx){
 
         try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
             PatchCommentRes patchCommentRes = commentService.deleteComment(commentIdx);
 
             if(!patchCommentRes.getDeleteSuccess()){

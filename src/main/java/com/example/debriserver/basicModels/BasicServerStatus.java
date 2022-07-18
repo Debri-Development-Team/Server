@@ -26,8 +26,6 @@ public enum BasicServerStatus {
      * 2000 : Server 오류
      * */
     SERVER_ERROR(false, 2000, "Server Error"),
-
-    
     PASSWORD_ENCRYPTION_ERROR(false, 2010, "비밀번호 암호화에 실패하였습니다."),
     PASSWORD_DECRYPTION_ERROR(false, 2011, "비밀번호 복호화에 실패하였습니다."),
     USERS_EMPTY_USER_ID(false, 2012, "유저 아이디를 확인해주세요."),
@@ -40,6 +38,7 @@ public enum BasicServerStatus {
     POST_EMPTY_IMG_URL(false, 3032, "게시물의 이미지를 넣어주세요."),
     MODIFY_FAIL_POST(false, 3033, "게시물 수정 실패"),
 
+    //COMMENT
     COMMENT_TOO_LONG_ERROR(false, 3050, "내용의 길이가 너무 깁니다(최대 5000자)"),
     COMMENT_NOT_EXIST_ERROR(false, 3051, "댓글이나 대댓글이 존재하지 않습니다."),
     COMMENT_POST_DELETED_ERROR(false, 3052, "게시물이 삭제되어 댓글 작성이 불가합니다."),
@@ -63,13 +62,13 @@ public enum BasicServerStatus {
      * 5000 : Jwt 오류
      * */
     JWT_NOT_EXIST(false, 5000, "AccessToken 이 없습니다."),
-    EXPIRED_TOKEN(false, 5001, "AccessToken Expired"),
+    EXPIRED_TOKEN(false, 5001, "AccessToken Expired(갱신 필요)"),
     INVALID_JWT(false, 5002, "Invalid Jwt Token"),
     INVALID_SIGNATURE(false, 5003, "Invalid Jwt Signature"),
     UNSUPPORTED_JWT(false, 5004, "Unsupported Jwt"),
     EMPTY_JWT_CLAIMS_STRING(false, 5005, "Jwt Claims String Empty");
 
-    private final boolean isSuccess;//
+    private final boolean isSuccess;
     private final int returnCode;
     private final String returnMsg;
 
