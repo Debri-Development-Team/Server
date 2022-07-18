@@ -16,6 +16,9 @@ import java.util.Date;
 public class jwtUtility {
     private static final int JWT_EXPIRE_TIME = 604800000;
 
+    /**
+     * Jwt Token 생성 메서드
+     * */
     public static String createToken(int userIdx) {
 
         Date now = new Date();
@@ -46,7 +49,7 @@ public class jwtUtility {
 
     public String getJwt(){
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        return request.getHeader("X-ACCESS-TOKEN");
+        return request.getHeader("ACCESS-TOKEN");
     }
 
     /**
@@ -73,6 +76,7 @@ public class jwtUtility {
             return false;
         }
     }
+
     /**
      * userIdx 추출
      * @return int

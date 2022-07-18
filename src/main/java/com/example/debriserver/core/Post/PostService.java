@@ -29,9 +29,9 @@ public class PostService {
 
             int postIdx = postDao.insertPosts(postPostsReq);
 
-            for (int i = 0; i < postPostsReq.getPostImgUrls().size(); i++) {
+           /* for (int i = 0; i < postPostsReq.getPostImgUrls().size(); i++) {
                 postDao.insertPostsImgs(postIdx, postPostsReq.getPostImgUrls().get(i));
-            }
+            }*/
 
             return new PostPostsRes(postIdx);
         }
