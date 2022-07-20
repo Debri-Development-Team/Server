@@ -26,14 +26,14 @@ public class AuthController {
     private final AuthService authService;
 
     @Autowired
-    private final jwtUtility jwtUtility;
+    private final jwtUtility JwtUtility;
 
 
-    public AuthController(AuthProvider authProvider, AuthService authService, jwtUtility jwtUtility)
+    public AuthController(AuthProvider authProvider, AuthService authService, jwtUtility JwtUtility)
     {
         this.authProvider = authProvider;
         this.authService = authService;
-        this.jwtUtility = jwtUtility;
+        this.JwtUtility = JwtUtility;
     }
 
     @ResponseBody
