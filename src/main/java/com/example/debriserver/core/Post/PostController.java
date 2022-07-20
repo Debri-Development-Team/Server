@@ -4,9 +4,7 @@ package com.example.debriserver.core.Post;
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
-import com.example.debriserver.core.Post.model.PatchPostsReq;
-import com.example.debriserver.core.Post.model.PostPostsReq;
-import com.example.debriserver.core.Post.model.PostPostsRes;
+import com.example.debriserver.core.Post.model.*;
 import com.example.debriserver.utility.jwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -80,6 +78,34 @@ public class PostController {
             postService.deletePost(postIdx);
             String result = "삭제를 성공했습니다.";
             return new BasicResponse<>(result);
+        } catch(BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/like")
+    public BasicResponse<String> createPostLike(@RequestBody PostPostLikeReq postPostLikeReq) {
+        try {
+
+            postService.createPostLike(postPostLikeReq.getUserIdx(), postPostLikeReq.getPostIdx(), postPostLikeReq);
+            String result = "좋아요 또는 싫어요가 생성되었습니다.";
+            return new BasicResponse<>(result);
+
+        } catch(BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @PatchMapping("/like/cancel")
+    public BasicResponse<String> cancelPostLike(@RequestBody PatchPostLikeReq patchPostLikeReq) {
+        try {
+
+            postService.cancelPostLike(patchPostLikeReq.getUserIdx(), patchPostLikeReq.getPostIdx());
+            String result = "좋아요 또는 싫어요가 취소되었습니다.";
+            return new BasicResponse<>(result);
+
         } catch(BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
         }

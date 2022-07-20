@@ -1,6 +1,7 @@
 package com.example.debriserver.core.Post;
 
 import com.example.debriserver.core.Post.model.PostImgUrlReq;
+import com.example.debriserver.core.Post.model.PostPostLikeReq;
 import com.example.debriserver.core.Post.model.PostPostsReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -68,8 +69,24 @@ public class PostDao {
 
     public int deletePost(int postIdx){
         String deletePostQuery = "UPDATE Post SET status='DELETE' WHERE postIdx=?";
-        Object [] deletePostParams = new Object[]{postIdx};
+        int deletePostParams = postIdx;
         return this.jdbcTemplate.update(deletePostQuery,
                 deletePostParams);
+    }
+
+    public int insertPostLike(PostPostLikeReq postPostLikeReq) {
+        String insertPostLikeQuery = "INSERT INTO PostLike(postIdx, userIdx, likeStatus) VALUES(?,?,?)";
+        Object []insertPostLikeParams = new Object[]{
+                postPostLikeReq.getPostIdx(),
+                postPostLikeReq.getUserIdx(),
+                postPostLikeReq.getLikeStatus()
+        };
+        return this.jdbcTemplate.update(insertPostLikeQuery, insertPostLikeParams);
+    }
+
+    public int deletePostLike(int postIdx) {
+        String insertPostLikeQuery = "UPDATE PostLike SET likeStatus='NULL' WHERE postIdx=?";
+        int insertPostLikeParams = postIdx;
+        return this.jdbcTemplate.update(insertPostLikeQuery, insertPostLikeParams);
     }
 }
