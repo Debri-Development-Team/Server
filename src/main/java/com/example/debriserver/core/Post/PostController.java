@@ -9,6 +9,9 @@ import com.example.debriserver.utility.jwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.Basic;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/post")
 public class PostController {
@@ -118,4 +121,48 @@ public class PostController {
         }
     }
 
+    /**
+     * 특정 게시판의 게시글 리스트를 조회하는 api
+     * [GET] localhost/api/post/getList/{boardIdx}
+     * */
+    @GetMapping("/getList/{boardIdx}")
+    public BasicResponse<List<GetPostListRes>> getPostList(@PathVariable int boardIdx){
+
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            if(!postProvider.checkBoardExist(boardIdx)) return new BasicResponse<>(BasicServerStatus.BOARD_NOT_EXIST);
+
+            List<GetPostListRes> getPostListRes = postProvider.getPostList(boardIdx);
+
+            return  new BasicResponse<>(getPostListRes);
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 특정 게시물의 내용을 조회하는 api
+     * [GET] localhost/api/post/get/{postIdx}
+     * */
+    @GetMapping("/get/{postIdx}")
+    public BasicResponse<GetPostRes> getPost(@PathVariable int postIdx){
+
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            if(postProvider.checkPostExist(postIdx) == 0) return new BasicResponse<>(BasicServerStatus.POSTS_EMPTY_POST_ID);
+
+            GetPostRes getPostRes = postProvider.getPost(postIdx);
+
+            return new BasicResponse<>(getPostRes);
+
+        }catch(BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 }

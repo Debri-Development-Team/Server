@@ -51,6 +51,9 @@ public enum BasicServerStatus {
     POST_USERS_EMPTY_PASSWORD(false, 3021, "비밀번호를 입력해주세요."),
     POST_USERS_INVALID_EMAIL(false, 3022, "이메일 형식을 확인해주세요."),
 
+    // [BOARD]
+    BOARD_NOT_EXIST(false, 3060, "게시판이 존재하지 않습니다."),
+
     /**
      * 4000 : Response 오류
      * */
