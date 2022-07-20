@@ -85,4 +85,52 @@ public class PostController {
         }
     }
 
+    /**
+     * Post 스크랩 설정 메서드
+     * */
+    @ResponseBody
+    @PostMapping("/scrap/{postIdx}")
+    public BasicResponse<String> scrapPost(@PathVariable ("postIdx") int postIdx)
+    {
+        try{
+            String jwtToken = jwt.getJwt();
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx();
+
+            String result = "스크랩이 설정되었습니다.";
+            postService.scrapPost(postIdx, userIdx);
+
+            return new BasicResponse<>(result);
+
+        }catch(BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * Post 스크랩 해제 메서드
+     * */
+    @ResponseBody
+    @PostMapping("/unscrap/{postIdx}")
+    public BasicResponse<String> unScrapPost(@PathVariable ("postIdx") int postIdx)
+    {
+        try{
+            String jwtToken = jwt.getJwt();
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx();
+
+            String result = "스크랩이 해제되었습니다.";
+            postService.unScrapPost(postIdx, userIdx);
+
+            return new BasicResponse<>(result);
+
+        }catch(BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+
+
 }

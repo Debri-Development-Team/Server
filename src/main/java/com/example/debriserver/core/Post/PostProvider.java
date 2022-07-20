@@ -32,4 +32,13 @@ public class PostProvider {
         }
     }
 
+    public int checkPostMarkedExist(int postIdx, int userIdx) throws BasicException
+    {
+        try{
+            return postDao.checkPostMarkedExist(postIdx, userIdx);
+        }catch (Exception exception) {
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
 }

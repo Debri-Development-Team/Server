@@ -89,4 +89,72 @@ public class PostService {
             throw new BasicException(DB_ERROR);
         }
     }
+
+    /**
+     * 게시물 스크랩 설정
+     * 게시물을 처음으로 스크랩 하는 경우 : insertPostMarked 함수 실행
+     * 스크랩 해제했다가 다시 스크랩 하는 경우 : scrapPost 함수 실행
+     */
+    public void scrapPost(int postIdx, int userIdx) throws BasicException
+    {
+        // postIdx가 Post table에 존재하는지 확인
+        if(postProvider.checkPostExist(postIdx) == 0)
+        {
+            throw new BasicException(POSTS_EMPTY_POST_ID);
+        }
+
+        // userIdx가 User table에 존재하는지 확인
+        if(postProvider.checkUserExist(userIdx) == 0)
+        {
+            throw new BasicException(USERS_EMPTY_USER_ID);
+        }
+
+        // 데이터가 PostMarked table에 존재하지 않는 경우
+        if(postProvider.checkPostMarkedExist(postIdx, userIdx) == 0)
+        {
+            // PostMarked에 데이터를 추가하는 함수
+            int result = postDao.insertPostMarked(postIdx, userIdx);
+        }
+        // 데이터가 PostMarked table에 이미 존재하는 경우
+        else
+        {
+            // status를 ACTIVE로 바꾸는 함수
+            int result = postDao.scrapPost(postIdx, userIdx);
+        }
+    }
+
+    /**
+     * 게시물 스크랩 해제
+     * 활성화 된 스크랩 클릭 : unScrapPost 함수 실행
+     */
+    public void unScrapPost(int postIdx, int userIdx) throws BasicException
+    {
+        // postIdx가 Post table에 존재하는지 확인
+        if(postProvider.checkPostExist(postIdx) == 0)
+        {
+            throw new BasicException(POSTS_EMPTY_POST_ID);
+        }
+
+        // userIdx가 User table에 존재하는지 확인
+        if(postProvider.checkUserExist(userIdx) == 0)
+        {
+            throw new BasicException(USERS_EMPTY_USER_ID);
+        }
+
+        // 데이터가 PostMarked table에 존재하지 않는 경우
+        if(postProvider.checkPostMarkedExist(postIdx, userIdx) == 0)
+        {
+            // PostMarked에 데이터를 추가 -> status를 INACTIVE로 변경
+            int result = postDao.insertPostMarked(postIdx, userIdx);
+            int result2 = postDao.unScrapPost(postIdx, userIdx);
+        }
+        // 데이터가 PostMarked table에 이미 존재하는 경우
+        else
+        {
+            // status를 INACTIVE로 바꾸는 함수
+            int result = postDao.unScrapPost(postIdx, userIdx);
+        }
+    }
+
+
 }
