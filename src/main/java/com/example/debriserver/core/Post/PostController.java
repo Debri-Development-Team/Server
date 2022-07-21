@@ -9,7 +9,6 @@ import com.example.debriserver.utility.jwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.Basic;
 import java.util.List;
 
 @RestController
@@ -144,6 +143,28 @@ public class PostController {
     }
 
     /**
+     * 전체 게시판에서 게시글 리스트를 조회하는 api
+     * [GET] localhost/api/post/getSearchList
+     * */
+    @ResponseBody
+    @GetMapping("/getSearchList")
+    public BasicResponse<List<GetPostSearchListRes>> getPostSearchList(@RequestBody GetPostSearchListReq getPostSearchListReq){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            String keyword = getPostSearchListReq.getKeyword();
+            List<GetPostSearchListRes> getPostSearchListRes = postProvider.getPostSearchList(keyword);
+
+            return  new BasicResponse<>(getPostSearchListRes);
+
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
      * 특정 게시물의 내용을 조회하는 api
      * [GET] localhost/api/post/get/{postIdx}
      * */
@@ -165,4 +186,5 @@ public class PostController {
             return new BasicResponse<>((exception.getStatus()));
         }
     }
+
 }

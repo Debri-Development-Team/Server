@@ -125,6 +125,33 @@ public class PostDao {
                 boardIdx);
     }
 
+    public List<GetPostSearchListRes> getPostSearchList(String keyword){
+        String getPostSearchListQuery = "SELECT distinct p.boardIdx, p.postIdx, u.nickname, p.postName\n" +
+                                        "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
+                                        "WHERE p.status = 'ACTIVE' AND p.postName like '%" +
+                                        keyword +
+                                        "%'";
+
+        String getLikeCountQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
+
+        String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
+
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";
+
+        return this.jdbcTemplate.query(getPostSearchListQuery,
+                (rs, rowNum) -> new GetPostSearchListRes
+                        (
+                                rs.getInt("boardIdx"),
+                                rs.getInt("postIdx"),
+                                rs.getString("nickName"),
+                                rs.getString("postName"),
+                                this.jdbcTemplate.queryForObject(getLikeCountQuery, int.class, rs.getInt("postIdx")),
+                                this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
+                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx"))
+                        )
+        );
+    }
+
     public GetPostRes getPost(int postIdx){
         String getPostQuery = "SELECT distinct p.boardIdx, p.postIdx, p.postName, u.nickname, p.postContent\n" +
                 "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx WHERE postIdx = ?;";
