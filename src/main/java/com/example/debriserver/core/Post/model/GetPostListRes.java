@@ -17,4 +17,5 @@ public class GetPostListRes {
     private String postName;
     private int likeNumber;
     private int timeAfterCreated;
+    private int commentNumber;
 }

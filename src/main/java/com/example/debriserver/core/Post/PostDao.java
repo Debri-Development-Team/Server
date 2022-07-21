@@ -109,6 +109,8 @@ public class PostDao {
 
         String getLikeCountQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
 
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";
+
         return this.jdbcTemplate.query(getListQuery,
                 (rs, rowNum) -> new GetPostListRes
                         (
@@ -117,7 +119,8 @@ public class PostDao {
                                 rs.getString("nickName"),
                                 rs.getString("postName"),
                                 this.jdbcTemplate.queryForObject(getLikeCountQuery, int.class, rs.getInt("postIdx")),
-                                this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx"))
+                                this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
+                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx"))
                         ),
                 boardIdx);
     }
