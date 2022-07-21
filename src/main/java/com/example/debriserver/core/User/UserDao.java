@@ -20,17 +20,8 @@ public class UserDao {
     public PostSignUpRes createSignUp(PostSignUpReq postSignUpReq) {
         //먼저 유저 이메일, 비밀번호, 닉네임,  생일, 프로필이미지URI를 저장
         String insertQuery = "INSERT\n" +
-                "INTO User(userId, password, nickname, birthday,jwtRefreshToken)\n" +
-                "VALUES (?, ?, ?, ?, 'a');";
-
-     /*   //방금 삽입한 인덱스를 가져온다
-        String preInsertedIdxQuery= "SELECT MAX(userIdx) FROM User;";
-
-        //회원가입 정보를 가져온다
-        String getInsertedUserQuery =
-                "SELECT userId, password, nickname, birthday, profileImgURl\n" +
-                        "FROM User\n" +
-                        "WHERE userIdx = ?;";*/
+                "INTO User(userId, password, nickname, birthday, jwtRefreshToken)\n" +
+                "VALUES (?, ?, ?, ?, 'Init');";
 
         Object[] insertUserParameters = new Object[]
                 {
@@ -38,12 +29,10 @@ public class UserDao {
                         postSignUpReq.getPassword(),
                         postSignUpReq.getNickname(),
                         postSignUpReq.getBirthday(),
-//                        postSignUpReq.getProfileImgUrl(),
-
                 };
         this.jdbcTemplate.update(insertQuery, insertUserParameters);
 
-        String getUserQuery = "select userIdx, userId, nickname  from User where userId = ?";
+        String getUserQuery = "select userIdx, userId, nickname from User where userId = ?";
         String getUserParams = postSignUpReq.getUserId();
 
 
@@ -53,7 +42,6 @@ public class UserDao {
                         rs.getInt("userIdx"),
                         rs.getString("userId"),
                         rs.getString("nickname")
-
                 ), getUserParams);
 
     }
@@ -63,7 +51,7 @@ public class UserDao {
 
         int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, userId);
 
-        if (result == 0) return false;
+        if(result == 0) return false;
         else return true;
     }
 

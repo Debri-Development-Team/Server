@@ -1,2 +1,3 @@
-package com.example.debriserver.utility;public class SHA256 {
+package com.example.debriserver.utility;
+public class SHA256 {
 }
