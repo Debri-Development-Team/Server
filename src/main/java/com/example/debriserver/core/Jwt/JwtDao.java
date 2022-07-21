@@ -26,7 +26,7 @@ public class JwtDao {
         String refreshToken = refreshJwtRes.getRefreshToken();
         Object[] refreshParameters = new Object[]{
                 refreshToken,
-                refreshJwtRes.getUserIdx();
+                refreshJwtRes.getUserIdx()
         };
 
         String updateRefreshTokenQuery = "UPDATE User SET jwtRefreshToken = ? WHERE userIdx = ?;";
