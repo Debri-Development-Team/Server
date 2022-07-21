@@ -65,6 +65,15 @@ public class CommentService {
         }
     }
 
+    public PatchModRes modifyComment(int commentIdx, PatchModReq patchModReq) throws BasicException{
+        try{
+            PatchModRes patchModRes = commentDao.modifyComment(commentIdx, patchModReq);
+
+            return patchModRes;
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
     public boolean checkCommentExist(int postIdx) throws BasicException{
         try{
             return commentDao.checkCommentExist(postIdx);
@@ -85,6 +94,23 @@ public class CommentService {
         try{
             return commentDao.checkCommentDeleted(commentIdx);
         }catch (Exception exception) {
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean isAuthor(int userIdx, int commentIdx) throws BasicException{
+
+        try{
+            return commentDao.isAuthor(userIdx, commentIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean isDeleted(int commentIdx) throws BasicException{
+        try{
+            return commentDao.isDeleted(commentIdx);
+        }catch (Exception exception){
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }

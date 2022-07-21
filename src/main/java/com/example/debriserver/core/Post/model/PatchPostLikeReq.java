@@ -4,17 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
-public class PostPostsReq {
+public class PatchPostLikeReq {
 
-    private int boardIdx;
+    private int postIdx;
     private int userIdx;
-    private String postContent;
-    private String postName;
-    //private List<PostImgUrlReq> postImgUrls;
-
 }

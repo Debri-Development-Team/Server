@@ -1,9 +1,7 @@
 package com.example.debriserver.core.Post;
 
 import com.example.debriserver.basicModels.BasicException;
-import com.example.debriserver.core.Post.model.PatchPostsReq;
-import com.example.debriserver.core.Post.model.PostPostsReq;
-import com.example.debriserver.core.Post.model.PostPostsRes;
+import com.example.debriserver.core.Post.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,15 +21,18 @@ public class PostService {
         this.postProvider = postProvider;
     }
 
+    /**
+     * 게시물 생성
+     */
     public PostPostsRes createPosts(PostPostsReq postPostsReq) throws BasicException {
 
         try{
 
             int postIdx = postDao.insertPosts(postPostsReq);
 
-            for (int i = 0; i < postPostsReq.getPostImgUrls().size(); i++) {
+           /* for (int i = 0; i < postPostsReq.getPostImgUrls().size(); i++) {
                 postDao.insertPostsImgs(postIdx, postPostsReq.getPostImgUrls().get(i));
-            }
+            }*/
 
             return new PostPostsRes(postIdx);
         }
@@ -41,6 +42,9 @@ public class PostService {
         }
     }
 
+    /**
+     * 게시물 수정
+     */
     public void modifyPost(int userIdx, int postIdx, PatchPostsReq patchPostsReq) throws BasicException {
         if (postProvider.checkUserExist(userIdx) == 0) {
             throw new BasicException(USERS_EMPTY_USER_ID);
@@ -62,9 +66,16 @@ public class PostService {
         }
     }
 
+    /**
+     * 게시물 삭제
+     */
     public void deletePost(int postIdx) throws BasicException {
 
         try{
+
+            if (postProvider.checkPostExist(postIdx) == 0) {
+                throw new BasicException(POSTS_EMPTY_POST_ID);
+            }
 
             int result = postDao.deletePost(postIdx);
             if (result == 0) {
@@ -72,7 +83,43 @@ public class PostService {
             }
         }
         catch (Exception exception) {
-            System.out.println(exception);
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
+    public void createPostLike(int userIdx, int postIdx, PostPostLikeReq postPostLikeReq) throws BasicException {
+
+        if (postProvider.checkUserExist(userIdx) == 0) {
+            throw new BasicException(USERS_EMPTY_USER_ID);
+        }
+
+        if (postProvider.checkPostExist(postIdx) == 0) {
+            throw new BasicException(POSTS_EMPTY_POST_ID);
+        }
+
+        try {
+            postDao.insertPostLike(postPostLikeReq);
+        } catch (Exception e) {
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
+    public void cancelPostLike(int userIdx, int postIdx) throws BasicException {
+
+        if (postProvider.checkUserExist(userIdx) == 0) {
+            throw new BasicException(USERS_EMPTY_USER_ID);
+        }
+
+        if (postProvider.checkPostExist(postIdx) == 0) {
+            throw new BasicException(POSTS_EMPTY_POST_ID);
+        }
+
+        try {
+            int result = postDao.deletePostLike(postIdx);
+            if (result == 0) {
+                throw new BasicException(DB_ERROR);
+            }
+        } catch (Exception e) {
             throw new BasicException(DB_ERROR);
         }
     }
