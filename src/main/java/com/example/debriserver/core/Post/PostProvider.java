@@ -38,11 +38,14 @@ public class PostProvider {
         }
     }
 
-    public int checkPostMarkedExist(int postIdx, int userIdx) throws BasicException
-    {
-        try{
+    public int checkPostMarkedExist(int postIdx, int userIdx) throws BasicException {
+        try {
             return postDao.checkPostMarkedExist(postIdx, userIdx);
-        }catch (Exception exception) {
+        } catch (Exception exception) {
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
     public boolean checkBoardExist(int boardIdx) throws BasicException{
         try{
             return postDao.checkBoardExist(boardIdx);
