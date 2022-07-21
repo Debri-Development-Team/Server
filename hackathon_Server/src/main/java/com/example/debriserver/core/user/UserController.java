@@ -1,12 +1,12 @@
-package com.example.debriserver.core.user;
+package com.example.debriserver.core.User;
 
 
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
-import com.example.debriserver.core.user.model.PostLoginReq;
-import com.example.debriserver.core.user.model.PostLoginRes;
-import com.example.debriserver.core.user.model.PostUserReq;
-import com.example.debriserver.core.user.model.PostUserRes;
+import com.example.debriserver.core.User.Model.PostLoginReq;
+import com.example.debriserver.core.User.Model.PostLoginRes;
+import com.example.debriserver.core.User.Model.PostUserReq;
+import com.example.debriserver.core.User.Model.PostUserRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
