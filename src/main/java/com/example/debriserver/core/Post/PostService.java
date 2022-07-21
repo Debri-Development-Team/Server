@@ -1,11 +1,14 @@
 package com.example.debriserver.core.Post;
 
 import com.example.debriserver.basicModels.BasicException;
+import com.example.debriserver.core.Post.model.GetScrapRes;
 import com.example.debriserver.core.Post.model.PatchPostsReq;
 import com.example.debriserver.core.Post.model.PostPostsReq;
 import com.example.debriserver.core.Post.model.PostPostsRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static com.example.debriserver.basicModels.BasicServerStatus.*;
 
@@ -156,5 +159,17 @@ public class PostService {
         }
     }
 
+
+    public List<GetScrapRes> getScrapPosts(int userIdx) throws BasicException
+    {
+        // userIdx가 User table에 존재하는지 확인
+        if(postProvider.checkUserExist(userIdx) == 0)
+        {
+            throw new BasicException(USERS_EMPTY_USER_ID);
+        }
+
+        List<GetScrapRes> getPosts = postDao.getScrapPosts(userIdx);
+        return getPosts;
+    }
 
 }

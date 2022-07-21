@@ -1,11 +1,13 @@
 package com.example.debriserver.core.Post;
 
+import com.example.debriserver.core.Post.model.GetScrapRes;
 import com.example.debriserver.core.Post.model.PostPostsReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 @Repository
 public class PostDao {
@@ -126,6 +128,28 @@ public class PostDao {
         };
         return this.jdbcTemplate.update(unScrapPostQuery,
                 unScrapPostParams);
+    }
+
+    /**
+     * 유저가 스크랩한 글
+     **/
+    public List<GetScrapRes> getScrapPosts(int userIdx)
+    {
+        String getScrapPostsQuery = "select PM.postIdx, P.boardIdx, PM.userIdx, P.postContent, P.postName, P.createdAt, P.updatedAt\n" +
+                "FROM Post as P\n" +
+                "left join(select postIdx, userIdx, status from PostMarked) PM on P.postIdx = PM.postIdx\n" +
+                "where PM.userIdx = ? and P.status = 'ACTIVE'";
+        int getScrapPostsParams = userIdx;
+        return this.jdbcTemplate.query(getScrapPostsQuery,
+                (rs, rowNum) -> new GetScrapRes(
+                        rs.getInt("postIdx"),
+                        rs.getInt("boardIdx"),
+                        rs.getInt("userIdx"),
+                        rs.getString("postContent"),
+                        rs.getString("postName"),
+                        rs.getString("createdAt"),
+                        rs.getString("updatedAt")
+                ), getScrapPostsParams);
     }
 
 }

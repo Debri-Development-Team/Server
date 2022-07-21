@@ -1,8 +1,11 @@
 package com.example.debriserver.core.Post;
 
 import com.example.debriserver.basicModels.BasicException;
+import com.example.debriserver.core.Post.model.GetScrapRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static com.example.debriserver.basicModels.BasicServerStatus.DB_ERROR;
 
@@ -40,5 +43,7 @@ public class PostProvider {
             throw new BasicException(DB_ERROR);
         }
     }
+
+
 
 }

@@ -4,12 +4,15 @@ package com.example.debriserver.core.Post;
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
+import com.example.debriserver.core.Post.model.GetScrapRes;
 import com.example.debriserver.core.Post.model.PatchPostsReq;
 import com.example.debriserver.core.Post.model.PostPostsReq;
 import com.example.debriserver.core.Post.model.PostPostsRes;
 import com.example.debriserver.utility.jwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/post")
@@ -131,6 +134,25 @@ public class PostController {
         }
     }
 
+    /**
+     * 유저가 스크랩한 Posts
+     * */
+    @ResponseBody
+    @GetMapping("/getMyScrap")
+    public BasicResponse<List<GetScrapRes>> getScrapPosts()
+    {
+        try{
+            String jwtToken = jwt.getJwt();
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
+            int userIdx = jwt.getUserIdx();
+
+            List<GetScrapRes> getPosts = postService.getScrapPosts(userIdx);
+            return new BasicResponse<>(getPosts);
+
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
 }
