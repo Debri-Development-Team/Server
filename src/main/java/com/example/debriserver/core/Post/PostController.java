@@ -97,11 +97,10 @@ public class PostController {
      * */
     @ResponseBody
     @PostMapping("/scrap/{postIdx}")
-    public BasicResponse<String> scrapPost(@PathVariable ("postIdx") int postIdx)
-    {
-        try{
+    public BasicResponse<String> scrapPost(@PathVariable ("postIdx") int postIdx) {
+        try {
             String jwtToken = jwt.getJwt();
-            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             int userIdx = jwt.getUserIdx();
 
@@ -110,125 +109,132 @@ public class PostController {
 
             return new BasicResponse<>(result);
 
-        }catch(BasicException exception){
-
-    @ResponseBody
-    @PostMapping("/like")
-    public BasicResponse<String> createPostLike(@RequestBody PostPostLikeReq postPostLikeReq) {
-        try {
-
-            String jwtToken = jwt.getJwt();
-
-            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
-
-            postService.createPostLike(postPostLikeReq.getUserIdx(), postPostLikeReq.getPostIdx(), postPostLikeReq);
-            String result = "좋아요 또는 싫어요가 생성되었습니다.";
-            return new BasicResponse<>(result);
-
-        } catch(BasicException exception){
+        } catch (BasicException exception) {
             return new BasicResponse<>((exception.getStatus()));
         }
     }
 
-    @ResponseBody
-    @PatchMapping("/like/cancel")
-    public BasicResponse<String> cancelPostLike(@RequestBody PatchPostLikeReq patchPostLikeReq) {
-        try {
-            String jwtToken = jwt.getJwt();
+            @ResponseBody
+            @PostMapping("/like")
+            public BasicResponse<String> createPostLike (@RequestBody PostPostLikeReq postPostLikeReq){
+                try {
 
-            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
-            
-            postService.cancelPostLike(patchPostLikeReq.getUserIdx(), patchPostLikeReq.getPostIdx());
-            String result = "좋아요 또는 싫어요가 취소되었습니다.";
-            return new BasicResponse<>(result);
+                    String jwtToken = jwt.getJwt();
 
-        } catch(BasicException exception){
+                    if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            return new BasicResponse<>((exception.getStatus()));
-        }
-    }
+                    postService.createPostLike(postPostLikeReq.getUserIdx(), postPostLikeReq.getPostIdx(), postPostLikeReq);
+                    String result = "좋아요 또는 싫어요가 생성되었습니다.";
+                    return new BasicResponse<>(result);
 
-    /**
-     * Post 스크랩 해제 메서드
-     * */
-    @ResponseBody
-    @PostMapping("/unscrap/{postIdx}")
-    public BasicResponse<String> unScrapPost(@PathVariable ("postIdx") int postIdx)
-    {
-        try{
-            String jwtToken = jwt.getJwt();
-            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+                } catch (BasicException exception) {
+                    return new BasicResponse<>((exception.getStatus()));
+                }
+            }
 
-            int userIdx = jwt.getUserIdx();
+            @ResponseBody
+            @PatchMapping("/like/cancel")
+            public BasicResponse<String> cancelPostLike(@RequestBody PatchPostLikeReq patchPostLikeReq){
+                try {
+                    String jwtToken = jwt.getJwt();
 
-            String result = "스크랩이 해제되었습니다.";
-            postService.unScrapPost(postIdx, userIdx);
+                    if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            return new BasicResponse<>(result);
+                    postService.cancelPostLike(patchPostLikeReq.getUserIdx(), patchPostLikeReq.getPostIdx());
+                    String result = "좋아요 또는 싫어요가 취소되었습니다.";
+                    return new BasicResponse<>(result);
 
-        }catch(BasicException exception){
+                } catch (BasicException exception) {
+                    return new BasicResponse<>((exception.getStatus()));
+                }
+            }
 
-     * 특정 게시판의 게시글 리스트를 조회하는 api
-     * [GET] localhost/api/post/getList/{boardIdx}
-     * */
-    @GetMapping("/getList/{boardIdx}")
-    public BasicResponse<List<GetPostListRes>> getPostList(@PathVariable int boardIdx){
+            /**
+             * Post 스크랩 해제 메서드
+             * */
+            @ResponseBody
+            @PostMapping("/unscrap/{postIdx}")
+            public BasicResponse<String> unScrapPost(@PathVariable("postIdx") int postIdx) {
+                try {
+                    String jwtToken = jwt.getJwt();
+                    if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-        try{
-            String jwtToken = jwt.getJwt();
+                    int userIdx = jwt.getUserIdx();
 
-            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+                    String result = "스크랩이 해제되었습니다.";
+                    postService.unScrapPost(postIdx, userIdx);
 
-            if(!postProvider.checkBoardExist(boardIdx)) return new BasicResponse<>(BasicServerStatus.BOARD_NOT_EXIST);
+                    return new BasicResponse<>(result);
 
-            List<GetPostListRes> getPostListRes = postProvider.getPostList(boardIdx);
+                } catch (BasicException exception) {
+                    return new BasicResponse<>((exception.getStatus()));
+                }
+            }
 
-            return  new BasicResponse<>(getPostListRes);
-        }catch (BasicException exception){
-            return new BasicResponse<>((exception.getStatus()));
-        }
-    }
+     /*특정 게시판의 게시글 리스트를 조회하는 api
+      * [GET]localhost / api / post / getList / {boardIdx}
+      * */
+     @GetMapping("/getList/{boardIdx}")
+     public BasicResponse<List<GetPostListRes>> getPostList ( @PathVariable int boardIdx){
 
-    /**
-     * 유저가 스크랩한 Posts
-     * */
-    @ResponseBody
-    @GetMapping("/getMyScrap")
-    public BasicResponse<List<GetScrapRes>> getScrapPosts()
-    {
-        try{
-            String jwtToken = jwt.getJwt();
-            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+         try {
+             String jwtToken = jwt.getJwt();
 
-            int userIdx = jwt.getUserIdx();
+             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            List<GetScrapRes> getPosts = postService.getScrapPosts(userIdx);
-            return new BasicResponse<>(getPosts);
+             if (!postProvider.checkBoardExist(boardIdx))
+                 return new BasicResponse<>(BasicServerStatus.BOARD_NOT_EXIST);
 
-        }catch (BasicException exception){
-            return new BasicResponse<>((exception.getStatus()));
-        }
-    }
+             List<GetPostListRes> getPostListRes = postProvider.getPostList(boardIdx);
 
-     * 특정 게시물의 내용을 조회하는 api
-     * [GET] localhost/api/post/get/{postIdx}
-     * */
-    @GetMapping("/get/{postIdx}")
-    public BasicResponse<GetPostRes> getPost(@PathVariable int postIdx){
+             return new BasicResponse<>(getPostListRes);
+         } catch (BasicException exception) {
+             return new BasicResponse<>((exception.getStatus()));
+         }
+     }
 
-        try{
-            String jwtToken = jwt.getJwt();
+     /**
+      * 유저가 스크랩한 Posts
+      * */
+     @ResponseBody
+     @GetMapping("/getMyScrap")
+     public BasicResponse<List<GetScrapRes>> getScrapPosts ()
+     {
+         try {
+             String jwtToken = jwt.getJwt();
+             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+             int userIdx = jwt.getUserIdx();
 
-            if(postProvider.checkPostExist(postIdx) == 0) return new BasicResponse<>(BasicServerStatus.POSTS_EMPTY_POST_ID);
+             List<GetScrapRes> getPosts = postService.getScrapPosts(userIdx);
+             return new BasicResponse<>(getPosts);
 
-            GetPostRes getPostRes = postProvider.getPost(postIdx);
+         } catch (BasicException exception) {
+             return new BasicResponse<>((exception.getStatus()));
+         }
+     }
 
-            return new BasicResponse<>(getPostRes);
+     /*특정 게시물의 내용을 조회하는 api
+      * [GET]localhost / api / post / get / {postIdx}
+      * */
+     @GetMapping("/get/{postIdx}")
+     public BasicResponse<GetPostRes> getPost ( @PathVariable int postIdx){
 
-        }catch(BasicException exception){
-            return new BasicResponse<>((exception.getStatus()));
-        }
-    }
+         try {
+             String jwtToken = jwt.getJwt();
+
+             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+             if (postProvider.checkPostExist(postIdx) == 0)
+                 return new BasicResponse<>(BasicServerStatus.POSTS_EMPTY_POST_ID);
+
+             GetPostRes getPostRes = postProvider.getPost(postIdx);
+
+             return new BasicResponse<>(getPostRes);
+
+         } catch (BasicException exception) {
+             return new BasicResponse<>((exception.getStatus()));
+         }
+     }
 }
+
