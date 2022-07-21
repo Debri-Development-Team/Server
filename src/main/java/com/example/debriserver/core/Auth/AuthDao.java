@@ -23,6 +23,7 @@ public class AuthDao {
         String getUserQuery = "select userIdx, userId, password, nickname, birthday from User where userId = ?";
         String getUserParams = postLoginReq.getEmail();
 
+
         return this.jdbcTemplate.queryForObject(getUserQuery,
                 (rs, rowNum) -> new User(
                         rs.getInt("userIdx"),
@@ -31,6 +32,17 @@ public class AuthDao {
                         rs.getString("nickname"),
                         rs.getString("birthday")
                 ), getUserParams);
+
+
     }
 
+    public void insertRefresh(String Refresh,String userId){
+        String insertRefreshQuery = "UPDATE User SET jwtRefreshToken = ? WHERE userId =?;";
+        Object[] insertRefreshParameters = new Object[] {
+                Refresh,
+                userId
+        };
+
+        this.jdbcTemplate.update(insertRefreshQuery, insertRefreshParameters);
+    }
 }
