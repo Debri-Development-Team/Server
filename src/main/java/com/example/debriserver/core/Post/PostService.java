@@ -5,6 +5,7 @@ import com.example.debriserver.core.Post.model.GetScrapRes;
 import com.example.debriserver.core.Post.model.PatchPostsReq;
 import com.example.debriserver.core.Post.model.PostPostsReq;
 import com.example.debriserver.core.Post.model.PostPostsRes;
+import com.example.debriserver.core.Post.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -88,7 +89,43 @@ public class PostService {
             }
         }
         catch (Exception exception) {
-            System.out.println(exception);
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
+    public void createPostLike(int userIdx, int postIdx, PostPostLikeReq postPostLikeReq) throws BasicException {
+
+        if (postProvider.checkUserExist(userIdx) == 0) {
+            throw new BasicException(USERS_EMPTY_USER_ID);
+        }
+
+        if (postProvider.checkPostExist(postIdx) == 0) {
+            throw new BasicException(POSTS_EMPTY_POST_ID);
+        }
+
+        try {
+            postDao.insertPostLike(postPostLikeReq);
+        } catch (Exception e) {
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
+    public void cancelPostLike(int userIdx, int postIdx) throws BasicException {
+
+        if (postProvider.checkUserExist(userIdx) == 0) {
+            throw new BasicException(USERS_EMPTY_USER_ID);
+        }
+
+        if (postProvider.checkPostExist(postIdx) == 0) {
+            throw new BasicException(POSTS_EMPTY_POST_ID);
+        }
+
+        try {
+            int result = postDao.deletePostLike(postIdx);
+            if (result == 0) {
+                throw new BasicException(DB_ERROR);
+            }
+        } catch (Exception e) {
             throw new BasicException(DB_ERROR);
         }
     }

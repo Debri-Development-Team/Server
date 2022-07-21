@@ -1,8 +1,8 @@
-package com.example.debriserver.core.user;
+package com.example.debriserver.core.User;
 
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicServerStatus;
-import com.example.debriserver.core.user.model.*;
+import com.example.debriserver.core.User.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
