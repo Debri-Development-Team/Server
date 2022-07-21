@@ -1,8 +1,8 @@
-package com.example.debriserver.core.user;
+package com.example.debriserver.core.User;
 
-import com.example.debriserver.core.user.model.PostLoginReq;
-import com.example.debriserver.core.user.model.PostUserReq;
-import com.example.debriserver.core.user.model.User;
+import com.example.debriserver.core.User.Model.PostLoginReq;
+import com.example.debriserver.core.User.Model.PostUserReq;
+import com.example.debriserver.core.User.Model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
