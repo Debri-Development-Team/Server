@@ -51,6 +51,16 @@ public enum BasicServerStatus {
     POST_USERS_EMPTY_PASSWORD(false, 3021, "비밀번호를 입력해주세요."),
     POST_USERS_INVALID_EMAIL(false, 3022, "이메일 형식을 확인해주세요."),
 
+
+    POST_USERS_INCORRECT_PASSWORD(false,3023,"비밀번호가 일치하지 않습니다."),
+
+    POST_USERS_EMPTY_NICKNAME(false, 3024, "닉네임을 입력해주세요."),
+
+    POST_USERS_EMPTY_BIRTHDAY(false, 3025, "생년월일을 입력해주세요."),
+
+    POST_USERS_EXIST_EMAIL(false,3026,"중복된 이메일입니다"),
+    POST_USERS_EXIST_NICKNAME(false,3027,"중복된 닉네임입니다"),
+
     // [BOARD]
     BOARD_NOT_EXIST(false, 3060, "게시판이 존재하지 않습니다."),
 

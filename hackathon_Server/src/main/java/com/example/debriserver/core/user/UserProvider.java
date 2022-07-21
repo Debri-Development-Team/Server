@@ -1,4 +1,4 @@
-package com.example.debriserver.core.user;
+package com.example.debriserver.core.User;
 
 import com.example.debriserver.basicModels.BasicException;
 import org.springframework.beans.factory.annotation.Autowired;
