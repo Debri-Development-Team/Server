@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostReplyOnPostRes {
-    private String commentContents;
+    private String commentContent;
     private int userIdx;
     private int commentIdx;
     private int commentLevel;
