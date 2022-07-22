@@ -36,7 +36,7 @@ public class JwtController {
     @PatchMapping("/refresh")
     public BasicResponse<PatchRefreshRes> getRefresh(@RequestBody PatchRefreshReq patchRefreshReq){
         try{
-            RefreshJwtRes refreshJwtRes = JwtUtility.refreshToken(patchRefreshReq.getExpiredToken(), patchRefreshReq.getRefreshToken());
+            RefreshJwtRes refreshJwtRes = JwtUtility.refreshToken(JwtUtility.getJwt(), patchRefreshReq.getRefreshToken());
 
             PatchRefreshRes patchRefreshRes = jwtService.getRefresh(refreshJwtRes);
 

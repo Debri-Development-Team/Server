@@ -13,9 +13,7 @@ public class PostSignUpReq {
     private String password;
     private String password2;
     private String nickname;
-    private int birthday;
-//    private String profileImgUrl;
-    private String jwtRefreshToken;
+    private String birthday;
 }
 
 

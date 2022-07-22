@@ -13,7 +13,5 @@ public class PostSignUpRes {
     private int userIdx;
     private String userId;
     private String nickname;
-
-
 }
 

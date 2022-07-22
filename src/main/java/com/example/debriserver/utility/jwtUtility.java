@@ -110,9 +110,9 @@ public class jwtUtility {
             throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
         } catch (UnsupportedJwtException exception){
             throw new BasicException(BasicServerStatus.UNSUPPORTED_JWT);
-        } catch (IllegalArgumentException exception){
+        } /*catch (IllegalArgumentException exception){
             throw new BasicException(BasicServerStatus.EMPTY_JWT_CLAIMS_STRING);
-        }
+        }*/
 
         //Return userIdx
         return claimsJws.getBody().get("userIdx", Integer.class);

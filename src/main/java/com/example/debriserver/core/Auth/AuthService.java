@@ -56,6 +56,9 @@ public class AuthService {
             int userIdx = user.getUserIdx();
             String jwt = jwtUtility.createToken(userIdx);
             String refreshToken = jwtUtility.createRefreshToken();
+
+            authDao.insertRefresh(refreshToken, postLoginReq.getEmail());
+
             return new PostLoginRes(userIdx, jwt, refreshToken);
         }
         else

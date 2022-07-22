@@ -29,6 +29,7 @@ public enum BasicServerStatus {
     PASSWORD_ENCRYPTION_ERROR(false, 2010, "비밀번호 암호화에 실패하였습니다."),
     PASSWORD_DECRYPTION_ERROR(false, 2011, "비밀번호 복호화에 실패하였습니다."),
     USERS_EMPTY_USER_ID(false, 2012, "유저 아이디를 확인해주세요."),
+
     /**
      * 3000 : Request 오류
      * */
