@@ -1,5 +1,6 @@
 package com.example.debriserver.core.Board;
 
+import com.example.debriserver.core.Board.model.GetBoardListRes;
 import com.example.debriserver.core.Board.model.GetScrapBoardListRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -77,5 +78,16 @@ public class BoardDao {
                         rs.getString("updatedAt"),
                         rs.getString("status")
                 ), getBoardListParams);
+    }
+
+    public List<GetBoardListRes> getList() {
+        String getListQuery = "SELECT boardIdx, boardName, boardAdmin FROM Board WHERE status = 'ACTIVE';";
+
+        return this.jdbcTemplate.query(getListQuery,
+                (rs, rowNum) -> new GetBoardListRes(
+                        rs.getInt("boardIdx"),
+                        rs.getString("boardName"),
+                        rs.getString("boardAdmin")
+                ));
     }
 }
