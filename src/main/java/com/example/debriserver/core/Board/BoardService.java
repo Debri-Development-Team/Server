@@ -39,12 +39,12 @@ public class BoardService {
 
                 int result = boardDao.insertBoardSubs(boardIdx, userIdx);
                 if (result == 0) {
-                    throw new BasicException(DB_ERROR);
+                    throw new BasicException(BOARD_INSERT_FAIL);
                 }
 
                 int result2 = boardDao.scrapBoard(boardIdx, userIdx);
                 if (result2 == 0) {
-                    throw new BasicException(DB_ERROR);
+                    throw new BasicException(BOARD_SCRAP_FAIL);
                 }
             }
             else {
@@ -70,7 +70,7 @@ public class BoardService {
 
                 int result = boardDao.cancelScrapBoard(boardIdx, userIdx);
                 if (result == 0) {
-                    throw new BasicException(DB_ERROR);
+                    throw new BasicException(BOARD_SCRAP_CANCEL_FAIL);
                 }
             }
             else {
