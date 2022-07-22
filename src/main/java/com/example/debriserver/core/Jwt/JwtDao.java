@@ -2,7 +2,6 @@ package com.example.debriserver.core.Jwt;
 
 
 import com.example.debriserver.basicModels.BasicException;
-import com.example.debriserver.core.Jwt.Model.PatchRefreshReq;
 import com.example.debriserver.core.Jwt.Model.PatchRefreshRes;
 import com.example.debriserver.utility.Model.RefreshJwtRes;
 import com.example.debriserver.utility.jwtUtility;
