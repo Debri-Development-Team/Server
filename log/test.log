@@ -47,3 +47,10 @@
 2022-07-22 04:29:57.390  INFO 71760 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
 2022-07-22 04:29:57.415  INFO 71760 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8521 (http) with context path ''
 2022-07-22 04:29:57.424  INFO 71760 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Started DebriServerApplication in 2.459 seconds (JVM running for 3.009)
+2022-07-22 04:39:54.268  INFO 71760 --- [http-nio-8521-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-07-22 04:39:54.269  INFO 71760 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-07-22 04:39:54.270  INFO 71760 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2022-07-22 04:49:54.827  WARN 71760 --- [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Retrograde clock change detected (housekeeper delta=27s865ms), soft-evicting connections from pool.
+2022-07-22 04:56:25.961  INFO 71760 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2022-07-22 04:56:25.964  INFO 71760 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-07-22 04:56:26.042  INFO 71760 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
