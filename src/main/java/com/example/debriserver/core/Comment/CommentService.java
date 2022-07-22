@@ -51,6 +51,7 @@ public class CommentService {
 
             return getCommentRes;
         }catch (Exception exception){
+            System.out.println(exception.getMessage());
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }

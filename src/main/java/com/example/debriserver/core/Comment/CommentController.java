@@ -105,6 +105,9 @@ public class CommentController {
             if(!commentService.checkCommentExist(postIdx)){
                 throw new BasicException(BasicServerStatus.COMMENT_NOT_EXIST_ERROR);
             }
+            if(commentService.checkPostDeleted(postIdx)){
+                throw new BasicException(BasicServerStatus.COMMENT_ROOT_POST_NOT_EXIST);
+            }
 
             List<GetCommentRes> getCommentRes= commentService.getComment(postIdx);
 

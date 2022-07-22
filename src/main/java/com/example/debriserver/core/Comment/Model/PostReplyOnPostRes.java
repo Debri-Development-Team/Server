@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PostReplyOnPostRes {
     private String commentContent;
-    private int userIdx;
+    private int authorIdx;
     private int commentIdx;
     private int commentLevel;
     private int commentGroup;
