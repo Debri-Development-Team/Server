@@ -64,6 +64,8 @@ public enum BasicServerStatus {
 
     // [BOARD]
     BOARD_NOT_EXIST(false, 3060, "게시판이 존재하지 않습니다."),
+    SCRAP_BOARD_EXIST(false, 3061, "이미 스크랩한 게시판 입니다."),
+    SCRAP_BOARD_NOT_EXIST(false, 3062, "스크랩하지 않은 게시판 입니다."),
 
     /**
      * 4000 : Response 오류

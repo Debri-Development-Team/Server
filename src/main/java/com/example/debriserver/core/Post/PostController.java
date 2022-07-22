@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
-import javax.persistence.Basic;
 import java.util.List;
 
 @RestController
@@ -32,6 +31,9 @@ public class PostController {
         this.postService = postService;
     }
 
+    /**
+     * 게시물 생성
+     */
     @ResponseBody
     @PostMapping("/create")
     public BasicResponse<PostPostsRes> createPosts(@RequestBody PostPostsReq postPostsReq) {
@@ -55,6 +57,9 @@ public class PostController {
         }
     }
 
+    /**
+     * 게시물 수정
+     */
     @ResponseBody
     @PatchMapping("/{postIdx}")
     public BasicResponse<String> modifyPost(@PathVariable ("postIdx") int postIdx, @RequestBody PatchPostsReq patchPostsReq) {
@@ -75,6 +80,9 @@ public class PostController {
         }
     }
 
+    /**
+     * 게시물 삭제
+     */
     @ResponseBody
     @PatchMapping("/{postIdx}/status")
     public BasicResponse<String> deletePost(@PathVariable ("postIdx") int postIdx) {
@@ -114,66 +122,73 @@ public class PostController {
         }
     }
 
-            @ResponseBody
-            @PostMapping("/like")
-            public BasicResponse<String> createPostLike (@RequestBody PostPostLikeReq postPostLikeReq){
-                try {
+    /**
+     * 게시물 좋아요 생성
+     */
+    @ResponseBody
+    @PostMapping("/like")
+    public BasicResponse<String> createPostLike (@RequestBody PostPostLikeReq postPostLikeReq){
+        try {
 
-                    String jwtToken = jwt.getJwt();
+            String jwtToken = jwt.getJwt();
 
-                    if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-                    postService.createPostLike(postPostLikeReq.getUserIdx(), postPostLikeReq.getPostIdx(), postPostLikeReq);
-                    String result = "좋아요 또는 싫어요가 생성되었습니다.";
-                    return new BasicResponse<>(result);
+            postService.createPostLike(postPostLikeReq.getUserIdx(), postPostLikeReq.getPostIdx(), postPostLikeReq);
+            String result = "좋아요 또는 싫어요가 생성되었습니다.";
+            return new BasicResponse<>(result);
 
-                } catch (BasicException exception) {
-                    return new BasicResponse<>((exception.getStatus()));
-                }
-            }
+        } catch (BasicException exception) {
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
-            @ResponseBody
-            @PatchMapping("/like/cancel")
-            public BasicResponse<String> cancelPostLike(@RequestBody PatchPostLikeReq patchPostLikeReq){
-                try {
-                    String jwtToken = jwt.getJwt();
+    /**
+     * 게시물 좋아요 취소
+     */
+    @ResponseBody
+    @PatchMapping("/like/cancel")
+    public BasicResponse<String> cancelPostLike(@RequestBody PatchPostLikeReq patchPostLikeReq){
+        try {
+            String jwtToken = jwt.getJwt();
 
-                    if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-                    postService.cancelPostLike(patchPostLikeReq.getUserIdx(), patchPostLikeReq.getPostIdx());
-                    String result = "좋아요 또는 싫어요가 취소되었습니다.";
-                    return new BasicResponse<>(result);
+            postService.cancelPostLike(patchPostLikeReq.getUserIdx(), patchPostLikeReq.getPostIdx());
+            String result = "좋아요 또는 싫어요가 취소되었습니다.";
+            return new BasicResponse<>(result);
 
-                } catch (BasicException exception) {
-                    return new BasicResponse<>((exception.getStatus()));
-                }
-            }
+        } catch (BasicException exception) {
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
-            /**
-             * Post 스크랩 해제 메서드
-             * */
-            @ResponseBody
-            @PostMapping("/unscrap/{postIdx}")
-            public BasicResponse<String> unScrapPost(@PathVariable("postIdx") int postIdx) {
-                try {
-                    String jwtToken = jwt.getJwt();
-                    if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+    /**
+     * Post 스크랩 해제 메서드
+     * */
+    @ResponseBody
+    @PostMapping("/unscrap/{postIdx}")
+    public BasicResponse<String> unScrapPost(@PathVariable("postIdx") int postIdx) {
+        try {
+            String jwtToken = jwt.getJwt();
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-                    int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx();
 
-                    String result = "스크랩이 해제되었습니다.";
-                    postService.unScrapPost(postIdx, userIdx);
+            String result = "스크랩이 해제되었습니다.";
+            postService.unScrapPost(postIdx, userIdx);
 
-                    return new BasicResponse<>(result);
+            return new BasicResponse<>(result);
 
-                } catch (BasicException exception) {
-                    return new BasicResponse<>((exception.getStatus()));
-                }
-            }
+        } catch (BasicException exception) {
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
-     /*특정 게시판의 게시글 리스트를 조회하는 api
+     /**
+      * 특정 게시판의 게시글 리스트를 조회하는 api
       * [GET]localhost / api / post / getList / {boardIdx}
-      * */
+      */
      @GetMapping("/getList/{boardIdx}")
      public BasicResponse<List<GetPostListRes>> getPostList ( @PathVariable int boardIdx){
 
@@ -214,7 +229,8 @@ public class PostController {
          }
      }
 
-     /*특정 게시물의 내용을 조회하는 api
+     /**
+      * 특정 게시물의 내용을 조회하는 api
       * [GET]localhost / api / post / get / {postIdx}
       * */
      @GetMapping("/get/{postIdx}")
