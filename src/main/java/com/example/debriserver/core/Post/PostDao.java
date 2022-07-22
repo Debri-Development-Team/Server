@@ -232,21 +232,24 @@ public class PostDao {
     }
 
     public GetPostRes getPost(int postIdx){
-        String getPostQuery = "SELECT distinct p.boardIdx, p.postIdx, p.postName, u.nickname, p.postContent\n" +
+        String getPostQuery = "SELECT distinct p.boardIdx, p.postIdx, p.postName, u.nickname, p.postContent, p.userIdx\n" +
                 "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx WHERE postIdx = ?;";
         String getLikeQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";
 
         return this.jdbcTemplate.queryForObject(getPostQuery,
                 (rs, rowNum) -> new GetPostRes
                         (
                                 rs.getInt("boardIdx"),
                                 rs.getInt("postIdx"),
+                                rs.getInt("userIdx"),
                                 rs.getString("postName"),
                                 rs.getString("nickName"),
                                 rs.getString("postContent"),
                                 this.jdbcTemplate.queryForObject(getLikeQuery, int.class, postIdx),
-                                this.jdbcTemplate.queryForObject(getTimeQuery, int.class, postIdx)
+                                this.jdbcTemplate.queryForObject(getTimeQuery, int.class, postIdx),
+                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, postIdx)
                         ),
                 postIdx);
     }

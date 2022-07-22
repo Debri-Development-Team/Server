@@ -8,11 +8,11 @@ import lombok.Setter;
 @Setter
 public class PostReplyOnReplyRes {
     private String commentContent;//
-    private int userIdx;//
+    private int authorIdx;//
     private int postIdx;//
     private int commentIdx;
     private int commentGroup;
     private int commentOrder;
     private int level;
-    private String userName;//
+    private String authorName;//
 }
