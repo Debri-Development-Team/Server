@@ -40,6 +40,7 @@ public class CommentService {
             return postReplyOnReplyRes;
 
         }catch(Exception exception){
+            System.out.println(exception.getMessage());
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }

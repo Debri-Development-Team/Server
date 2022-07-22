@@ -68,7 +68,7 @@ public class CommentDao {
                         (rs, rowNum) ->
                         {
                             PostReplyOnPostRes postReplyOnPostRes = new PostReplyOnPostRes();
-                            postReplyOnPostRes.setCommentContents(rs.getString("commentContent"));
+                            postReplyOnPostRes.setCommentContent(rs.getString("commentContent"));
                             postReplyOnPostRes.setUserIdx(rs.getInt("userIdx"));
                             postReplyOnPostRes.setCommentIdx(rs.getInt("commentIdx"));
                             postReplyOnPostRes.setCommentLevel(rs.getInt("class"));
@@ -97,8 +97,8 @@ public class CommentDao {
 
         //대댓글 저장
         String storeCommentQuery = "INSERT\n" +
-                "INTO Comment(userIdx, postIdx, class,commentOrder, groupNum, commentContent)\n" +
-                "VALUES (?, ?, ?, ?, ?, ?);";
+                "INTO Comment(userIdx, postIdx, class,commentOrder, groupNum, commentContent, authorName)\n" +
+                "VALUES (?, ?, ?, ?, ?, ?, ?);";
 
         Object[] storeCommentParameters = new Object[]
                 {
@@ -107,7 +107,8 @@ public class CommentDao {
                         1,
                         ExistCount + 1,
                         postReplyOnReplyReq.getRootCommentIdx(),
-                        postReplyOnReplyReq.getContent()
+                        postReplyOnReplyReq.getContent(),
+                        postReplyOnReplyReq.getAuthorName()
                 };
 
         this.jdbcTemplate.update(storeCommentQuery, storeCommentParameters);
@@ -139,7 +140,7 @@ public class CommentDao {
 
         postReplyOnReplyRes.setUserIdx(postReplyOnReplyReq.getUserIdx());
         postReplyOnReplyRes.setUserName(postReplyOnReplyReq.getAuthorName());
-        postReplyOnReplyRes.setCommentContents(postReplyOnReplyReq.getContent());
+        postReplyOnReplyRes.setCommentContent(postReplyOnReplyReq.getContent());
         postReplyOnReplyRes.setPostIdx(postReplyOnReplyReq.getPostIdx());
         postReplyOnReplyRes.setCommentIdx(insertedIdx);
         postReplyOnReplyRes.setCommentGroup(others[0]);

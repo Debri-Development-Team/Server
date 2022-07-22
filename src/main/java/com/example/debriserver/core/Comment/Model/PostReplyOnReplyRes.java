@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PostReplyOnReplyRes {
-    private String commentContents;//
+    private String commentContent;//
     private int userIdx;//
     private int postIdx;//
     private int commentIdx;
