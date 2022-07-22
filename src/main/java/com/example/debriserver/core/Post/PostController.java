@@ -162,7 +162,7 @@ public class PostController {
             return new BasicResponse<>((exception.getStatus()));
         }
     }
-
+    
     /**
      * Post 스크랩 해제 메서드
      * */
@@ -179,11 +179,33 @@ public class PostController {
             postService.unScrapPost(postIdx, userIdx);
 
             return new BasicResponse<>(result);
-
-        } catch (BasicException exception) {
+         } catch (BasicException exception) {
             return new BasicResponse<>((exception.getStatus()));
         }
     }
+    
+    /**
+     * 전체 게시판에서 게시글 리스트를 조회하는 api
+     * [GET] localhost/api/post/getSearchList
+     * */
+    @ResponseBody
+    @GetMapping("/getSearchList")
+    public BasicResponse<List<GetPostSearchListRes>> getPostSearchList(@RequestBody GetPostSearchListReq getPostSearchListReq){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            String keyword = getPostSearchListReq.getKeyword();
+            List<GetPostSearchListRes> getPostSearchListRes = postProvider.getPostSearchList(keyword);
+
+            return  new BasicResponse<>(getPostSearchListRes);
+
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+    
 
      /**
       * 특정 게시판의 게시글 리스트를 조회하는 api
