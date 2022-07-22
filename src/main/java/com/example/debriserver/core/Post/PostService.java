@@ -27,9 +27,6 @@ public class PostService {
         this.postProvider = postProvider;
     }
 
-    /**
-     * 게시물 생성
-     */
     public PostPostsRes createPosts(PostPostsReq postPostsReq) throws BasicException {
 
         try{
@@ -48,9 +45,6 @@ public class PostService {
         }
     }
 
-    /**
-     * 게시물 수정
-     */
     public void modifyPost(int userIdx, int postIdx, PatchPostsReq patchPostsReq) throws BasicException {
         if (postProvider.checkUserExist(userIdx) == 0) {
             throw new BasicException(USERS_EMPTY_USER_ID);
@@ -72,9 +66,6 @@ public class PostService {
         }
     }
 
-    /**
-     * 게시물 삭제
-     */
     public void deletePost(int postIdx) throws BasicException {
 
         try{
