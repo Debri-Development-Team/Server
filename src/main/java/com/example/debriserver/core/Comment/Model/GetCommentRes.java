@@ -9,11 +9,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class GetCommentRes {
     private int commentIdx;
-    private int userIdx;
+    private int authorIdx;
     private int postIdx;
     private int commentLevel;
     private int commentOrder;
     private int commentGroup;
+    private int timeAfterCreated;
     private String commentContent;
     private String authorName;
 }

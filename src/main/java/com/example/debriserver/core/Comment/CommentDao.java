@@ -69,7 +69,7 @@ public class CommentDao {
                         {
                             PostReplyOnPostRes postReplyOnPostRes = new PostReplyOnPostRes();
                             postReplyOnPostRes.setCommentContent(rs.getString("commentContent"));
-                            postReplyOnPostRes.setUserIdx(rs.getInt("userIdx"));
+                            postReplyOnPostRes.setAuthorIdx(rs.getInt("userIdx"));
                             postReplyOnPostRes.setCommentIdx(rs.getInt("commentIdx"));
                             postReplyOnPostRes.setCommentLevel(rs.getInt("class"));
                             postReplyOnPostRes.setCommentGroup(rs.getInt("groupNum"));
@@ -138,8 +138,8 @@ public class CommentDao {
                         insertedIdx
                 );
 
-        postReplyOnReplyRes.setUserIdx(postReplyOnReplyReq.getUserIdx());
-        postReplyOnReplyRes.setUserName(postReplyOnReplyReq.getAuthorName());
+        postReplyOnReplyRes.setAuthorIdx(postReplyOnReplyReq.getUserIdx());
+        postReplyOnReplyRes.setAuthorName(postReplyOnReplyReq.getAuthorName());
         postReplyOnReplyRes.setCommentContent(postReplyOnReplyReq.getContent());
         postReplyOnReplyRes.setPostIdx(postReplyOnReplyReq.getPostIdx());
         postReplyOnReplyRes.setCommentIdx(insertedIdx);
@@ -194,6 +194,7 @@ public class CommentDao {
                 "SELECT commentIdx, userIdx, postIdx, authorName, class, commentOrder, groupNum, commentContent\n" +
                 "FROM Comment\n" +
                 "WHERE postIdx = ? and status = 'ACTIVE';";
+        String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Comment WHERE commentIdx = ?), CURRENT_TIMESTAMP);";
 
         return this.jdbcTemplate.query
                 (
@@ -206,6 +207,7 @@ public class CommentDao {
                                         rs.getInt("class"),
                                         rs.getInt("commentOrder"),
                                         rs.getInt("groupNum"),
+                                        this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("commentIdx")),
                                         rs.getString("commentContent"),
                                         rs.getString("authorName")
                                 ), postIdx
