@@ -1,8 +1,7 @@
 package com.example.debriserver.core.Board;
 
 import com.example.debriserver.basicModels.BasicException;
-import com.example.debriserver.core.Board.model.GetBoardListRes;
-import com.example.debriserver.core.Board.model.GetScrapBoardListRes;
+import com.example.debriserver.core.Board.model.GetUnscrapBoardListRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,10 +44,10 @@ public class BoardProvider {
     }
 
 
-    public List<GetBoardListRes> getList() throws BasicException{
+    public List<GetUnscrapBoardListRes> getList(int userIdx) throws BasicException{
 
         try{
-            return boardDao.getList();
+            return boardDao.getList(userIdx);
 
         }catch (Exception exception){
             throw new BasicException(DB_ERROR);

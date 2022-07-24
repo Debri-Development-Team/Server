@@ -9,8 +9,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetBoardListRes {
+public class GetUnscrapBoardListRes {
     private int boardIdx;
     private String boardName;
     private String boardAdmin;
+    private String createdAt;
+    private String updatedAt;
+    private String status;
 }
