@@ -8,11 +8,12 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class GetScrapRes {
-    private int postIdx;
+
     private int boardIdx;
+    private int postIdx;
     private int userIdx;
-    private String postContent;
     private String postName;
-    private String createdAt;
-    private String updatedAt;
+    private int likeNumber;
+    private int timeAfterCreated;
+    private int commentNumber;
 }
