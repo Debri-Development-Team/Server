@@ -11,7 +11,7 @@ public class GetScrapRes {
 
     private int boardIdx;
     private int postIdx;
-    private int userIdx;
+    private String authorName;
     private String postName;
     private int likeNumber;
     private int timeAfterCreated;

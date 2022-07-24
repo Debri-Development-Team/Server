@@ -147,9 +147,10 @@ public class PostDao {
      **/
     public List<GetScrapRes> getScrapPosts(int userIdx)
     {
-        String getScrapPostsQuery = "select PM.postIdx, P.boardIdx, PM.userIdx, P.postContent, P.postName, P.createdAt, P.updatedAt\n" +
+        String getScrapPostsQuery = "select PM.postIdx, P.boardIdx, U.nickname, P.postName\n" +
                 "FROM Post as P\n" +
                 "left join(select postIdx, userIdx, status from PostMarked) PM on P.postIdx = PM.postIdx\n" +
+                "left join User as U on P.userIdx = U.userIdx\n" +
                 "where PM.userIdx = ? and P.status = 'ACTIVE'";
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
 
@@ -160,7 +161,7 @@ public class PostDao {
                 (rs, rowNum) -> new GetScrapRes(
                         rs.getInt("postIdx"),
                         rs.getInt("boardIdx"),
-                        rs.getInt("userIdx"),
+                        rs.getString("nickName"),
                         rs.getString("postName"),
                         this.jdbcTemplate.queryForObject(getLikeCountQuery, int.class, rs.getInt("postIdx")),
                         this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
