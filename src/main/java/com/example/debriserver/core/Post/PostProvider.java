@@ -16,7 +16,6 @@ import static com.example.debriserver.basicModels.BasicServerStatus.DB_ERROR;
 @Service
 public class PostProvider {
 
-    @Autowired
     private final PostDao postDao;
 
     public PostProvider(PostDao postDao) {
