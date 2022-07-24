@@ -3,13 +3,15 @@ package com.example.debriserver.core.Board;
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
-import com.example.debriserver.core.Board.model.GetBoardListRes;
+import com.example.debriserver.core.Board.model.GetUnscrapBoardListRes;
 import com.example.debriserver.core.Board.model.GetScrapBoardListRes;
 import com.example.debriserver.utility.jwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.example.debriserver.basicModels.BasicServerStatus.USERS_EMPTY_USER_ID;
 
 @RestController
 @RequestMapping("/api/board")
@@ -73,7 +75,7 @@ public class BoardController {
     }
 
     /**
-     * 유저의 즐겨찾기 게시판 조회
+     * 2.3 유저의 즐겨찾기 게시판 조회
      */
     @GetMapping("/scrap/getList")
     public BasicResponse<List<GetScrapBoardListRes>> getBoardList() {
@@ -92,17 +94,28 @@ public class BoardController {
         }
     }
 
-    @GetMapping("/getList")
-    public BasicResponse<List<GetBoardListRes>> getList(){
+    /**
+     *
+     * 2.4 유저가 구독하지 않은 게시판 리스트 조회 api
+     * */
+    @GetMapping("/unscrap/getList")
+    public BasicResponse<List<GetUnscrapBoardListRes>> getList(){
 
         try{
             String jwtToken = jwt.getJwt();
 
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            List<GetBoardListRes> getBoardListResList = boardProvider.getList();
+            int userIdx = jwt.getUserIdx();
 
-            return new BasicResponse<>(getBoardListResList);
+            if(boardProvider.checkUserExist(userIdx) == 0)
+            {
+                throw new BasicException(USERS_EMPTY_USER_ID);
+            }
+
+            List<GetUnscrapBoardListRes> getUnscrapBoardListResList = boardProvider.getList(userIdx);
+
+            return new BasicResponse<>(getUnscrapBoardListResList);
 
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
