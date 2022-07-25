@@ -1,5 +1,6 @@
 package com.example.debriserver.core.Board;
 
+import com.example.debriserver.core.Board.model.GetScrapBoardCountRes;
 import com.example.debriserver.core.Board.model.GetUnscrapBoardListRes;
 import com.example.debriserver.core.Board.model.GetScrapBoardListRes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,9 +65,10 @@ public class BoardDao {
 
     public List<GetScrapBoardListRes> getScrapBoardList(int userIdx) {
         String getBoardListQuery = "SELECT b.boardIdx, b.boardName, b.boardAdmin, b.createdAt, b.updatedAt, bs.status\n" +
-                "FROM Board AS b LEFT JOIN BoardSubscription bs ON b.boardIdx = bs.boardIdx\n" +
-                "WHERE bs.userIdx = ? and b.status = 'ACTIVE' and bs.status = 'ACTIVE';";
-
+                "FROM Board AS b\n" +
+                "LEFT JOIN(SELECT boardIdx, userIdx, status FROM BoardSubscription) bs ON b.boardIdx = bs.boardIdx\n" +
+                "WHERE bs.userIdx = ? and b.status = 'ACTIVE' and bs.status = 'ACTIVE'";
+             
         int getBoardListParams = userIdx;
 
         return this.jdbcTemplate.query(getBoardListQuery,
@@ -81,9 +83,14 @@ public class BoardDao {
     }
 
     public List<GetUnscrapBoardListRes> getList(int userIdx) {
-        String getListQuery = "SELECT b.boardIdx, b.boardName, b.boardAdmin, b.createdAt, b.updatedAt, BS.status\n" +
-                "FROM Board as b LEFT JOIN BoardSubscription BS on b.boardIdx = BS.boardIdx\n" +
-                "WHERE BS.status='INACTIVE' and b.status = 'ACTIVE' and BS.userIdx = ?;";
+        String getListQuery = "SELECT distinct b.boardIdx, b.boardName, b.boardAdmin, b.createdAt, b.updatedAt\n" +
+                "FROM Board as b\n" +
+                "WHERE NOT EXISTS(\n" +
+                "    SELECT DISTINCT bs.boardIdx\n" +
+                "    FROM BoardSubscription as bs\n" +
+                "    JOIN User as u\n" +
+                "    WHERE u.userIdx = ? and u.userIdx = bs.userIdx and bs.status = 'ACTIVE' and bs.boardIdx = b.boardIdx\n" +
+                ");;";
 
         return this.jdbcTemplate.query(getListQuery,
                 (rs, rowNum) -> new GetUnscrapBoardListRes(
@@ -91,11 +98,17 @@ public class BoardDao {
                         rs.getString("boardName"),
                         rs.getString("boardAdmin"),
                         rs.getString("createdAt"),
-                        rs.getString("updatedAt"),
-                        rs.getString("status")
+                        rs.getString("updatedAt")
                 ), userIdx);
     }
 
+
+    public int countScrapBoardList(int userIdx) {
+        String countScrapQuery = "SELECT COUNT(boardIdx) FROM BoardSubscription WHERE userIdx = ? and status = 'ACTIVE';";
+
+        return this.jdbcTemplate.queryForObject(countScrapQuery, int.class, userIdx);
+  }
+  
     /**
      * true면 없음 ->
      * false만 있음
@@ -111,5 +124,6 @@ public class BoardDao {
         int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, parameters);
 
         return result == 0;
+
     }
 }
