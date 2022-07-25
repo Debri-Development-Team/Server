@@ -11,16 +11,12 @@ public class ReportProvider {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private final ReportService reportService;
-
-    @Autowired
     private final ReportDao reportDao;
 
     @Autowired
     private final jwtUtility jwt;
 
-    public ReportProvider(ReportService reportService, ReportDao reportDao, jwtUtility jwt){
-        this.reportService = reportService;
+    public ReportProvider(ReportDao reportDao, jwtUtility jwt){
         this.reportDao = reportDao;
         this.jwt = jwt;
     }

@@ -14,14 +14,10 @@ public class LectureProvider {
     private final jwtUtility jwt;
 
     @Autowired
-    private final LectureService lectureService;
-
-    @Autowired
     private final LectureDao lectureDao;
 
-    public LectureProvider(jwtUtility jwt, LectureService lectureService, LectureDao lectureDao){
+    public LectureProvider(jwtUtility jwt, LectureDao lectureDao){
         this.jwt = jwt;
-        this.lectureService = lectureService;
         this.lectureDao = lectureDao;
     }
 
