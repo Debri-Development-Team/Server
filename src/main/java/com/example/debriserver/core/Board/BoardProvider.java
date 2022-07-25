@@ -53,4 +53,13 @@ public class BoardProvider {
             throw new BasicException(DB_ERROR);
         }
     }
+
+    public boolean checkUnscrapExist(int boardIdx, int userIdx) throws BasicException{
+
+        try{
+            return boardDao.checkUnscrapExist(boardIdx, userIdx);
+        }catch (Exception exception){
+            throw new BasicException(DB_ERROR);
+        }
+    }
 }
