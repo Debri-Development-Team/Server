@@ -52,7 +52,7 @@ public enum BasicServerStatus {
     POST_USERS_EMPTY_PASSWORD(false, 3021, "비밀번호를 입력해주세요."),
     POST_USERS_INVALID_EMAIL(false, 3022, "이메일 형식을 확인해주세요."),
 
-
+    // [USER]
     POST_USERS_INCORRECT_PASSWORD(false,3023,"비밀번호가 일치하지 않습니다."),
 
     POST_USERS_EMPTY_NICKNAME(false, 3024, "닉네임을 입력해주세요."),
@@ -90,14 +90,6 @@ public enum BasicServerStatus {
     INVALID_SIGNATURE(false, 5003, "Invalid Jwt Signature"),
     UNSUPPORTED_JWT(false, 5004, "Unsupported Jwt"),
     EMPTY_JWT_CLAIMS_STRING(false, 5005, "Jwt Claims String Empty");
-
-    /**
-     * 6000: 신고 API에서 사용 6000 번부터는 하원이 사용 6500번부터 미뇽이 사용
-     */
-
-    /**
-     * 7000: 커리큘럼 API에서 사용 7000번 부터 찜니가 사용, 7300번 부터 루키가 사용, 7600번 부터 루카가 사용
-     * */
 
     private final boolean isSuccess;
     private final int returnCode;
