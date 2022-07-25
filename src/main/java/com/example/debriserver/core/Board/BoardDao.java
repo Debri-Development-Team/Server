@@ -64,9 +64,9 @@ public class BoardDao {
 
     public List<GetScrapBoardListRes> getScrapBoardList(int userIdx) {
         String getBoardListQuery = "SELECT b.boardIdx, b.boardName, b.boardAdmin, b.createdAt, b.updatedAt, bs.status\n" +
-                "FROM Board AS b\n" +
-                "LEFT JOIN(SELECT boardIdx, userIdx FROM BoardSubscription) bs ON b.boardIdx = bs.boardIdx\n" +
-                "WHERE bs.userIdx = ? and b.status = 'ACTIVE' and bs.status = 'ACTIVE'";
+                "FROM Board AS b LEFT JOIN BoardSubscription bs ON b.boardIdx = bs.boardIdx\n" +
+                "WHERE bs.userIdx = ? and b.status = 'ACTIVE' and bs.status = 'ACTIVE';";
+
         int getBoardListParams = userIdx;
 
         return this.jdbcTemplate.query(getBoardListQuery,
@@ -94,5 +94,22 @@ public class BoardDao {
                         rs.getString("updatedAt"),
                         rs.getString("status")
                 ), userIdx);
+    }
+
+    /**
+     * true면 없음 ->
+     * false만 있음
+     * */
+    public boolean checkUnscrapExist(int boardIdx, int userIdx) {
+        String checkQuery = "SELECT EXISTS(SELECT boardIdx FROM BoardSubscription WHERE boardIdx = ? AND userIdx = ? AND status = 'INACTIVE');";
+
+        Object[] parameters = new Object[] {
+                boardIdx,
+                userIdx
+        };
+
+        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, parameters);
+
+        return result == 0;
     }
 }
