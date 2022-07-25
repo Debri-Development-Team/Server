@@ -1,5 +1,6 @@
 package com.example.debriserver.core.Board;
 
+import com.example.debriserver.core.Board.model.GetScrapBoardCountRes;
 import com.example.debriserver.core.Board.model.GetUnscrapBoardListRes;
 import com.example.debriserver.core.Board.model.GetScrapBoardListRes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +66,7 @@ public class BoardDao {
     public List<GetScrapBoardListRes> getScrapBoardList(int userIdx) {
         String getBoardListQuery = "SELECT b.boardIdx, b.boardName, b.boardAdmin, b.createdAt, b.updatedAt, bs.status\n" +
                 "FROM Board AS b\n" +
-                "LEFT JOIN(SELECT boardIdx, userIdx FROM BoardSubscription) bs ON b.boardIdx = bs.boardIdx\n" +
+                "LEFT JOIN(SELECT boardIdx, userIdx, status FROM BoardSubscription) bs ON b.boardIdx = bs.boardIdx\n" +
                 "WHERE bs.userIdx = ? and b.status = 'ACTIVE' and bs.status = 'ACTIVE'";
         int getBoardListParams = userIdx;
 
@@ -82,7 +83,7 @@ public class BoardDao {
 
     public List<GetUnscrapBoardListRes> getList(int userIdx) {
         String getListQuery = "SELECT b.boardIdx, b.boardName, b.boardAdmin, b.createdAt, b.updatedAt, BS.status\n" +
-                "FROM Board as b LEFT JOIN BoardSubscription BS on b.boardIdx = BS.boardIdx\n" +
+                "FROM Board as b LEFT JOIN BoardSubscription as BS on b.boardIdx = BS.boardIdx\n" +
                 "WHERE BS.status='INACTIVE' and b.status = 'ACTIVE' and BS.userIdx = ?;";
 
         return this.jdbcTemplate.query(getListQuery,
@@ -94,5 +95,11 @@ public class BoardDao {
                         rs.getString("updatedAt"),
                         rs.getString("status")
                 ), userIdx);
+    }
+
+    public int countScrapBoardList(int userIdx) {
+        String countScrapQuery = "SELECT COUNT(boardIdx) FROM BoardSubscription WHERE userIdx = ? and status = 'ACTIVE';";
+
+        return this.jdbcTemplate.queryForObject(countScrapQuery, int.class, userIdx);
     }
 }

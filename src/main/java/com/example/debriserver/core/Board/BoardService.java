@@ -1,6 +1,7 @@
 package com.example.debriserver.core.Board;
 
 import com.example.debriserver.basicModels.BasicException;
+import com.example.debriserver.core.Board.model.GetScrapBoardCountRes;
 import com.example.debriserver.core.Board.model.GetScrapBoardListRes;
 import com.example.debriserver.core.Post.model.GetScrapRes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,12 +84,16 @@ public class BoardService {
 
     public List<GetScrapBoardListRes> getScrapBoardList(int userIdx) throws BasicException {
 
-        if(boardProvider.checkUserExist(userIdx) == 0)
-        {
-            throw new BasicException(USERS_EMPTY_USER_ID);
-        }
+        if(boardDao.countScrapBoardList(userIdx) > 0) {
+            if (boardProvider.checkUserExist(userIdx) == 0) {
+                throw new BasicException(USERS_EMPTY_USER_ID);
+            }
 
-        List<GetScrapBoardListRes> getScrapBoardListRes = boardDao.getScrapBoardList(userIdx);
-        return getScrapBoardListRes;
+            List<GetScrapBoardListRes> getScrapBoardListRes = boardDao.getScrapBoardList(userIdx);
+            return getScrapBoardListRes;
+        }
+        else {
+            throw new BasicException(BOARD_GET_SCRAP_LIST_FAIL);
+        }
     }
 }

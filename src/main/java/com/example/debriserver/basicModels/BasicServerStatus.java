@@ -70,6 +70,7 @@ public enum BasicServerStatus {
     BOARD_SCRAP_FAIL(false, 3063, "게시판 스크랩에 실패했습니다."),
     BOARD_SCRAP_CANCEL_FAIL(false, 3064, "게시판 스크랩 취소에 실패했습니다."),
     BOARD_INSERT_FAIL(false, 3065, "스크랩 게시판에 생성에 실패했습니다"),
+    BOARD_GET_SCRAP_LIST_FAIL(false,3066,"스크랩된 게시판이 존제하지 않습니다"),
 
 
     /**
