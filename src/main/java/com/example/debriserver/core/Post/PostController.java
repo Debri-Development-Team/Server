@@ -189,7 +189,7 @@ public class PostController {
      * [GET] localhost/api/post/getSearchList
      * */
     @ResponseBody
-    @GetMapping("/getSearchList")
+    @PostMapping("/getSearchList")
     public BasicResponse<List<GetPostSearchListRes>> getPostSearchList(@RequestBody GetPostSearchListReq getPostSearchListReq){
         try{
             String jwtToken = jwt.getJwt();
