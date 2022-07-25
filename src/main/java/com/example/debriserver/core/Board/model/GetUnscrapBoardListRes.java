@@ -15,5 +15,4 @@ public class GetUnscrapBoardListRes {
     private String boardAdmin;
     private String createdAt;
     private String updatedAt;
-    private String status;
 }

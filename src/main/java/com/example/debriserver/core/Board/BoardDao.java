@@ -82,9 +82,14 @@ public class BoardDao {
     }
 
     public List<GetUnscrapBoardListRes> getList(int userIdx) {
-        String getListQuery = "SELECT b.boardIdx, b.boardName, b.boardAdmin, b.createdAt, b.updatedAt, BS.status\n" +
-                "FROM Board as b LEFT JOIN BoardSubscription as BS on b.boardIdx = BS.boardIdx\n" +
-                "WHERE BS.status='INACTIVE' and b.status = 'ACTIVE' and BS.userIdx = ?;";
+        String getListQuery = "SELECT distinct b.boardIdx, b.boardName, b.boardAdmin, b.createdAt, b.updatedAt\n" +
+                "FROM Board as b\n" +
+                "WHERE NOT EXISTS(\n" +
+                "    SELECT DISTINCT bs.boardIdx\n" +
+                "    FROM BoardSubscription as bs\n" +
+                "    JOIN User as u\n" +
+                "    WHERE u.userIdx = ? and u.userIdx = bs.userIdx and bs.status = 'ACTIVE' and bs.boardIdx = b.boardIdx\n" +
+                ");;";
 
         return this.jdbcTemplate.query(getListQuery,
                 (rs, rowNum) -> new GetUnscrapBoardListRes(
@@ -92,8 +97,7 @@ public class BoardDao {
                         rs.getString("boardName"),
                         rs.getString("boardAdmin"),
                         rs.getString("createdAt"),
-                        rs.getString("updatedAt"),
-                        rs.getString("status")
+                        rs.getString("updatedAt")
                 ), userIdx);
     }
 
