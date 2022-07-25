@@ -48,10 +48,20 @@ public class BoardService {
                     throw new BasicException(BOARD_SCRAP_FAIL);
                 }
             }
+            else if(!boardProvider.checkUnscrapExist(boardIdx, userIdx)){
+
+                int result2 = boardDao.scrapBoard(boardIdx, userIdx);
+                if (result2 == 0) {
+                    throw new BasicException(BOARD_SCRAP_FAIL);
+                }
+            }
             else {
                 throw new BasicException(SCRAP_BOARD_EXIST);
             }
-        } catch (Exception e) {
+        } catch (BasicException e) {
+            System.out.println(e.getStatus());
+            throw new BasicException(e.getStatus());
+        }catch (Exception e){
             throw new BasicException(DB_ERROR);
         }
     }

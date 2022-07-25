@@ -68,6 +68,7 @@ public class BoardDao {
                 "FROM Board AS b\n" +
                 "LEFT JOIN(SELECT boardIdx, userIdx, status FROM BoardSubscription) bs ON b.boardIdx = bs.boardIdx\n" +
                 "WHERE bs.userIdx = ? and b.status = 'ACTIVE' and bs.status = 'ACTIVE'";
+             
         int getBoardListParams = userIdx;
 
         return this.jdbcTemplate.query(getBoardListQuery,
@@ -101,9 +102,28 @@ public class BoardDao {
                 ), userIdx);
     }
 
+
     public int countScrapBoardList(int userIdx) {
         String countScrapQuery = "SELECT COUNT(boardIdx) FROM BoardSubscription WHERE userIdx = ? and status = 'ACTIVE';";
 
         return this.jdbcTemplate.queryForObject(countScrapQuery, int.class, userIdx);
+  }
+  
+    /**
+     * true면 없음 ->
+     * false만 있음
+     * */
+    public boolean checkUnscrapExist(int boardIdx, int userIdx) {
+        String checkQuery = "SELECT EXISTS(SELECT boardIdx FROM BoardSubscription WHERE boardIdx = ? AND userIdx = ? AND status = 'INACTIVE');";
+
+        Object[] parameters = new Object[] {
+                boardIdx,
+                userIdx
+        };
+
+        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, parameters);
+
+        return result == 0;
+
     }
 }
