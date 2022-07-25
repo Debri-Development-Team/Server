@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: debriServer
+  main:
+      allow-circular-references: true
 
 #DB Config
   datasource:
