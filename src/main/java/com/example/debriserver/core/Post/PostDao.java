@@ -147,21 +147,27 @@ public class PostDao {
      **/
     public List<GetScrapRes> getScrapPosts(int userIdx)
     {
-        String getScrapPostsQuery = "select PM.postIdx, P.boardIdx, PM.userIdx, P.postContent, P.postName, P.createdAt, P.updatedAt\n" +
+        String getScrapPostsQuery = "select PM.postIdx, P.boardIdx, U.nickname, P.postName\n" +
                 "FROM Post as P\n" +
                 "left join(select postIdx, userIdx, status from PostMarked) PM on P.postIdx = PM.postIdx\n" +
+                "left join User as U on P.userIdx = U.userIdx\n" +
                 "where PM.userIdx = ? and P.status = 'ACTIVE'";
-        int getScrapPostsParams = userIdx;
+        String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
+
+        String getLikeCountQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
+
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";
         return this.jdbcTemplate.query(getScrapPostsQuery,
                 (rs, rowNum) -> new GetScrapRes(
                         rs.getInt("postIdx"),
                         rs.getInt("boardIdx"),
-                        rs.getInt("userIdx"),
-                        rs.getString("postContent"),
+                        rs.getString("nickName"),
                         rs.getString("postName"),
-                        rs.getString("createdAt"),
-                        rs.getString("updatedAt")
-                ), getScrapPostsParams);
+                        this.jdbcTemplate.queryForObject(getLikeCountQuery, int.class, rs.getInt("postIdx")),
+                        this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
+                        this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx"))
+                ), userIdx);
+
     }
 
     public int insertPostLike(PostPostLikeReq postPostLikeReq) {

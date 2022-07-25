@@ -1,6 +1,6 @@
 package com.example.debriserver.core.Board;
 
-import com.example.debriserver.core.Board.model.GetBoardListRes;
+import com.example.debriserver.core.Board.model.GetUnscrapBoardListRes;
 import com.example.debriserver.core.Board.model.GetScrapBoardListRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -63,10 +63,10 @@ public class BoardDao {
     }
 
     public List<GetScrapBoardListRes> getScrapBoardList(int userIdx) {
-        String getBoardListQuery = "SELECT b.boardIdx, b.boardName, b.boardAdmin, b.createdAt, b.updatedAt, b.status\n" +
-                "FROM Board AS b\n" +
-                "LEFT JOIN(SELECT boardIdx, userIdx FROM BoardSubscription) bs ON b.boardIdx = bs.boardIdx\n" +
-                "WHERE bs.userIdx = ? and b.status = 'ACTIVE'";
+        String getBoardListQuery = "SELECT b.boardIdx, b.boardName, b.boardAdmin, b.createdAt, b.updatedAt, bs.status\n" +
+                "FROM Board AS b LEFT JOIN BoardSubscription bs ON b.boardIdx = bs.boardIdx\n" +
+                "WHERE bs.userIdx = ? and b.status = 'ACTIVE' and bs.status = 'ACTIVE';";
+
         int getBoardListParams = userIdx;
 
         return this.jdbcTemplate.query(getBoardListQuery,
@@ -80,14 +80,36 @@ public class BoardDao {
                 ), getBoardListParams);
     }
 
-    public List<GetBoardListRes> getList() {
-        String getListQuery = "SELECT boardIdx, boardName, boardAdmin FROM Board WHERE status = 'ACTIVE';";
+    public List<GetUnscrapBoardListRes> getList(int userIdx) {
+        String getListQuery = "SELECT b.boardIdx, b.boardName, b.boardAdmin, b.createdAt, b.updatedAt, BS.status\n" +
+                "FROM Board as b LEFT JOIN BoardSubscription BS on b.boardIdx = BS.boardIdx\n" +
+                "WHERE BS.status='INACTIVE' and b.status = 'ACTIVE' and BS.userIdx = ?;";
 
         return this.jdbcTemplate.query(getListQuery,
-                (rs, rowNum) -> new GetBoardListRes(
+                (rs, rowNum) -> new GetUnscrapBoardListRes(
                         rs.getInt("boardIdx"),
                         rs.getString("boardName"),
-                        rs.getString("boardAdmin")
-                ));
+                        rs.getString("boardAdmin"),
+                        rs.getString("createdAt"),
+                        rs.getString("updatedAt"),
+                        rs.getString("status")
+                ), userIdx);
+    }
+
+    /**
+     * true면 없음 ->
+     * false만 있음
+     * */
+    public boolean checkUnscrapExist(int boardIdx, int userIdx) {
+        String checkQuery = "SELECT EXISTS(SELECT boardIdx FROM BoardSubscription WHERE boardIdx = ? AND userIdx = ? AND status = 'INACTIVE');";
+
+        Object[] parameters = new Object[] {
+                boardIdx,
+                userIdx
+        };
+
+        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, parameters);
+
+        return result == 0;
     }
 }
