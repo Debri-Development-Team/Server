@@ -13,4 +13,5 @@ public class GetLectureListRes {
     private int chapterNumber;
     private String langTag;
     private String pricing;
+    private String materialType;
 }

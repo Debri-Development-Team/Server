@@ -24,10 +24,10 @@ public class LectureDao {
      */
     public List<GetLectureListRes> getLectureList() {
         String getQuery =
-                "SELECT L.lectureIdx, lectureName, chapterNumber, L.langTag, pricing\n" +
+                "SELECT L.lectureIdx, lectureName, chapterNumber, L.langTag, pricing, SUB.matreialType\n" +
                         "FROM\n" +
                         "(Lecture as L LEFT JOIN\n" +
-                        "(SELECT M.chapterNumber, MAT.lectureIdx FROM Material as M LEFT JOIN Material_Lecture as MAT ON M.materialIdx = MAT.materialIdx) as SUB\n" +
+                        "(SELECT M.chapterNumber, MAT.lectureIdx, M.matreialType FROM Material as M LEFT JOIN Material_Lecture as MAT ON M.materialIdx = MAT.materialIdx) as SUB\n" +
                         "ON L.lectureIdx = SUB.lectureIdx);";
 
         return this.jdbcTemplate.query(getQuery, (rs, rowNum) -> new GetLectureListRes(
@@ -35,7 +35,8 @@ public class LectureDao {
                         rs.getString("lectureName"),
                         rs.getInt("chapterNumber"),
                         rs.getString("langTag"),
-                        rs.getString("pricing")
+                        rs.getString("pricing"),
+                        rs.getString("materialType")
                 )
         );
     }
@@ -81,12 +82,12 @@ public class LectureDao {
      * */
     public List<GetLectureListRes> getScrapLectureList(int userIdx) {
         String getQuery =
-                "SELECT SUB2.lectureIdx, lectureName, chapterNumber, SUB2.langTag, pricing\n" +
-                "FROM (SELECT L.*, SUB.chapterNumber FROM (Lecture as L LEFT JOIN\n" +
-                "(SELECT M.chapterNumber, MAT.lectureIdx FROM Material as M LEFT JOIN Material_Lecture as MAT ON M.materialIdx = MAT.materialIdx) as SUB\n" +
-                "ON L.lectureIdx = SUB.lectureIdx)) as SUB2 LEFT JOIN\n" +
-                "LectureScrap as LS ON SUB2.lectureIdx = LS.lectureIdx\n" +
-                "WHERE LS.status = 'ACTIVE' and LS.userIdx = ?;";
+                "SELECT SUB2.lectureIdx, lectureName, chapterNumber, SUB2.langTag, pricing, SUB2.materialType\n" +
+                "                FROM (SELECT L.*, SUB.chapterNumber, SUB.materialType FROM (Lecture as L LEFT JOIN\n" +
+                "                (SELECT M.chapterNumber, MAT.lectureIdx, M.materialType FROM Material as M LEFT JOIN Material_Lecture as MAT ON M.materialIdx = MAT.materialIdx) as SUB\n" +
+                "                ON L.lectureIdx = SUB.lectureIdx)) as SUB2 LEFT JOIN\n" +
+                "                LectureScrap as LS ON SUB2.lectureIdx = LS.lectureIdx\n" +
+                "                WHERE LS.status = 'ACTIVE' and LS.userIdx = ?;";
 
         return this.jdbcTemplate.query(getQuery,(rs, rowNum)
                 -> new GetLectureListRes(
@@ -94,7 +95,8 @@ public class LectureDao {
                     rs.getString("lectureName"),
                     rs.getInt("chapterNumber"),
                     rs.getString("langTag"),
-                    rs.getString("pricing")
+                    rs.getString("pricing"),
+                    rs.getString("materialType")
         ), userIdx);
     }
     /**
@@ -126,6 +128,32 @@ public class LectureDao {
                         rs.getString("materialLink"),
                         rs.getInt("chapterNumber")
         ), lectureIdx);
+    }
+
+    /**
+     * 강의 검색
+     * */
+    public List<GetLectureListRes> searchLecture(String langTag, String typeTag, String pricing, String keyword) {
+        String getQuery ="";
+
+        Object[] parameters = new Object[]{
+                pricing,
+                pricing,
+                langTag,
+                langTag,
+                typeTag,
+                typeTag,
+        };
+
+        return this.jdbcTemplate.query(getQuery,
+                (rs, rowNum) -> new GetLectureListRes(
+                        rs.getInt("lectureIdx"),
+                        rs.getString("lectureName"),
+                        rs.getInt("chapterNumber"),
+                        rs.getString(langTag),
+                        rs.getString("pricing"),
+                        rs.getString("materialType")
+                ), parameters);
     }
 
     /**
@@ -196,5 +224,19 @@ public class LectureDao {
         String checkQuery = "SELECT EXISTS(SELECT userIdx, lectureIdx FROM LectureScrap WHERE userIdx = ? and status = 'ACTIVE');";
 
         return 0 < this.jdbcTemplate.queryForObject(checkQuery, int.class, userIdx);
+    }
+
+    public int checkSearchRowExist(String langTag, String typeTag, String pricing, String keyword) {
+        String checkQuery = "";
+
+        Object[] parameters = new Object[]{
+                pricing,
+                pricing,
+                langTag,
+                langTag,
+                typeTag,
+                typeTag,
+        };
+        return this.jdbcTemplate.queryForObject(checkQuery, int.class, parameters);
     }
 }
