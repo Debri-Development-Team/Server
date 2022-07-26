@@ -1,5 +1,7 @@
 package com.example.debriserver.core.Lecture;
 
+import com.example.debriserver.basicModels.BasicException;
+import com.example.debriserver.basicModels.BasicServerStatus;
 import com.example.debriserver.utility.jwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,5 +21,21 @@ public class LectureService {
         this.jwt = jwt;
         this.lectureProvider = lectureProvider;
         this.lectureDao = lectureDao;
+    }
+
+    public boolean createLectureScrap(int userIdx, int lectureIdx, boolean checkParameter) throws BasicException{
+        try{
+            return lectureDao.createLectureScrap(userIdx, lectureIdx, checkParameter);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean deleteLectureScrap(int userIdx, int lectureIdx) throws BasicException{
+        try{
+            return lectureDao.deleteLectureScrap(userIdx, lectureIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
     }
 }
