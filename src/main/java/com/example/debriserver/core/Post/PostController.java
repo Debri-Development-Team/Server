@@ -197,7 +197,8 @@ public class PostController {
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             String keyword = getPostSearchListReq.getKeyword();
-            List<GetPostSearchListRes> getPostSearchListRes = postProvider.getPostSearchList(keyword);
+            int userIdx = jwt.getUserIdx();
+            List<GetPostSearchListRes> getPostSearchListRes = postProvider.getPostSearchList(userIdx, keyword);
 
             return  new BasicResponse<>(getPostSearchListRes);
 

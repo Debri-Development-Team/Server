@@ -15,5 +15,14 @@ public class ReportDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-
+    public int reportUser(int reportUserIdx, int postIdx, String reason)
+    {
+        String reportUserQuery = "INSERT INTO ReportedUser(reportUserIdx, reportedUserIdx, reason) VALUES (?, (select userIdx from Post where postIdx = ?), ?);";
+        Object[] reportUserParams = new Object[]{
+                reportUserIdx,
+                postIdx,
+                reason
+        };
+        return this.jdbcTemplate.update(reportUserQuery, reportUserParams);
+    }
 }

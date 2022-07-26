@@ -63,10 +63,10 @@ public class PostProvider {
         }
     }
 
-    public List<GetPostSearchListRes> getPostSearchList(String keyword) throws BasicException{
+    public List<GetPostSearchListRes> getPostSearchList(int userIdx, String keyword) throws BasicException{
         try{
 
-            return postDao.getPostSearchList(keyword);
+            return postDao.getPostSearchList(userIdx, keyword);
 
         }catch (Exception exception){
             System.out.println(exception.getMessage());

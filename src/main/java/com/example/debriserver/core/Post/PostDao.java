@@ -210,12 +210,14 @@ public class PostDao {
                 boardIdx);
     }
 
-    public List<GetPostSearchListRes> getPostSearchList(String keyword){
-        String getPostSearchListQuery = "SELECT distinct p.boardIdx, p.postIdx, u.nickname, p.postName\n" +
-                                        "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
-                                        "WHERE p.status = 'ACTIVE' AND p.postName like '%" +
-                                        keyword +
-                                        "%'";
+    public List<GetPostSearchListRes> getPostSearchList(int userIdx, String keyword){
+        String getPostSearchListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, ru.reportUserIdx, ru.reportedUserIdx\n" +
+                "FROM Post as p\n" +
+                "    LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
+                "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx =" + userIdx + "\n" +
+                "WHERE p.status = 'ACTIVE' AND p.postName like '%test%' AND reportedUserIdx is null";
+
+//        int getPostSearchListParams = userIdx;
 
         String getLikeCountQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
 
@@ -233,8 +235,7 @@ public class PostDao {
                                 this.jdbcTemplate.queryForObject(getLikeCountQuery, int.class, rs.getInt("postIdx")),
                                 this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
                                 this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx"))
-                        )
-        );
+                        ));
     }
 
     public GetPostRes getPost(int postIdx){
