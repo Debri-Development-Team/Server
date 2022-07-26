@@ -2,9 +2,13 @@ package com.example.debriserver.core.Lecture;
 
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicServerStatus;
+import com.example.debriserver.core.Lecture.Model.GetLectureListRes;
+import com.example.debriserver.core.Lecture.Model.GetLectureRes;
 import com.example.debriserver.utility.jwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class LectureService {
@@ -35,6 +39,31 @@ public class LectureService {
         try{
             return lectureDao.deleteLectureScrap(userIdx, lectureIdx);
         }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public List<GetLectureListRes> getLectureList() throws BasicException{
+        try{
+            return lectureDao.getLectureList();
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public List<GetLectureListRes> getScrapLectureList(int userIdx) throws BasicException{
+        try{
+            return lectureDao.getScrapLectureList(userIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public GetLectureRes getLecture(int lectureIdx) throws BasicException{
+        try{
+            return lectureDao.getLecture(lectureIdx);
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }
