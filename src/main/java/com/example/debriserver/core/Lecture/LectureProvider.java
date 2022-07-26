@@ -31,4 +31,28 @@ public class LectureProvider {
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }
+
+    public boolean checkLectureScrapExist(int userIdx, int lectureIdx) throws BasicException{
+        try{
+            return lectureDao.checkLectureScrapExist(userIdx, lectureIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean checkLectureUnscrapExist(int userIdx, int lectureIdx) throws BasicException{
+        try{
+            return lectureDao.checkLectureUnscrapExist(userIdx, lectureIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean checkLectureScrapDataExist(int userIdx, int lectureIdx) throws BasicException{
+        try{
+            return lectureDao.checkLectureScrapDataExist(userIdx, lectureIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
 }

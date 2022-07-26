@@ -110,7 +110,12 @@ public enum BasicServerStatus {
 
 
 
-   SCRAP_TARGET_LECTURE_NOT_EXIST(false, 7300, "스크랩 대상 강의가 존재하지 않습니다.");
+    SCRAP_TARGET_LECTURE_NOT_EXIST(false, 7300, "스크랩 대상 강의가 존재하지 않습니다."),
+    SCRAP_FAIL(false, 7301, "스크랩 실패"),
+    ALREADY_SCRAP_LECTUER(false, 7302, "이미 스크랩한 강의 입니다."),
+    ALREADY_UNSCRAP_LECTUER(false, 7303, "이미 스크랩 삭제한 강의 입니다."),
+    SCRAP_DELETE_FAIL(false, 7304, "스크랩 삭제 실패");
+
     private final boolean isSuccess;
     private final int returnCode;
     private final String returnMsg;
