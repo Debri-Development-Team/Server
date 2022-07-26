@@ -143,9 +143,10 @@ public class CommentDao {
         postReplyOnReplyRes.setCommentContent(postReplyOnReplyReq.getContent());
         postReplyOnReplyRes.setPostIdx(postReplyOnReplyReq.getPostIdx());
         postReplyOnReplyRes.setCommentIdx(insertedIdx);
+        postReplyOnReplyRes.setCommentLevel(others[2]);
         postReplyOnReplyRes.setCommentGroup(others[0]);
         postReplyOnReplyRes.setCommentOrder(others[1]);
-        postReplyOnReplyRes.setLevel(others[2]);
+
 
         return postReplyOnReplyRes;
     }
