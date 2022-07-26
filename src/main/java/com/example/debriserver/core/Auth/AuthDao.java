@@ -20,7 +20,7 @@ public class AuthDao {
 
     public User getUser(PostLoginReq postLoginReq)
     {
-        String getUserQuery = "select userIdx, userId, password, nickname, birthday from User where userId = ?";
+        String getUserQuery = "select userIdx, userId, password, nickname, birthday from User where userId = ? and status = 'ACTIVE'";
         String getUserParams = postLoginReq.getEmail();
 
 
@@ -37,7 +37,7 @@ public class AuthDao {
     }
 
     public void insertRefresh(String Refresh,String userId){
-        String insertRefreshQuery = "UPDATE User SET jwtRefreshToken = ? WHERE userId =?;";
+        String insertRefreshQuery = "UPDATE User SET jwtRefreshToken = ? WHERE userId =? and status = 'ACTIVE';";
         Object[] insertRefreshParameters = new Object[] {
                 Refresh,
                 userId

@@ -188,7 +188,7 @@ public class PostDao {
 
     public List<GetPostListRes> getPostList(int boardIdx){
         String getListQuery = "SELECT distinct p.boardIdx, p.postIdx, u.nickname, p.postName\n" +
-                "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx WHERE boardIdx = ?;";
+                "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx WHERE boardIdx = ? and p.status = 'ACTIVE';";
 
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
 
@@ -239,7 +239,8 @@ public class PostDao {
 
     public GetPostRes getPost(int postIdx){
         String getPostQuery = "SELECT distinct p.boardIdx, p.postIdx, p.postName, u.nickname, p.postContent, p.userIdx\n" +
-                "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx WHERE postIdx = ?;";
+                "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx WHERE postIdx = ? and p.status = 'ACTIVE';";
+
         String getLikeQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
         String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";

@@ -67,4 +67,17 @@ public class LectureService {
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }
+
+    public List<GetLectureListRes> searchLecture(String langTag, String typeTag, String pricing, String keyword) throws BasicException {
+        try {
+            if (!lectureProvider.checkSearchRowExist(langTag, typeTag, pricing, keyword)) throw new BasicException(BasicServerStatus.SEARCH_TARGET_NOT_EXIST);
+
+                return lectureDao.searchLecture(langTag, typeTag, pricing, keyword);
+        } catch (BasicException exception) {
+            throw new BasicException(exception.getStatus());
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
 }
