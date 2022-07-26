@@ -3,12 +3,15 @@ package com.example.debriserver.core.Lecture;
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
+import com.example.debriserver.core.Lecture.Model.GetLectureListRes;
 import com.example.debriserver.core.Lecture.Model.PostScrapReq;
 import com.example.debriserver.utility.jwtUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/lecture")
@@ -31,7 +34,22 @@ public class LectureController {
         this.lectureService = lectureService;
         this.jwt = JwtUtility;
     }
-    //@GetMapping("/getLectureList")
+    /**
+     * 6.1 전체 강의 리스트 조회 API
+     * [GET] 127.0.0.1/api/lecture/getLectureList
+     * */
+    @GetMapping("/getLectureList")
+    public List<BasicResponse<GetLectureListRes>> getLectureList(){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            return lectureService.getLectureList();
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
     /**
      * 6.2 강의 즐겨찾기 API

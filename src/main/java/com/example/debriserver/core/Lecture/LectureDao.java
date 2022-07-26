@@ -1,10 +1,13 @@
 package com.example.debriserver.core.Lecture;
 
+import com.example.debriserver.basicModels.BasicResponse;
+import com.example.debriserver.core.Lecture.Model.GetLectureListRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 @Repository
 public class LectureDao {
@@ -15,6 +18,12 @@ public class LectureDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    /**
+     * 전체 강의 리스트 조회
+     * */
+    public List<BasicResponse<GetLectureListRes>> getLectureList() {
+        String getQuery = "";
+    }
 
     /**
      * 강의 스크랩 생성
@@ -107,4 +116,6 @@ public class LectureDao {
 
         return 1 == this.jdbcTemplate.queryForObject(checkQuery, int.class, parameters);
     }
+
+
 }
