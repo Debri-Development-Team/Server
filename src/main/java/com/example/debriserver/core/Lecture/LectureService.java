@@ -20,4 +20,7 @@ public class LectureService {
         this.lectureProvider = lectureProvider;
         this.lectureDao = lectureDao;
     }
+
+    public String createLectureScrap(int userIdx, int lectureIdx) {
+    }
 }

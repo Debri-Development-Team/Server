@@ -14,4 +14,8 @@ public class LectureDao {
     public void getDataSource(DataSource dataSource){
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
+
+    public boolean checkLectureExist(int lectureIdx) {
+        String checkQuery = "";
+    }
 }
