@@ -3,7 +3,6 @@ package com.example.debriserver.core.User;
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
-import com.example.debriserver.core.Auth.model.PostLoginRes;
 import com.example.debriserver.core.User.Model.PostSignUpReq;
 import com.example.debriserver.core.User.Model.PostSignUpRes;
 import org.slf4j.Logger;
@@ -33,6 +32,9 @@ public class UserController {
         this.userDao = userDao;
     }
 
+    /**
+     * 회원가입 API
+     */
     @PostMapping("/signUp")
     public BasicResponse<PostSignUpRes> signUp(@RequestBody PostSignUpReq postSignUpReq) {
         try{
@@ -89,5 +91,49 @@ public class UserController {
             return new BasicResponse<>((exception.getStatus()));
         }
     }
+
+    /*@ResponseBody
+    @PatchMapping("/{userIdx}")
+    public BasicResponse<String> modifyUser(@PathVariable ("userIdx") int userIdx, @RequestBody PatchUserReq patchUserReq) {
+        try{
+            *//*String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);*//*
+
+            *//*if (patchUserReq.getPostContent().length() > 5000) {
+                return new BasicResponse<>(BasicServerStatus.POST_TOO_LONG_CONTENTS);
+            }*//*
+
+            userService.modifyUser(patchUserReq.getUserIdx(), userIdx, patchUserReq);
+            String result = "게시물 정보 수정을 완료하였습니다.";
+            return new BasicResponse<>(result);
+        } catch(BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }*/
+
+    // 회원 삭제
+    @ResponseBody
+    @PatchMapping("/{userId}/status")
+    public BasicResponse<String> deleteUser(@PathVariable("userId") String userId){
+        try {
+            /*// TODO: jwt는 다음주차에서 배울 내용입니다!
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(userId != userIdxByJwt){
+                return new BasicResponse<>(INVALID_USER_JWT);
+            }
+            //같다면 유저 삭제*/
+
+            userService.deleteUser(userId);
+
+            String result = "삭제되었습니다.";
+            return new BasicResponse<>(result);
+        } catch (BasicException exception) {
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
 
 }
