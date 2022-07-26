@@ -54,12 +54,13 @@ public class AuthService {
         if(user.getPassword().equals(postLoginReq.getPwd()))
         {
             int userIdx = user.getUserIdx();
+            String userName = user.getNickname();
             String jwt = jwtUtility.createToken(userIdx);
             String refreshToken = jwtUtility.createRefreshToken();
 
             authDao.insertRefresh(refreshToken, postLoginReq.getEmail());
 
-            return new PostLoginRes(userIdx, jwt, refreshToken);
+            return new PostLoginRes(userIdx, userName, jwt, refreshToken);
         }
         else
         {
