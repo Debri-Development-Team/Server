@@ -39,13 +39,14 @@ public class LectureController {
      * [GET] 127.0.0.1/api/lecture/getLectureList
      * */
     @GetMapping("/getLectureList")
-    public List<BasicResponse<GetLectureListRes>> getLectureList(){
+    public BasicResponse<List<GetLectureListRes>> getLectureList(){
         try{
             String jwtToken = jwt.getJwt();
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            return lectureService.getLectureList();
+            return new BasicResponse<>(lectureService.getLectureList());
+
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
         }
@@ -106,4 +107,24 @@ public class LectureController {
         }
     }
 
+    /**
+     * 6.4 즐겨찾기 한 강의 리스트 조회
+     * [GET] 127.0.0.1:8521/api/lecture/getScrapList/{userIdx}
+     * */
+    @GetMapping("/getScrapList/{userIdx}")
+    public BasicResponse<List<GetLectureListRes>>getScrapLectureList(@PathVariable int userIdx){
+
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            if(!lectureProvider.checkScrapActiveLectureExist(userIdx)) throw new BasicException(BasicServerStatus.SCRAP_ACTIVE_NOT_EXIST);
+
+            return new BasicResponse<>(lectureService.getScrapLectureList(userIdx));
+
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 }

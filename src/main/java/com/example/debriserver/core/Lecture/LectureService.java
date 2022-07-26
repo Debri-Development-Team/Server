@@ -43,9 +43,17 @@ public class LectureService {
         }
     }
 
-    public List<BasicResponse<GetLectureListRes>> getLectureList() throws BasicException{
+    public List<GetLectureListRes> getLectureList() throws BasicException{
         try{
             return lectureDao.getLectureList();
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public List<GetLectureListRes> getScrapLectureList(int userIdx) throws BasicException{
+        try{
+            return lectureDao.getScrapLectureList(userIdx);
         }catch (Exception exception){
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
