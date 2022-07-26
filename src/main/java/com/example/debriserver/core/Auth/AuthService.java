@@ -60,7 +60,7 @@ public class AuthService {
 
             authDao.insertRefresh(refreshToken, postLoginReq.getEmail());
 
-            return new PostLoginRes(userIdx, userName, jwt, refreshToken);
+            return new PostLoginRes(userIdx, userName, user.getUserId(), user.getBirthday(), jwt, refreshToken);
         }
         else
         {
