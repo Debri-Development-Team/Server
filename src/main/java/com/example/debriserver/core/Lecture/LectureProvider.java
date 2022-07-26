@@ -1,5 +1,7 @@
 package com.example.debriserver.core.Lecture;
 
+import com.example.debriserver.basicModels.BasicException;
+import com.example.debriserver.basicModels.BasicServerStatus;
 import com.example.debriserver.utility.jwtUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,4 +24,35 @@ public class LectureProvider {
     }
 
 
+    public boolean checkLectureExist(int lectureIdx) throws BasicException{
+        try{
+            return lectureDao.checkLectureExist(lectureIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean checkLectureScrapExist(int userIdx, int lectureIdx) throws BasicException{
+        try{
+            return lectureDao.checkLectureScrapExist(userIdx, lectureIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean checkLectureUnscrapExist(int userIdx, int lectureIdx) throws BasicException{
+        try{
+            return lectureDao.checkLectureUnscrapExist(userIdx, lectureIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean checkLectureScrapDataExist(int userIdx, int lectureIdx) throws BasicException{
+        try{
+            return lectureDao.checkLectureScrapDataExist(userIdx, lectureIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
 }

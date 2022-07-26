@@ -110,7 +110,7 @@ public class PostController {
             String jwtToken = jwt.getJwt();
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
 
             String result = "스크랩이 설정되었습니다.";
             postService.scrapPost(postIdx, userIdx);
@@ -173,7 +173,7 @@ public class PostController {
             String jwtToken = jwt.getJwt();
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
 
             String result = "스크랩이 해제되었습니다.";
             postService.unScrapPost(postIdx, userIdx);
@@ -241,7 +241,7 @@ public class PostController {
              String jwtToken = jwt.getJwt();
              if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-             int userIdx = jwt.getUserIdx();
+             int userIdx = jwt.getUserIdx(jwtToken);
 
              List<GetScrapRes> getPosts = postService.getScrapPosts(userIdx);
              return new BasicResponse<>(getPosts);

@@ -90,7 +90,7 @@ public enum BasicServerStatus {
     INVALID_JWT(false, 5002, "Invalid Jwt Token"),
     INVALID_SIGNATURE(false, 5003, "Invalid Jwt Signature"),
     UNSUPPORTED_JWT(false, 5004, "Unsupported Jwt"),
-    EMPTY_JWT_CLAIMS_STRING(false, 5005, "Jwt Claims String Empty");
+    EMPTY_JWT_CLAIMS_STRING(false, 5005, "Jwt Claims String Empty"),
 
     /**
      * 6000: 신고 API에서 사용 6000 번부터는 하원이 사용 6500번부터 미뇽이 사용
@@ -99,6 +99,22 @@ public enum BasicServerStatus {
     /**
      * 7000: 커리큘럼 API에서 사용 7000번 부터 찜니가 사용, 7300번 부터 루키가 사용, 7600번 부터 루카가 사용
      * */
+
+
+
+
+
+
+
+
+
+
+
+    SCRAP_TARGET_LECTURE_NOT_EXIST(false, 7300, "스크랩 대상 강의가 존재하지 않습니다."),
+    SCRAP_FAIL(false, 7301, "스크랩 실패"),
+    ALREADY_SCRAP_LECTUER(false, 7302, "이미 스크랩한 강의 입니다."),
+    ALREADY_UNSCRAP_LECTUER(false, 7303, "이미 스크랩 삭제한 강의 입니다."),
+    SCRAP_DELETE_FAIL(false, 7304, "스크랩 삭제 실패");
 
     private final boolean isSuccess;
     private final int returnCode;
