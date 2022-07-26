@@ -55,4 +55,12 @@ public class LectureProvider {
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }
+
+    public boolean checkScrapActiveLectureExist(int userIdx) throws  BasicException{
+        try{
+            return lectureDao.checkScrapActiveLectureExist(userIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
 }
