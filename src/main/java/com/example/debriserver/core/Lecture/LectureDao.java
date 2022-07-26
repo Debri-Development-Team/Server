@@ -2,6 +2,7 @@ package com.example.debriserver.core.Lecture;
 
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.core.Lecture.Model.GetLectureListRes;
+import com.example.debriserver.core.Lecture.Model.GetLectureRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -96,6 +97,37 @@ public class LectureDao {
                     rs.getString("pricing")
         ), userIdx);
     }
+    /**
+     * 강의 상세 내용 조회
+     * */
+    public GetLectureRes getLecture(int lectureIdx) {
+        String getQuery =
+                "SELECT L.*, SUB.materialIdx, SUB.materialName,SUB.materialAuthor, SUB.publisher, SUB.publishDate, SUB.materialLink, SUB.chapterNumber FROM\n" +
+                "Lecture as L LEFT JOIN\n" +
+                "(SELECT M.*, ML.lectureIdx FROM Material as M LEFT JOIN Material_Lecture as ML ON M.materialIdx = ML.materialIdx) as SUB\n" +
+                "ON L.lectureIdx = SUB.lectureIdx WHERE L.lectureIdx = ?;";
+
+        return this.jdbcTemplate.queryForObject(getQuery, (rs, rowNum)
+                -> new GetLectureRes(
+                        rs.getInt("lectureIdx"),
+                        rs.getString("lectureName"),
+                        rs.getString("lectureDesc"),
+                        rs.getString("langTag"),
+                        rs.getInt("matNumber"),
+                        rs.getString("pricing"),
+                        rs.getString("createdAt"),
+                        rs.getString("updatedAt"),
+                        rs.getString("complete"),
+                        rs.getInt("materialIdx"),
+                        rs.getString("materialName"),
+                        rs.getString("materialAuthor"),
+                        rs.getString("publisher"),
+                        rs.getString("publishDate"),
+                        rs.getString("materialLink"),
+                        rs.getInt("chapterNumber")
+        ), lectureIdx);
+    }
+
     /**
      * 강의가 존재 하는지 체크하는 메서드
      *

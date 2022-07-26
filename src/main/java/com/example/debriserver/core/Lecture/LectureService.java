@@ -1,9 +1,9 @@
 package com.example.debriserver.core.Lecture;
 
 import com.example.debriserver.basicModels.BasicException;
-import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
 import com.example.debriserver.core.Lecture.Model.GetLectureListRes;
+import com.example.debriserver.core.Lecture.Model.GetLectureRes;
 import com.example.debriserver.utility.jwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,6 +55,15 @@ public class LectureService {
         try{
             return lectureDao.getScrapLectureList(userIdx);
         }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public GetLectureRes getLecture(int lectureIdx) throws BasicException{
+        try{
+            return lectureDao.getLecture(lectureIdx);
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }

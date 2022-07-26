@@ -4,6 +4,7 @@ import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
 import com.example.debriserver.core.Lecture.Model.GetLectureListRes;
+import com.example.debriserver.core.Lecture.Model.GetLectureRes;
 import com.example.debriserver.core.Lecture.Model.PostScrapReq;
 import com.example.debriserver.utility.jwtUtility;
 import org.slf4j.Logger;
@@ -123,6 +124,25 @@ public class LectureController {
 
             return new BasicResponse<>(lectureService.getScrapLectureList(userIdx));
 
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /*
+     * 6.5 강의 상세조회 API
+     * [GET] 127.0.0.1:8521/api/lecture/getLecture/{lectureIdx}
+     * */
+    @GetMapping("/getLecture/{lectureIdx}")
+    public BasicResponse<GetLectureRes> getLecture(@PathVariable int lectureIdx){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            if(!lectureProvider.checkLectureExist(lectureIdx)) throw new BasicException(BasicServerStatus.LECTURE_NOT_EXIST);
+
+            return new BasicResponse<>(lectureService.getLecture(lectureIdx));
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
         }
