@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.example.debriserver.basicModels.BasicServerStatus.DB_ERROR;
+
 @Service
 public class LectureProvider {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -53,6 +55,23 @@ public class LectureProvider {
             return lectureDao.checkLectureScrapDataExist(userIdx, lectureIdx);
         }catch (Exception exception){
             throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean checkScrapActiveLectureExist(int userIdx) throws  BasicException{
+        try{
+            return lectureDao.checkScrapActiveLectureExist(userIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean checkSearchRowExist(String langTag, String typeTag, String pricing, String keyword)throws BasicException {
+        try {
+            return 0 < lectureDao.checkSearchRowExist(langTag, typeTag, pricing, keyword);
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            throw new BasicException(DB_ERROR);
         }
     }
 }
