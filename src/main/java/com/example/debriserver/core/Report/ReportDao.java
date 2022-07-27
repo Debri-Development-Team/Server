@@ -25,4 +25,22 @@ public class ReportDao {
         };
         return this.jdbcTemplate.update(reportUserQuery, reportUserParams);
     }
+
+    public int checkUserExist(int userIdx)
+    {
+        String checkUserExistQuery = "select exists(select userIdx from User where userIdx = ? and status = 'ACTIVE')";
+        int checkUserExistParams = userIdx;
+        return this.jdbcTemplate.queryForObject(checkUserExistQuery,
+                int.class,
+                checkUserExistParams);
+    }
+
+    public int checkPostExist(int postIdx)
+    {
+        String checkPostExistQuery = "select exists(select postIdx from Post where postIdx = ? and status = 'ACTIVE')";
+        int checkPostExistParams = postIdx;
+        return this.jdbcTemplate.queryForObject(checkPostExistQuery,
+                int.class,
+                checkPostExistParams);
+    }
 }

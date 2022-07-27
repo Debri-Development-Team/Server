@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.example.debriserver.basicModels.BasicServerStatus.DB_ERROR;
+import static com.example.debriserver.basicModels.BasicServerStatus.*;
 
 @Service
 public class ReportService {
@@ -37,7 +37,24 @@ public class ReportService {
     public void reportUser(int reportUserIdx, int postIdx, String reason) throws BasicException
     {
         try{
+            // reportUserIdx가 User table에 존재하는지 확인
+            if(reportProvider.checkUserExist(reportUserIdx) == 0)
+            {
+                throw new BasicException(USERS_EMPTY_USER_ID);
+            }
+
+            // postIdx가 Post table에 존재하는지 확인
+            if(reportProvider.checkPostExist(postIdx) == 0)
+            {
+                throw new BasicException(POSTS_EMPTY_POST_ID);
+            }
+
             int result = reportDao.reportUser(reportUserIdx, postIdx, reason);
+            if(result == 0)
+            {
+                throw new BasicException(DB_ERROR);
+            }
+
         } catch (Exception exception) {
             throw new BasicException(DB_ERROR);
         }

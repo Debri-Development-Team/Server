@@ -223,7 +223,8 @@ public class PostController {
              if (!postProvider.checkBoardExist(boardIdx))
                  return new BasicResponse<>(BasicServerStatus.BOARD_NOT_EXIST);
 
-             List<GetPostListRes> getPostListRes = postProvider.getPostList(boardIdx);
+             int userIdx = jwt.getUserIdx();
+             List<GetPostListRes> getPostListRes = postProvider.getPostList(userIdx, boardIdx);
 
              return new BasicResponse<>(getPostListRes);
          } catch (BasicException exception) {
