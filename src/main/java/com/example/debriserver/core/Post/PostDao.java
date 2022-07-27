@@ -189,7 +189,7 @@ public class PostDao {
         int insertPostLikeParams = postIdx;
         return this.jdbcTemplate.update(insertPostLikeQuery, insertPostLikeParams);
     }
-
+    
     public List<GetPostListRes> getPostList(int userIdx, int boardIdx){
         String getListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus, pm.status as scrapStatus\n" +
                 "FROM Post as p\n" +
@@ -253,7 +253,8 @@ public class PostDao {
 
     public GetPostRes getPost(int postIdx){
         String getPostQuery = "SELECT distinct p.boardIdx, p.postIdx, p.postName, u.nickname, p.postContent, p.userIdx\n" +
-                "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx WHERE postIdx = ?;";
+                "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx WHERE postIdx = ? and p.status = 'ACTIVE';";
+
         String getLikeQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
         String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";

@@ -11,8 +11,8 @@ public class PostReplyOnReplyRes {
     private int authorIdx;//
     private int postIdx;//
     private int commentIdx;
+    private int commentLevel;
     private int commentGroup;
     private int commentOrder;
-    private int level;
     private String authorName;//
 }

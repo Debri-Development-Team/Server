@@ -41,7 +41,7 @@ public class BoardController {
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
             boardService.scrapBoard(boardIdx, userIdx);
 
             String result = "게시판이 스크랩 되었습니다.";
@@ -63,7 +63,7 @@ public class BoardController {
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
             boardService.cancelScrapBoard(boardIdx, userIdx);
 
             String result = "게시판 스크랩이 취소 되었습니다.";
@@ -85,7 +85,7 @@ public class BoardController {
 
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
             List<GetScrapBoardListRes> getScrapBoardListRes = boardService.getScrapBoardList(userIdx);
 
             return new BasicResponse<>(getScrapBoardListRes);
@@ -106,7 +106,7 @@ public class BoardController {
 
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
 
             if(boardProvider.checkUserExist(userIdx) == 0)
             {
