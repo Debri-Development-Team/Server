@@ -36,7 +36,6 @@ public class LectureController {
         this.jwt = JwtUtility;
     }
     /**
-     * 데이터베이스 변경으로 인한 재작업
      * 6.1 전체 강의 리스트 조회 API
      * [GET] 127.0.0.1/api/lecture/getLectureList
      * */
@@ -110,8 +109,6 @@ public class LectureController {
     }
 
     /**
-     * 데이터베이스 변경으로 인한 재작업
-     * 6.1 전체 조회 API를 참고할 것
      * 6.4 즐겨찾기 한 강의 리스트 조회
      * [GET] 127.0.0.1:8521/api/lecture/getScrapList/{userIdx}
      * */
@@ -133,8 +130,6 @@ public class LectureController {
     }
 
     /*
-     * 데이터베이스 변경으로 인한 재작업
-     * 강의 기본 정보와 강의에 딸려있는 챕터의 완료 정보가 답겨있는 챕터 리스트(chapterIdx, chOrder, complete(관계테이블 이용))를 리턴 해야할 듯
      * 6.5 강의 상세조회 API
      * [GET] 127.0.0.1:8521/api/lecture/getLecture/{lectureIdx}
      * */
@@ -154,7 +149,6 @@ public class LectureController {
     }
 
     /*
-     * 데이터베이스 변경으로 인한 재작업
      * 검색한 타입에 맞는 강의의 리스트를 리턴
      * 6.6 강의 검색 API
      * [GET] 127.0.0.1:8521/api/lecture/search

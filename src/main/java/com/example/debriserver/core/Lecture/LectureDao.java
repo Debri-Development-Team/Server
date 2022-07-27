@@ -1,6 +1,7 @@
 package com.example.debriserver.core.Lecture;
 
 import com.example.debriserver.basicModels.BasicResponse;
+import com.example.debriserver.core.Lecture.Model.ChListRes;
 import com.example.debriserver.core.Lecture.Model.GetLectureListRes;
 import com.example.debriserver.core.Lecture.Model.GetLectureRes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +24,15 @@ public class LectureDao {
      * 전체 강의 리스트 조회
      */
     public List<GetLectureListRes> getLectureList() {
-        String getQuery =
-                "SELECT L.lectureIdx, lectureName, chapterNumber, L.langTag, pricing, SUB.matreialType\n" +
-                        "FROM\n" +
-                        "(Lecture as L LEFT JOIN\n" +
-                        "(SELECT M.chapterNumber, MAT.lectureIdx, M.matreialType FROM Material as M LEFT JOIN Material_Lecture as MAT ON M.materialIdx = MAT.materialIdx) as SUB\n" +
-                        "ON L.lectureIdx = SUB.lectureIdx);";
+        String getQuery = "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture WHERE status = 'ACTIVE';";
 
         return this.jdbcTemplate.query(getQuery, (rs, rowNum) -> new GetLectureListRes(
                         rs.getInt("lectureIdx"),
                         rs.getString("lectureName"),
-                        rs.getInt("chapterNumber"),
+                        rs.getInt("chNumber"),
                         rs.getString("langTag"),
                         rs.getString("pricing"),
-                        rs.getString("materialType")
+                        rs.getString("type")
                 )
         );
     }
@@ -77,56 +73,61 @@ public class LectureDao {
 
         return 0 < this.jdbcTemplate.update(updateQuery, parameters);
     }
+
     /**
      * 스크랩한 강의 리스트 조회
      * */
     public List<GetLectureListRes> getScrapLectureList(int userIdx) {
         String getQuery =
-                "SELECT SUB2.lectureIdx, lectureName, chapterNumber, SUB2.langTag, pricing, SUB2.materialType\n" +
-                "                FROM (SELECT L.*, SUB.chapterNumber, SUB.materialType FROM (Lecture as L LEFT JOIN\n" +
-                "                (SELECT M.chapterNumber, MAT.lectureIdx, M.materialType FROM Material as M LEFT JOIN Material_Lecture as MAT ON M.materialIdx = MAT.materialIdx) as SUB\n" +
-                "                ON L.lectureIdx = SUB.lectureIdx)) as SUB2 LEFT JOIN\n" +
-                "                LectureScrap as LS ON SUB2.lectureIdx = LS.lectureIdx\n" +
-                "                WHERE LS.status = 'ACTIVE' and LS.userIdx = ?;";
+                "SELECT L.lectureIdx, lectureName, chNumber, langTag, pricing, type\n" +
+                "FROM Lecture as L LEFT JOIN LectureScrap as LC ON L.lectureIdx = LC.lectureIdx\n" +
+                "WHERE L.status = 'ACTIVE' and LC.status = 'ACTIVE' and LC.userIdx = ?;";
+
 
         return this.jdbcTemplate.query(getQuery,(rs, rowNum)
                 -> new GetLectureListRes(
                     rs.getInt("lectureIdx"),
                     rs.getString("lectureName"),
-                    rs.getInt("chapterNumber"),
+                    rs.getInt("chNumber"),
                     rs.getString("langTag"),
                     rs.getString("pricing"),
-                    rs.getString("materialType")
+                    rs.getString("type")
         ), userIdx);
     }
     /**
      * 강의 상세 내용 조회
      * */
     public GetLectureRes getLecture(int lectureIdx) {
-        String getQuery =
-                "SELECT L.*, SUB.materialIdx, SUB.materialName,SUB.materialAuthor, SUB.publisher, SUB.publishDate, SUB.materialLink, SUB.chapterNumber FROM\n" +
-                "Lecture as L LEFT JOIN\n" +
-                "(SELECT M.*, ML.lectureIdx FROM Material as M LEFT JOIN Material_Lecture as ML ON M.materialIdx = ML.materialIdx) as SUB\n" +
-                "ON L.lectureIdx = SUB.lectureIdx WHERE L.lectureIdx = ?;";
+        String updateQuery = "UPDATE Lecture SET chNumber = (SELECT COUNT(*) FROM (SELECT chIdx FROM Ch_Lecture WHERE lectureIdx = ?) as sub) WHERE lectureIdx = ?;";
+        String getQuery = "SELECT lectureIdx, lectureName, lectureDesc, langTag, pricing, srcLink, type, chNumber FROM Lecture WHERE lectureIdx = ? and status = 'ACTIVE';";
+        String getListQuery = "SELECT chIdx, lectureIdx, chName, chOrder FROM Chapter WHERE lectureIdx = ? and status = 'ACTIVE';";
+
+        Object[] updateParameter = new Object[]{
+                lectureIdx,
+                lectureIdx
+        };
+
+        this.jdbcTemplate.update(updateQuery, updateParameter);
 
         return this.jdbcTemplate.queryForObject(getQuery, (rs, rowNum)
                 -> new GetLectureRes(
-                        rs.getInt("lectureIdx"),
-                        rs.getString("lectureName"),
-                        rs.getString("lectureDesc"),
-                        rs.getString("langTag"),
-                        rs.getInt("matNumber"),
-                        rs.getString("pricing"),
-                        rs.getString("createdAt"),
-                        rs.getString("updatedAt"),
-                        rs.getString("complete"),
-                        rs.getInt("materialIdx"),
-                        rs.getString("materialName"),
-                        rs.getString("materialAuthor"),
-                        rs.getString("publisher"),
-                        rs.getString("publishDate"),
-                        rs.getString("materialLink"),
-                        rs.getInt("chapterNumber")
+                rs.getInt("lectureIdx"),
+                rs.getString("lectureName"),
+                rs.getString("lectureDesc"),
+                rs.getString("langTag"),
+                rs.getString("pricing"),
+                rs.getString("srcLink"),
+                rs.getString("type"),
+                rs.getInt("chNumber"),
+                this.jdbcTemplate.query(getListQuery,((rs1, rowNum1)
+                        -> new ChListRes(
+                                rs1.getInt("chIdx"),
+                                rs1.getInt("lectureIdx"),
+                                rs1.getString("chName"),
+                                rs1.getInt("chOrder")
+                )), lectureIdx)
+
+
         ), lectureIdx);
     }
 
@@ -134,25 +135,42 @@ public class LectureDao {
      * 강의 검색
      * */
     public List<GetLectureListRes> searchLecture(String langTag, String typeTag, String pricing, String keyword) {
-        String getQuery ="";
+        String getQuery =
+                "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture\n" +
+                "WHERE\n" +
+                "(CASE WHEN STRCMP('html', ?) = 0 THEN langTag = 'html' WHEN STRCMP('css', ?) = 0 THEN langTag = 'css'\n" +
+                "WHEN STRCMP('js', ?) = 0 THEN langTag = 'JS' WHEN STRCMP('c', ?) = 0 THEN langTag = 'C'\n" +
+                "WHEN STRCMP('java', ?) = 0 THEN langTag = 'java' WHEN STRCMP('py', ?) = 0 THEN langTag = 'py'\n" +
+                "ELSE (langTag = 'html' or langTag = 'css' or langTag = 'JS' or langTag = 'C' or langTag = 'java' or langTag = 'py') END)\n" +
+                "and\n" +
+                "(CASE WHEN STRCMP('BOOK', ?) = 0 THEN type = 'BOOK' WHEN STRCMP('VIDEO', ?) = 0 THEN type = 'VIDEO' ELSE (type = 'BOOK' or type = 'VIDEO') END)\n" +
+                "and\n" +
+                "(CASE WHEN STRCMP('FREE', ?) = 0 THEN pricing = 'FREE' WHEN STRCMP('PAY', ?) = 0 THEN pricing = 'PAY' ELSE (pricing = 'FREE' or pricing = 'PAY') END)\n" +
+                "and\n" +
+                "lectureName LIKE" + "'%" + keyword + "%'\n" +
+                "and status = 'ACTIVE';";
 
         Object[] parameters = new Object[]{
-                pricing,
-                pricing,
+                langTag,
+                langTag,
+                langTag,
+                langTag,
                 langTag,
                 langTag,
                 typeTag,
                 typeTag,
+                pricing,
+                pricing
         };
 
         return this.jdbcTemplate.query(getQuery,
                 (rs, rowNum) -> new GetLectureListRes(
                         rs.getInt("lectureIdx"),
                         rs.getString("lectureName"),
-                        rs.getInt("chapterNumber"),
-                        rs.getString(langTag),
+                        rs.getInt("chNumber"),
+                        rs.getString("langTag"),
                         rs.getString("pricing"),
-                        rs.getString("materialType")
+                        rs.getString("type")
                 ), parameters);
     }
 
@@ -227,16 +245,36 @@ public class LectureDao {
     }
 
     public int checkSearchRowExist(String langTag, String typeTag, String pricing, String keyword) {
-        String checkQuery = "";
+        String checkQuery = "SELECT COUNT(*)\n" +
+                "FROM(\n" +
+                "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture\n" +
+                "WHERE\n" +
+                "(CASE WHEN STRCMP('html', ?) = 0 THEN langTag = 'html' WHEN STRCMP('css', ?) = 0 THEN langTag = 'css'\n" +
+                "WHEN STRCMP('js', ?) = 0 THEN langTag = 'JS' WHEN STRCMP('c', ?) = 0 THEN langTag = 'C'\n" +
+                "WHEN STRCMP('java', ?) = 0 THEN langTag = 'java' WHEN STRCMP('py', ?) = 0 THEN langTag = 'py'\n" +
+                "ELSE (langTag = 'html' or langTag = 'css' or langTag = 'JS' or langTag = 'C' or langTag = 'java' or langTag = 'py') END)\n" +
+                "and\n" +
+                "(CASE WHEN STRCMP('BOOK', ?) = 0 THEN type = 'BOOK' WHEN STRCMP('VIDEO', ?) = 0 THEN type = 'VIDEO' ELSE (type = 'BOOK' or type = 'VIDEO') END)\n" +
+                "and\n" +
+                "(CASE WHEN STRCMP('FREE', ?) = 0 THEN pricing = 'FREE' WHEN STRCMP('PAY', ?) = 0 THEN pricing = 'PAY' ELSE (pricing = 'FREE' or pricing = 'PAY') END)\n" +
+                "and\n" +
+                "lectureName LIKE" + "'%" + keyword + "%'\n" +
+                "and\n" +
+                "status = 'ACTIVE') as R;";
 
         Object[] parameters = new Object[]{
-                pricing,
-                pricing,
+                langTag,
+                langTag,
+                langTag,
+                langTag,
                 langTag,
                 langTag,
                 typeTag,
                 typeTag,
+                pricing,
+                pricing
         };
+
         return this.jdbcTemplate.queryForObject(checkQuery, int.class, parameters);
     }
 }
