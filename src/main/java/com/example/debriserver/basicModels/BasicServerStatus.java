@@ -90,7 +90,7 @@ public enum BasicServerStatus {
     INVALID_JWT(false, 5002, "Invalid Jwt Token"),
     INVALID_SIGNATURE(false, 5003, "Invalid Jwt Signature"),
     UNSUPPORTED_JWT(false, 5004, "Unsupported Jwt"),
-    EMPTY_JWT_CLAIMS_STRING(false, 5005, "Jwt Claims String Empty");
+    EMPTY_JWT_CLAIMS_STRING(false, 5005, "Jwt Claims String Empty"),
 
     /**
      * 6000: 신고 API에서 사용 6000 번부터는 하원이 사용 6500번부터 미뇽이 사용
@@ -99,6 +99,9 @@ public enum BasicServerStatus {
     /**
      * 7000: 커리큘럼 API에서 사용 7000번 부터 찜니가 사용, 7300번 부터 루키가 사용, 7600번 부터 루카가 사용
      * */
+
+    // [CURRI POST ERROR]
+    POST_CURRI_EMPTY_NAME(false, 7610, "커리큘럼 제목을 입력해주세요");
 
     private final boolean isSuccess;
     private final int returnCode;

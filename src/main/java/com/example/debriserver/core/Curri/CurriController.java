@@ -1,12 +1,18 @@
 package com.example.debriserver.core.Curri;
 
+import com.example.debriserver.basicModels.BasicException;
+import com.example.debriserver.basicModels.BasicResponse;
+import com.example.debriserver.basicModels.BasicServerStatus;
 import com.example.debriserver.core.Curri.CurriProvider;
 import com.example.debriserver.core.Curri.CurriService;
+import com.example.debriserver.core.Curri.Model.PostCurriCreateReq;
+import com.example.debriserver.core.Curri.Model.PostCurriCreateRes;
 import com.example.debriserver.utility.jwtUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,7 +51,26 @@ public class CurriController {
     */
 
     @PostMapping("/create")
-    public
+    public BasicResponse<PostCurriCreateRes> createCurri(@RequestBody PostCurriCreateReq postCurriCreateReq) {
+        try{
+            // jwtToken 인증
+            String jwtToken = jwt.getJwt();
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            // curri 제목 미입력시
+            if(postCurriCreateReq.getCurriName().equals(""))
+            {
+                throw new BasicException(BasicServerStatus.POST_CURRI_EMPTY_NAME);
+            }
+
+
+            PostCurriCreateRes postCurriCreateRes = curriService.createCurri(postCurriCreateReq);
+
+            return new BasicResponse<>(postCurriCreateRes);
+        } catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
 
     /*
