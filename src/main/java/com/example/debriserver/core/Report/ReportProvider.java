@@ -1,6 +1,7 @@
 package com.example.debriserver.core.Report;
 
 import com.example.debriserver.basicModels.BasicException;
+import com.example.debriserver.basicModels.BasicServerStatus;
 import com.example.debriserver.utility.jwtUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,14 @@ public class ReportProvider {
         this.jwt = jwt;
     }
 
+    public int findReportedPostUser(int postIdx) throws BasicException {
+          try {
+              return reportDao.findReportedPostUser(postIdx);
+          } catch (Exception exception) {
+            throw new BasicException(DB_ERROR);
+          }
+    }
+    
     public int checkUserExist(int userIdx) throws BasicException
     {
         try{
@@ -33,8 +42,23 @@ public class ReportProvider {
         }
     }
 
-    public int checkPostExist(int postIdx) throws BasicException
-    {
+    public int findReportedCommentUser(int commentIdx) throws BasicException {
+        try {
+            return reportDao.findReportedCommentUser(commentIdx);
+        } catch (Exception exception) {
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
+    public int checkUserExist(int userIdx) throws BasicException {
+        try{
+            return reportDao.checkUserExist(userIdx);
+        } catch (Exception exception) {
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
+    public int checkPostExist(int postIdx) throws BasicException{
         try{
             return reportDao.checkPostExist(postIdx);
         } catch (Exception exception) {
@@ -42,5 +66,11 @@ public class ReportProvider {
         }
     }
 
-
+    public int checkCommentExist(int commentIdx) throws BasicException{
+        try{
+            return reportDao.checkCommentExist(commentIdx);
+        } catch (Exception exception) {
+            throw new BasicException(DB_ERROR);
+        }
+    }
 }
