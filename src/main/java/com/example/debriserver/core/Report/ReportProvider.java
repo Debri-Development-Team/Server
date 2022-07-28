@@ -50,14 +50,6 @@ public class ReportProvider {
         }
     }
 
-    public int checkUserExist(int userIdx) throws BasicException {
-        try{
-            return reportDao.checkUserExist(userIdx);
-        } catch (Exception exception) {
-            throw new BasicException(DB_ERROR);
-        }
-    }
-
     public int checkPostExist(int postIdx) throws BasicException{
         try{
             return reportDao.checkPostExist(postIdx);

@@ -3,9 +3,9 @@ package com.example.debriserver.core.Report;
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
-import com.example.debriserver.core.Report.model.PostCommentReportReq;
-import com.example.debriserver.core.Report.model.PostPostReportReq;
-import com.example.debriserver.core.Report.model.PostReportUserReq;
+import com.example.debriserver.core.Report.Model.PostCommentReportReq;
+import com.example.debriserver.core.Report.Model.PostPostReportReq;
+import com.example.debriserver.core.Report.Model.PostReportUserReq;
 import com.example.debriserver.utility.jwtUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class ReportController {
             String jwtToken = jwt.getJwt();
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int reportUserIdx = jwt.getUserIdx();
+            int reportUserIdx = jwt.getUserIdx(jwtToken);
             String reason = postReportUserReq.getReason();
             String result = "사용자 신고가 완료되었습니다.";
 

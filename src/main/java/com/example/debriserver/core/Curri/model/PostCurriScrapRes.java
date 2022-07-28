@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-
-public class CurriScrapRes {
+public class PostCurriScrapRes {
 
     private int curriIdx;
     private String curriName;

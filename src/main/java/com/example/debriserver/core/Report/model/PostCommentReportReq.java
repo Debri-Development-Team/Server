@@ -1,4 +1,4 @@
-package com.example.debriserver.core.Report.model;
+package com.example.debriserver.core.Report.Model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
