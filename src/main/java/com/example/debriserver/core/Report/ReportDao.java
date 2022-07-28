@@ -2,8 +2,8 @@ package com.example.debriserver.core.Report;
 
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicServerStatus;
-import com.example.debriserver.core.Report.model.PostCommentReportReq;
-import com.example.debriserver.core.Report.model.PostPostReportReq;
+import com.example.debriserver.core.Report.Model.PostCommentReportReq;
+import com.example.debriserver.core.Report.Model.PostPostReportReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
