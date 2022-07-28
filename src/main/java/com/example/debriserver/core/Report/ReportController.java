@@ -42,7 +42,7 @@ public class ReportController {
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
 
             reportService.createPostReport(userIdx, postPostReportReq);
 
@@ -63,7 +63,7 @@ public class ReportController {
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
 
             reportService.createCommentReport(userIdx, postCommentReportReq);
 
