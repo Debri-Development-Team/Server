@@ -117,7 +117,7 @@ public class UserController {
     @PatchMapping("/{userId}/status")
     public BasicResponse<String> deleteUser(@PathVariable("userId") String userId){
         try {
-            /*// TODO: jwt는 다음주차에서 배울 내용입니다!
+            /*//
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
             //userIdx와 접근한 유저가 같은지 확인

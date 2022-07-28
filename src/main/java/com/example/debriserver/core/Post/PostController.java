@@ -197,7 +197,8 @@ public class PostController {
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             String keyword = getPostSearchListReq.getKeyword();
-            List<GetPostSearchListRes> getPostSearchListRes = postProvider.getPostSearchList(keyword);
+            int userIdx = jwt.getUserIdx(jwtToken);
+            List<GetPostSearchListRes> getPostSearchListRes = postProvider.getPostSearchList(userIdx, keyword);
 
             return  new BasicResponse<>(getPostSearchListRes);
 
@@ -222,7 +223,8 @@ public class PostController {
              if (!postProvider.checkBoardExist(boardIdx))
                  return new BasicResponse<>(BasicServerStatus.BOARD_NOT_EXIST);
 
-             List<GetPostListRes> getPostListRes = postProvider.getPostList(boardIdx);
+             int userIdx = jwt.getUserIdx(jwtToken);
+             List<GetPostListRes> getPostListRes = postProvider.getPostList(userIdx, boardIdx);
 
              return new BasicResponse<>(getPostListRes);
          } catch (BasicException exception) {
