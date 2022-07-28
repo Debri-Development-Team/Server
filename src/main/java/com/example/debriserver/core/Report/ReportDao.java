@@ -92,22 +92,33 @@ public class ReportDao {
                 deleteReportedCommentParams);
     }
 
-    public int checkUserExist(int userIdx){
-        String checkUserExistQuery = "SELECT exists(SELECT userIdx FROM User WHERE userIdx = ? AND status = 'ACTIVE')";
+    public int reportUser(int reportUserIdx, int postIdx, String reason)
+    {
+        String reportUserQuery = "INSERT INTO ReportedUser(reportUserIdx, reportedUserIdx, reason) VALUES (?, (select userIdx from Post where postIdx = ?), ?);";
+        Object[] reportUserParams = new Object[]{
+                reportUserIdx,
+                postIdx,
+                reason
+        };
+        return this.jdbcTemplate.update(reportUserQuery, reportUserParams);
+    }
+
+    public int checkUserExist(int userIdx)
+    {
+        String checkUserExistQuery = "select exists(select userIdx from User where userIdx = ? and status = 'ACTIVE')";
         int checkUserExistParams = userIdx;
         return this.jdbcTemplate.queryForObject(checkUserExistQuery,
                 int.class,
                 checkUserExistParams);
-
     }
 
-    public int checkPostExist(int postIdx){
-        String checkPostExistQuery = "SELECT exists(SELECT postIdx FROM Post WHERE postIdx = ? AND status = 'ACTIVE')";
+    public int checkPostExist(int postIdx)
+    {
+        String checkPostExistQuery = "select exists(select postIdx from Post where postIdx = ? and status = 'ACTIVE')";
         int checkPostExistParams = postIdx;
         return this.jdbcTemplate.queryForObject(checkPostExistQuery,
                 int.class,
                 checkPostExistParams);
-
     }
 
     public int checkCommentExist(int commentIdx) {

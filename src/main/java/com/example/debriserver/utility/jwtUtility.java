@@ -82,9 +82,8 @@ public class jwtUtility {
      * @return int
      * @throws BasicException
      * */
-    public int getUserIdx() throws BasicException{
+    public int getUserIdx(String accessToken) throws BasicException{
         // JWT 가져오기
-        String accessToken = getJwt();
         if(accessToken == null || accessToken.length() == 0){
             throw new BasicException(BasicServerStatus.JWT_NOT_EXIST);
         }

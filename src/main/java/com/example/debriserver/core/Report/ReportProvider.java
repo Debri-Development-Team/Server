@@ -26,8 +26,17 @@ public class ReportProvider {
     }
 
     public int findReportedPostUser(int postIdx) throws BasicException {
-        try {
-            return reportDao.findReportedPostUser(postIdx);
+          try {
+              return reportDao.findReportedPostUser(postIdx);
+          } catch (Exception exception) {
+            throw new BasicException(DB_ERROR);
+          }
+    }
+    
+    public int checkUserExist(int userIdx) throws BasicException
+    {
+        try{
+            return reportDao.checkUserExist(userIdx);
         } catch (Exception exception) {
             throw new BasicException(DB_ERROR);
         }

@@ -9,10 +9,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class GetScrapRes {
 
-    private int boardIdx;
     private int postIdx;
+    private int boardIdx;
     private String authorName;
     private String postName;
+    private String likeStatus;
+    private String scrapStatus;
     private int likeNumber;
     private int timeAfterCreated;
     private int commentNumber;
