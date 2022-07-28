@@ -1,9 +1,16 @@
 package com.example.debriserver.core.Report;
 
+import com.example.debriserver.basicModels.BasicException;
+import com.example.debriserver.basicModels.BasicResponse;
+import com.example.debriserver.basicModels.BasicServerStatus;
+import com.example.debriserver.core.Report.model.PostCommentReportReq;
+import com.example.debriserver.core.Report.model.PostPostReportReq;
 import com.example.debriserver.utility.jwtUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,6 +34,45 @@ public class ReportController {
         this. jwt = jwt;
     }
 
+    @PostMapping("/postReport")
+    public BasicResponse<String> createPostReport(@RequestBody PostPostReportReq postPostReportReq) {
 
+        try {
+            String jwtToken = jwt.getJwt();
 
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx();
+
+            reportService.createPostReport(userIdx, postPostReportReq);
+
+            String result = "게시물 신고가 접수되었습니다.";
+
+            return new BasicResponse<>(result);
+        } catch(BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+
+    }
+
+    @PostMapping("/commentReport")
+    public BasicResponse<String> createCommentReport(@RequestBody PostCommentReportReq postCommentReportReq) {
+
+        try {
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx();
+
+            reportService.createCommentReport(userIdx, postCommentReportReq);
+
+            String result = "댓글 신고가 접수되었습니다.";
+
+            return new BasicResponse<>(result);
+        } catch(BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+
+    }
 }
