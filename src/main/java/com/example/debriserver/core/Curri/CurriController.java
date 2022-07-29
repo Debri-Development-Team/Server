@@ -3,18 +3,14 @@ package com.example.debriserver.core.Curri;
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
-import com.example.debriserver.core.Curri.CurriProvider;
-import com.example.debriserver.core.Curri.CurriService;
-import com.example.debriserver.core.Curri.Model.PostCurriCreateReq;
-import com.example.debriserver.core.Curri.Model.PostCurriCreateRes;
+import com.example.debriserver.core.Curri.Model.*;
 import com.example.debriserver.utility.jwtUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import static com.example.debriserver.basicModels.BasicServerStatus.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/curri")
@@ -50,6 +46,7 @@ public class CurriController {
     *   [POST]: localhost:8521/api/curri/create
     */
 
+    @ResponseBody
     @PostMapping("/create")
     public BasicResponse<PostCurriCreateRes> createCurri(@RequestBody PostCurriCreateReq postCurriCreateReq) {
         try{
@@ -60,7 +57,7 @@ public class CurriController {
             // curri 제목 미입력시
             if(postCurriCreateReq.getCurriName().equals(""))
             {
-                throw new BasicException(BasicServerStatus.POST_CURRI_EMPTY_NAME);
+                throw new BasicException(BasicServerStatus.CURRI_EMPTY_NAME);
             }
 
 
@@ -73,20 +70,105 @@ public class CurriController {
     }
 
 
-    /*
+    /**
     *   커리큘럼 수정 API
     * */
 
+
     /*
     *   커리큘럼 리스트 조회 API
-    * */
+    *   [GET]: localhost:8521/api/curri/getList
+     */
+    @ResponseBody
+    @GetMapping("/getList")
+    public BasicResponse<List<GetCurriListRes>> getList(){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx();
+
+            List<GetCurriListRes> getCurriListResList = curriProvider.getList(userIdx);
+
+            return new BasicResponse<>(getCurriListResList);
+
+        } catch (BasicException exception) {
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
     /*
     *   커리큘럼 상세 조회 API
+    *   [GET]: localhost:8521/api/curri/getThisCurri
     * */
+    @ResponseBody
+    @GetMapping("/getThisCurri")
+    public BasicResponse<GetThisCurriRes> getThisCurri(@RequestBody GetThisCurriReq getThisCurriReq){
+        try {
+            String jwtToken = jwt.getJwt();
+
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            GetThisCurriRes getThisCurriRes = curriService.getThisCurri(getThisCurriReq);
+            return new BasicResponse<>(getThisCurriRes);
+
+        } catch (BasicException exception) {
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
     /*
     *   커리큘럼 삭제 API
+    *   [PATCH]: localhost:8521/api/curri/{curriIdx}/delete
     * */
+    @ResponseBody
+    @PatchMapping("/{curriIdx}/delete")
+    public BasicResponse<String> deleteCurri(@PathVariable ("curriIdx") int curriIdx) {
+        try {
+            String jwtToken = jwt.getJwt();
+
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            curriService.deleteCurri(curriIdx);
+            String result = "삭제를 성공했습니다.";
+            return new BasicResponse<>(result);
+        } catch (BasicException exception) {
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /*
+    *   챕터 완료 및 취소 API
+    *   [PATCH]: localhost:8521/api/curri/chapter/status
+    * */
+    @ResponseBody
+    @PatchMapping("/chapter/complete")
+    public BasicResponse<String> chapterStatus(@RequestBody PatchChapterStatuReq patchChapterCompleteReq) {
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            // 해당 쳅터가 현재 커리에 들어있는지 확인
+            if(curriProvider.checkChapterExist(patchChapterCompleteReq)) throw new BasicException(CURRI_EMPTY_CHAPTER);
+
+            int userIdx = jwt.getUserIdx();
+
+            String result;
+            // 챕터 완료인지 취소인지 확인
+            if(curriProvider.checkChapterStatus(patchChapterCompleteReq)){
+                curriService.completeChapter(patchChapterCompleteReq, userIdx);
+                result = "칭찬도장 꾸-욱!";
+            } else{
+                curriService.cancelCompleteChapter(patchChapterCompleteReq, userIdx);
+                result = "넌 항상 이런식이야";
+            }
+
+            return new BasicResponse<>(result);
+        } catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
 }

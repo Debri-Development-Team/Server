@@ -100,8 +100,10 @@ public enum BasicServerStatus {
      * 7000: 커리큘럼 API에서 사용 7000번 부터 찜니가 사용, 7300번 부터 루키가 사용, 7600번 부터 루카가 사용
      * */
 
-    // [CURRI POST ERROR]
-    POST_CURRI_EMPTY_NAME(false, 7610, "커리큘럼 제목을 입력해주세요");
+    // CURRI
+    CURRI_EMPTY_NAME(false, 7610, "커리큘럼 제목을 입력해주세요"),
+    CURRI_EMPTY_ID(false, 7611, "이미 삭제된 커리큘럼 이거나 존재하지 않습니다."),
+    CURRI_EMPTY_CHAPTER(false, 7612, "커리큘럼 상에서 해당 챕터가 존재하지 않습니다.");
 
     private final boolean isSuccess;
     private final int returnCode;
