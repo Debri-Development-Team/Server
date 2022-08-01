@@ -17,8 +17,6 @@ public class PostCurriScrapRes {
     private String visibleStatus;
     private String langTag;
     private float progressRate;
-    private int createdAt;
-    private int updatedAt;
     private String status;
     private String scraped;
     private int ownerIdx;
