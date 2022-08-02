@@ -1,9 +1,7 @@
 package com.example.debriserver.core.Lecture;
 
 import com.example.debriserver.basicModels.BasicResponse;
-import com.example.debriserver.core.Lecture.Model.ChListRes;
-import com.example.debriserver.core.Lecture.Model.GetLectureListRes;
-import com.example.debriserver.core.Lecture.Model.GetLectureRes;
+import com.example.debriserver.core.Lecture.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -277,4 +275,30 @@ public class LectureDao {
 
         return this.jdbcTemplate.queryForObject(checkQuery, int.class, parameters);
     }
+    
+    /**
+     * 로드맵 리스트 조회
+     * */
+    public List<GetRoadmapListRes> getRoadmapList() {
+        String getListQuery = "";
+
+    }
+
+    /**
+     * 로드맵 상세 조회
+     * */
+    public GetRoadmapRes getRoadmapView(int roadmapIdx) {
+        String getViewQuery = "";
+    }
+
+    /**
+     * 존재하면 false 존재 안하면 true
+     * */
+    public boolean checkRoadmapExist(int roadmapIdx) {
+        String checkQuery = "SELECT COUNT(*) FROM Curriculum WHere curriIdx = ?;";
+
+        return 0 == this.jdbcTemplate.queryForObject(checkQuery, int.class, roadmapIdx);
+    }
+
+
 }

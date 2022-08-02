@@ -3,9 +3,7 @@ package com.example.debriserver.core.Lecture;
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
-import com.example.debriserver.core.Lecture.Model.GetLectureListRes;
-import com.example.debriserver.core.Lecture.Model.GetLectureRes;
-import com.example.debriserver.core.Lecture.Model.PostScrapReq;
+import com.example.debriserver.core.Lecture.Model.*;
 import com.example.debriserver.utility.jwtUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +34,7 @@ public class LectureController {
         this.jwt = JwtUtility;
     }
     /**
-     * 6.1 전체 강의 리스트 조회 API
+     * 7.1 전체 강의 리스트 조회 API
      * [GET] 127.0.0.1/api/lecture/getLectureList
      * */
     @GetMapping("/getLectureList")
@@ -54,7 +52,7 @@ public class LectureController {
     }
 
     /**
-     * 6.2 강의 즐겨찾기 API
+     * 7.2 강의 즐겨찾기 API
      * [POST] 127.0.0.1:8521/api/lecture/scrap/create
      * */
     @PostMapping("/scrap/create")
@@ -83,7 +81,7 @@ public class LectureController {
     }
 
     /**
-     * 6.3 강의 즐겨찾기 삭제 API
+     * 7.2.1 강의 즐겨찾기 삭제 API
      * [POST] 127.0.0.1:8521/api/lecture/scrap/delete
      * */
     @PatchMapping("/scrap/delete")
@@ -109,7 +107,7 @@ public class LectureController {
     }
 
     /**
-     * 6.4 즐겨찾기 한 강의 리스트 조회
+     * 7.3 즐겨찾기 한 강의 리스트 조회
      * [GET] 127.0.0.1:8521/api/lecture/getScrapList/{userIdx}
      * */
     @GetMapping("/getScrapList/{userIdx}")
@@ -130,7 +128,7 @@ public class LectureController {
     }
 
     /*
-     * 6.5 강의 상세조회 API
+     * 7.4 강의 상세조회 API
      * [GET] 127.0.0.1:8521/api/lecture/getLecture/{lectureIdx}
      * */
     @GetMapping("/getLecture/{lectureIdx}")
@@ -150,7 +148,7 @@ public class LectureController {
 
     /*
      * 검색한 타입에 맞는 강의의 리스트를 리턴
-     * 6.6 강의 검색 API
+     * 7.4.1 강의 검색 API
      * [GET] 127.0.0.1:8521/api/lecture/search
      * */
     @GetMapping("/search")
@@ -164,6 +162,46 @@ public class LectureController {
 
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 7.6 로드맵 전체 리스트 조회 api
+     * */
+    @GetMapping("/roadmap/list")
+    public BasicResponse<List<GetRoadmapListRes>> getRoadmapList(){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            List<GetRoadmapListRes> getRoadmapListRes = lectureService.getRoadmapList();
+
+            return new BasicResponse<>(getRoadmapListRes);
+
+        }catch (BasicException exception){
+            return new BasicResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 7.6.2 로드맵 상세 조회 api
+     * */
+    @GetMapping("/roadmap/{roadmapIdx}")
+    public BasicResponse<GetRoadmapRes> getRoadmapView(@PathVariable int roadmapIdx){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            // 이거 변경 할 것!
+            if(lectureProvider.checkRoadmapExist(roadmapIdx)) throw new BasicException(BasicServerStatus.DB_ERROR);
+
+            GetRoadmapRes getRoadmapRes = lectureService.getRoadmapView(roadmapIdx);
+
+            return new BasicResponse<>(getRoadmapRes);
+        }catch (BasicException exception){
+            return new BasicResponse<>(exception.getStatus());
         }
     }
 }
