@@ -121,4 +121,24 @@ public class BoardController {
             return new BasicResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 2.5 전체 게시판 리스트 조회
+     * */
+    @GetMapping("allList")
+    public BasicResponse<List<GetScrapBoardListRes>> getAllBoardList(){
+
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            List<GetScrapBoardListRes> getScrapBoardListRes = boardService.getAllBoardList();
+
+            return new BasicResponse<>(getScrapBoardListRes);
+
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 }

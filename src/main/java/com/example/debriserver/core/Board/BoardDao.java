@@ -126,4 +126,18 @@ public class BoardDao {
         return result == 0;
 
     }
+
+    public List<GetScrapBoardListRes> getAllBoardList() {
+        String getListQuery = "SELECT * FROM Board WHERE status = 'ACTIVE';";
+
+        return this.jdbcTemplate.query(getListQuery,
+                (rs, rowNum) -> new GetScrapBoardListRes(
+                        rs.getInt("boardIdx"),
+                        rs.getString("boardName"),
+                        rs.getString("boardAdmin"),
+                        rs.getString("createdAt"),
+                        rs.getString("updatedAt"),
+                        rs.getString("status")
+                ));
+    }
 }
