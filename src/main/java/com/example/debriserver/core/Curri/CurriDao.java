@@ -237,6 +237,10 @@ public class CurriDao {
     }
 
     public GetThisCurriRes getThisCurri(GetThisCurriReq getThisCurriReq){
+        String getLectureInCurriQurey = "";
 
+        int getLectureInCurriParams = getThisCurriReq.getCurriIdx();
+
+        String getThisCurriQurey = "";
     }
 }

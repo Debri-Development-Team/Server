@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,4 +20,6 @@ public class GetThisCurriReq {
     private String progressRate;
     private int createdAt;
     private String status;
+
+    List<LectureListRes> getlectureList;
 }

@@ -76,9 +76,7 @@ public class CurriService {
 
     public GetThisCurriRes getThisCurri(GetThisCurriReq getThisCurriReq) throws BasicException{
         try{
-            GetThisCurriRes getThisCurriRes = curriDao.getThisCurri(getThisCurriReq);
-
-            return getThisCurriRes;
+            return curriDao.getThisCurri(getThisCurriReq);
 
         } catch (Exception exception){
             throw new BasicException(DB_ERROR);
