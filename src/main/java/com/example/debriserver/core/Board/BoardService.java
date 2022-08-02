@@ -106,4 +106,12 @@ public class BoardService {
             throw new BasicException(BOARD_GET_SCRAP_LIST_FAIL);
         }
     }
+
+    public List<GetScrapBoardListRes> getAllBoardList() throws BasicException{
+        try{
+            return boardDao.getAllBoardList();
+        }catch (Exception exception){
+            throw new BasicException(DB_ERROR);
+        }
+    }
 }

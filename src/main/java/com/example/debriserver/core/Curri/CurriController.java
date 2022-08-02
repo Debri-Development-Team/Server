@@ -64,7 +64,7 @@ public class CurriController {
             String jwtToken = jwt.getJwt();
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
 
             if(curriService.checkScrapedCurriExist(curriIdx,userIdx)== true) throw new BasicException(BasicServerStatus.SCRAP_Curri_EXIST);
 
@@ -90,7 +90,7 @@ public class CurriController {
             String jwtToken = jwt.getJwt();
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
 
             if(curriService.checkScrapedCurriExist(curriIdx,userIdx)== true) throw new BasicException(BasicServerStatus.SCRAP_Curri_EXIST);
 

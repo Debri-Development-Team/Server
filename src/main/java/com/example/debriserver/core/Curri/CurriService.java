@@ -3,6 +3,8 @@ package com.example.debriserver.core.Curri;
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicServerStatus;
 import com.example.debriserver.core.Curri.model.PostCurriScrapRes;
+import com.example.debriserver.core.User.UserDao;
+import com.example.debriserver.core.User.UserProvider;
 import com.example.debriserver.utility.jwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,10 +23,14 @@ public class CurriService {
     @Autowired
     private final CurriDao curriDao;
 
-    public CurriService(jwtUtility jwt, CurriProvider curriProvider, CurriDao curriDao){
+    @Autowired
+    private final UserProvider userProvider;
+
+    public CurriService(jwtUtility jwt, CurriProvider curriProvider, CurriDao curriDao, UserProvider userProvider){
         this.jwt = jwt;
         this.curriProvider = curriProvider;
         this.curriDao = curriDao;
+        this.userProvider = userProvider;
     }
 
     /**
@@ -52,10 +58,11 @@ public class CurriService {
     public void scrapCancel(String userId) throws BasicException {
 
         try{
-
             if (userProvider.checkUserExist(userId) == false) {
                 throw new BasicException(USERS_EMPTY_USER_ID);
             }
+
+            UserDao userDao = new UserDao();
 
             int result = userDao.deleteUser(userId);
             if (result == 0) {
