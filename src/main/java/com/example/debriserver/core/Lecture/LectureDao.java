@@ -280,14 +280,26 @@ public class LectureDao {
      * 로드맵 리스트 조회
      * */
     public List<GetRoadmapListRes> getRoadmapList() {
-        String getListQuery = "";
+        String getListQuery =
+                "SELECT curriIdx, curriName, langTag, status FROM Curriculum\n" +
+                "WHERE curriIdx = 1 or curriIdx = 2;";
+        String getNumberQuery = "SELECT COUNT(lectureIdx) FROM Lecture_Road WHERE roadIdx = ?;";
 
+        return this.jdbcTemplate.query(getListQuery,
+                (rs, rowNum) -> new GetRoadmapListRes(
+                        rs.getInt("curriIdx"),
+                        rs.getString("curriName"),
+                        rs.getString("langTag"),
+                        this.jdbcTemplate.queryForObject(getNumberQuery, int.class, rs.getInt("curriIdx")),
+                        rs.getString("status")
+                ));
     }
 
     /**
      * 로드맵 상세 조회
      * */
     public GetRoadmapRes getRoadmapView(int roadmapIdx) {
+
         String getViewQuery = "";
     }
 

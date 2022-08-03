@@ -10,4 +10,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetRoadmapRes {
+
+    private int curriIdx;
+    private String curriName;
+    private String curriAuthor;
+    private String visibleStatus;
+    private String langTag;
+    private String progressRate;
+    private int createdAt;
+    private String status;
 }
