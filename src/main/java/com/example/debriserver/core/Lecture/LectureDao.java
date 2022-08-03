@@ -283,7 +283,7 @@ public class LectureDao {
         String getListQuery =
                 "SELECT curriIdx, curriName, langTag, status FROM Curriculum\n" +
                 "WHERE curriIdx = 1 or curriIdx = 2;";
-        String getNumberQuery = "SELECT COUNT(lectureIdx) FROM Lecture_Road WHERE roadIdx = ?;";
+        String getNumberQuery = "SELECT COUNT(lectureIdx) FROM Lecture_Road_Curri WHERE roadIdx = ?;";
 
         return this.jdbcTemplate.query(getListQuery,
                 (rs, rowNum) -> new GetRoadmapListRes(
@@ -298,9 +298,23 @@ public class LectureDao {
     /**
      * 로드맵 상세 조회
      * */
-    public GetRoadmapRes getRoadmapView(int roadmapIdx) {
+    public List<GetRoadmapRes> getRoadmapView(int roadmapIdx) {
 
-        String getViewQuery = "";
+        String getViewQuery =
+                "SELECT C.curriIdx, curriName, curriAuthor, visibleStatus, langTag, status\n" +
+                "FROM\n" +
+                "Lecture_Road_Curri as LRC JOIN Curriculum as C on LRC.curriIdx = C.curriIdx\n" +
+                "WHERE LRC.roadIdx = ?;";
+
+        return this.jdbcTemplate.query(getViewQuery,
+                (rs, rowNum) -> new GetRoadmapRes(
+                        rs.getInt("curriIdx"),
+                        rs.getString("curriName"),
+                        rs.getString("curriAuthor"),
+                        rs.getString("visibleStatus"),
+                        rs.getString("langTag"),
+                        rs.getString("status")
+                ), roadmapIdx);
     }
 
     /**

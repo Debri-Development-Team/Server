@@ -87,11 +87,12 @@ public class LectureService {
         try{
             return lectureDao.getRoadmapList();
         }catch (Exception exception){
+            System.out.println(exception.getMessage());
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }
 
-    public GetRoadmapRes getRoadmapView(int roadmapIdx) throws BasicException{
+    public List<GetRoadmapRes> getRoadmapView(int roadmapIdx) throws BasicException{
         try{
             return lectureDao.getRoadmapView(roadmapIdx);
         }catch (Exception exception){
