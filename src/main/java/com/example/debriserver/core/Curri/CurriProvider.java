@@ -29,13 +29,20 @@ public class CurriProvider {
     }
 
     public List<GetCurriListRes> getList(int userIdx) throws BasicException{
-
         try{
-            return curriDao.getList(userIdx);
+            List<GetCurriListRes> getCurriListRes = curriDao.getList(userIdx);
+            return getCurriListRes;
         } catch (Exception exception){
             throw new BasicException(DB_ERROR);
         }
+    }
 
+    public int checkCurriScrap(int curriIdx) throws BasicException{
+        try{
+            return curriDao.checkCurriScrap(curriIdx);
+        } catch (Exception exception){
+            throw new BasicException(DB_ERROR);
+        }
     }
 
     public int checkCurriExist(int curriIdx) throws BasicException{

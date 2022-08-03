@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -12,10 +14,15 @@ import lombok.Setter;
 public class GetThisCurriRes {
     private int curriIdx;
     private String curriName;
-    private String curriAuthor;
     private String visibleStatus;
     private String langTag;
-    private String progressRate;
+    private Float progressRate;
     private int createdAt;
     private String status;
+    private int completeAt;
+    private int dDay;
+
+    List<LectureListInCurriRes> lectureListResList;
+
+    List<ChapterListInCurriRes> chapterListResList;
 }

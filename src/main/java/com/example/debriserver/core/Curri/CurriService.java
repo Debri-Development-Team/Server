@@ -25,21 +25,25 @@ public class CurriService {
         this.curriDao = curriDao;
     }
 
-    public PostCurriCreateRes createCurri(PostCurriCreateReq postCurriCreateReq) throws BasicException{
-        try{
-            PostCurriCreateRes postCurriCreateRes = curriDao.createCurri(postCurriCreateReq);
-
-            return postCurriCreateRes;
-        } catch(Exception exception){
-            System.out.println(exception.getMessage());
-            throw new BasicException(BasicServerStatus.DB_ERROR);
-        }
-    }
+//    public PostCurriCreateRes createCurri(PostCurriCreateReq postCurriCreateReq) throws BasicException{
+//        try{
+//            PostCurriCreateRes postCurriCreateRes = curriDao.createCurri(postCurriCreateReq);
+//
+//            return postCurriCreateRes;
+//        } catch(Exception exception){
+//            System.out.println(exception.getMessage());
+//            throw new BasicException(BasicServerStatus.DB_ERROR);
+//        }
+//    }
 
     public void deleteCurri(int curriIdx) throws BasicException {
         try{
             if (curriProvider.checkCurriExist(curriIdx) == 0){
                 throw new BasicException(CURRI_EMPTY_ID);
+            }
+
+            if (curriProvider.checkCurriScrap(curriIdx) > 0 ){
+                curriDao.disconnectAllScrap(curriIdx);
             }
 
             int result = curriDao.deleteCurri(curriIdx);

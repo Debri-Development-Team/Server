@@ -9,13 +9,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetCurriListRes {
-    private int curriIdx;
-    private String curriName;
-    private String curriAuthor;
-    private String visibleStatus;
+public class LectureListInCurriRes {
+    private int lectureIdx;
+    private String lectureName;
     private String langTag;
+    private int chNumber;
     private Float progressRate;
-    private String status;
-    private int createdAt;
 }

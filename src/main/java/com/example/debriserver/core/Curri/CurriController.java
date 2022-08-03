@@ -46,28 +46,28 @@ public class CurriController {
     *   [POST]: localhost:8521/api/curri/create
     */
 
-    @ResponseBody
-    @PostMapping("/create")
-    public BasicResponse<PostCurriCreateRes> createCurri(@RequestBody PostCurriCreateReq postCurriCreateReq) {
-        try{
-            // jwtToken 인증
-            String jwtToken = jwt.getJwt();
-            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
-
-            // curri 제목 미입력시
-            if(postCurriCreateReq.getCurriName().equals(""))
-            {
-                throw new BasicException(BasicServerStatus.CURRI_EMPTY_NAME);
-            }
-
-
-            PostCurriCreateRes postCurriCreateRes = curriService.createCurri(postCurriCreateReq);
-
-            return new BasicResponse<>(postCurriCreateRes);
-        } catch (BasicException exception){
-            return new BasicResponse<>((exception.getStatus()));
-        }
-    }
+//    @ResponseBody
+//    @PostMapping("/create")
+//    public BasicResponse<PostCurriCreateRes> createCurri(@RequestBody PostCurriCreateReq postCurriCreateReq) {
+//        try{
+//            // jwtToken 인증
+//            String jwtToken = jwt.getJwt();
+//            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+//
+//            // curri 제목 미입력시
+//            if(postCurriCreateReq.getCurriName().equals(""))
+//            {
+//                throw new BasicException(BasicServerStatus.CURRI_EMPTY_NAME);
+//            }
+//
+//
+//            PostCurriCreateRes postCurriCreateRes = curriService.createCurri(postCurriCreateReq);
+//
+//            return new BasicResponse<>(postCurriCreateRes);
+//        } catch (BasicException exception){
+//            return new BasicResponse<>((exception.getStatus()));
+//        }
+//    }
 
 
     /**

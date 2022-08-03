@@ -9,7 +9,13 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LectureListRes {
+public class ChapterListInCurriRes {
+    private int chIdx;
+    private String chName;
+    private int chNumber;
+    private String langTag;
+    private String chComplete;
+    private int progressOrder;
     private int lectureIdx;
-
+    private int completeChNumber;
 }
