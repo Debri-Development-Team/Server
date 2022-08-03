@@ -136,21 +136,18 @@ public class LectureDao {
         String getQuery =
                 "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture\n" +
                 "WHERE\n" +
-                "(CASE WHEN STRCMP('html', ?) = 0 THEN langTag = 'html' WHEN STRCMP('css', ?) = 0 THEN langTag = 'css'\n" +
-                "WHEN STRCMP('js', ?) = 0 THEN langTag = 'JS' WHEN STRCMP('c', ?) = 0 THEN langTag = 'C'\n" +
-                "WHEN STRCMP('java', ?) = 0 THEN langTag = 'java' WHEN STRCMP('py', ?) = 0 THEN langTag = 'py'\n" +
-                "ELSE (langTag = 'html' or langTag = 'css' or langTag = 'JS' or langTag = 'C' or langTag = 'java' or langTag = 'py') END)\n" +
+                "(CASE WHEN STRCMP('Front', ?) = 0 THEN langTag = 'Front' WHEN STRCMP('Back', ?) = 0 THEN langTag = 'Back'\n" +
+                "WHEN STRCMP('Python', ?) = 0 THEN langTag = 'Python' WHEN STRCMP('C 언어', ?) = 0 THEN langTag = 'C 언어'\n" +
+                "ELSE (langTag = 'Front' or langTag = 'Back' or langTag = 'Python' or langTag = 'C 언어') END)\n" +
                 "and\n" +
-                "(CASE WHEN STRCMP('BOOK', ?) = 0 THEN type = 'BOOK' WHEN STRCMP('VIDEO', ?) = 0 THEN type = 'VIDEO' ELSE (type = 'BOOK' or type = 'VIDEO') END)\n" +
+                "(CASE WHEN STRCMP('서적', ?) = 0 THEN type = '서적' WHEN STRCMP('영상', ?) = 0 THEN type = '영상' ELSE (type = '서적' or type = '영상') END)\n" +
                 "and\n" +
-                "(CASE WHEN STRCMP('FREE', ?) = 0 THEN pricing = 'FREE' WHEN STRCMP('PAY', ?) = 0 THEN pricing = 'PAY' ELSE (pricing = 'FREE' or pricing = 'PAY') END)\n" +
+                "(CASE WHEN STRCMP('무료', ?) = 0 THEN pricing = '무료' WHEN STRCMP('유료', ?) = 0 THEN pricing = '유료' ELSE (pricing = '무료' or pricing = '유료') END)\n" +
                 "and\n" +
                 "lectureName LIKE" + "'%" + keyword + "%'\n" +
                 "and status = 'ACTIVE';";
 
         Object[] parameters = new Object[]{
-                langTag,
-                langTag,
                 langTag,
                 langTag,
                 langTag,
@@ -243,26 +240,23 @@ public class LectureDao {
     }
 
     public int checkSearchRowExist(String langTag, String typeTag, String pricing, String keyword) {
-        String checkQuery = "SELECT COUNT(*)\n" +
+        String checkQuery =
+                "SELECT COUNT(*)\n" +
                 "FROM(\n" +
                 "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture\n" +
                 "WHERE\n" +
-                "(CASE WHEN STRCMP('html', ?) = 0 THEN langTag = 'html' WHEN STRCMP('css', ?) = 0 THEN langTag = 'css'\n" +
-                "WHEN STRCMP('js', ?) = 0 THEN langTag = 'JS' WHEN STRCMP('c', ?) = 0 THEN langTag = 'C'\n" +
-                "WHEN STRCMP('java', ?) = 0 THEN langTag = 'java' WHEN STRCMP('py', ?) = 0 THEN langTag = 'py'\n" +
-                "ELSE (langTag = 'html' or langTag = 'css' or langTag = 'JS' or langTag = 'C' or langTag = 'java' or langTag = 'py') END)\n" +
+                "(CASE WHEN STRCMP('Front', ?) = 0 THEN langTag = 'Front' WHEN STRCMP('Back', ?) = 0 THEN langTag = 'Back'\n" +
+                "WHEN STRCMP('Python', ?) = 0 THEN langTag = 'Python' WHEN STRCMP('C 언어', ?) = 0 THEN langTag = 'C 언어'\n" +
+                "ELSE (langTag = 'Front' or langTag = 'Back' or langTag = 'Python' or langTag = 'C 언어') END)\n" +
                 "and\n" +
-                "(CASE WHEN STRCMP('BOOK', ?) = 0 THEN type = 'BOOK' WHEN STRCMP('VIDEO', ?) = 0 THEN type = 'VIDEO' ELSE (type = 'BOOK' or type = 'VIDEO') END)\n" +
+                "(CASE WHEN STRCMP('서적', ?) = 0 THEN type = '서적' WHEN STRCMP('영상', ?) = 0 THEN type = '영상' ELSE (type = '서적' or type = '영상') END)\n" +
                 "and\n" +
-                "(CASE WHEN STRCMP('FREE', ?) = 0 THEN pricing = 'FREE' WHEN STRCMP('PAY', ?) = 0 THEN pricing = 'PAY' ELSE (pricing = 'FREE' or pricing = 'PAY') END)\n" +
+                "(CASE WHEN STRCMP('무료', ?) = 0 THEN pricing = '무료' WHEN STRCMP('유료', ?) = 0 THEN pricing = '유료' ELSE (pricing = '무료' or pricing = '유료') END)\n" +
                 "and\n" +
                 "lectureName LIKE" + "'%" + keyword + "%'\n" +
-                "and\n" +
-                "status = 'ACTIVE') as R;";
+                "and status = 'ACTIVE') as R;";
 
         Object[] parameters = new Object[]{
-                langTag,
-                langTag,
                 langTag,
                 langTag,
                 langTag,
