@@ -74,4 +74,15 @@ public class LectureProvider {
             throw new BasicException(DB_ERROR);
         }
     }
+
+    /**
+     * 존재하면 false 존재하지 않으면 true
+     * */
+    public boolean checkRoadmapExist(int roadmapIdx) throws BasicException{
+        try{
+            return lectureDao.checkRoadmapExist(roadmapIdx);
+        }catch (Exception exception){
+            throw  new BasicException(DB_ERROR);
+        }
+    }
 }

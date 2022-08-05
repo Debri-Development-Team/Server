@@ -8,7 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-//@NoArgsConstructor
 public class GetPostRes {
 
     private int boardIdx;
@@ -20,4 +19,6 @@ public class GetPostRes {
     private int LikeNumber;
     private int timeAfterCreated;
     private int commentNumber;
+    private boolean UserScrap;
+    private boolean UserLike;
 }

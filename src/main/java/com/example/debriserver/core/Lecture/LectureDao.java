@@ -1,9 +1,7 @@
 package com.example.debriserver.core.Lecture;
 
 import com.example.debriserver.basicModels.BasicResponse;
-import com.example.debriserver.core.Lecture.Model.ChListRes;
-import com.example.debriserver.core.Lecture.Model.GetLectureListRes;
-import com.example.debriserver.core.Lecture.Model.GetLectureRes;
+import com.example.debriserver.core.Lecture.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -271,4 +269,56 @@ public class LectureDao {
 
         return this.jdbcTemplate.queryForObject(checkQuery, int.class, parameters);
     }
+    
+    /**
+     * 로드맵 리스트 조회
+     * */
+    public List<GetRoadmapListRes> getRoadmapList() {
+        String getListQuery =
+                "SELECT curriIdx, curriName, langTag, status FROM Curriculum\n" +
+                "WHERE curriIdx = 1 or curriIdx = 2;";
+        String getNumberQuery = "SELECT COUNT(lectureIdx) FROM Lecture_Road_Curri WHERE roadIdx = ?;";
+
+        return this.jdbcTemplate.query(getListQuery,
+                (rs, rowNum) -> new GetRoadmapListRes(
+                        rs.getInt("curriIdx"),
+                        rs.getString("curriName"),
+                        rs.getString("langTag"),
+                        this.jdbcTemplate.queryForObject(getNumberQuery, int.class, rs.getInt("curriIdx")),
+                        rs.getString("status")
+                ));
+    }
+
+    /**
+     * 로드맵 상세 조회
+     * */
+    public List<GetRoadmapRes> getRoadmapView(int roadmapIdx) {
+
+        String getViewQuery =
+                "SELECT C.curriIdx, curriName, curriAuthor, visibleStatus, langTag, status\n" +
+                "FROM\n" +
+                "Lecture_Road_Curri as LRC JOIN Curriculum as C on LRC.curriIdx = C.curriIdx\n" +
+                "WHERE LRC.roadIdx = ?;";
+
+        return this.jdbcTemplate.query(getViewQuery,
+                (rs, rowNum) -> new GetRoadmapRes(
+                        rs.getInt("curriIdx"),
+                        rs.getString("curriName"),
+                        rs.getString("curriAuthor"),
+                        rs.getString("visibleStatus"),
+                        rs.getString("langTag"),
+                        rs.getString("status")
+                ), roadmapIdx);
+    }
+
+    /**
+     * 존재하면 false 존재 안하면 true
+     * */
+    public boolean checkRoadmapExist(int roadmapIdx) {
+        String checkQuery = "SELECT COUNT(*) FROM Curriculum WHere curriIdx = ?;";
+
+        return 0 == this.jdbcTemplate.queryForObject(checkQuery, int.class, roadmapIdx);
+    }
+
+
 }

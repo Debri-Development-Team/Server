@@ -251,14 +251,42 @@ public class PostDao {
                         ));
     }
 
-    public GetPostRes getPost(int postIdx){
+    public GetPostRes getPost(int postIdx, int userIdx){
+        boolean userLikeStatus;
+        boolean userScrapStatus;
+
         String getPostQuery = "SELECT distinct p.boardIdx, p.postIdx, p.postName, u.nickname, p.postContent, p.userIdx\n" +
                 "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx WHERE postIdx = ? and p.status = 'ACTIVE';";
 
         String getLikeQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
         String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";
+        String checkUserLikeStatusQuery = "SELECT COUNT(*) FROM PostLike WHERE postIdx = ? and userIdx = ?;";
+        String checkUserScrapStatusQuery = "SELECT COUNT(*) FROM PostMarked WHERE postIdx = ? and userIdx = ?;";
+        String getUserLikeStatusQuery = "SELECT IF(likeStatus = 'LIKE', true, false) FROM PostLike WHERE postIdx = ? and userIdx = ?;";
+        String getUserScrapStatusQuery = "SELECT IF(status = 'ACTIVE', true, false) FROM PostMarked WHERE postIdx = ? and userIdx = ?;";
 
+        Object[] userStatusParameters = new Object[]{
+                postIdx,
+                userIdx
+        };
+
+        if(this.jdbcTemplate.queryForObject(checkUserLikeStatusQuery, int.class, userStatusParameters) <= 0){
+            userLikeStatus = false;
+        }
+        else{
+            if(this.jdbcTemplate.queryForObject(getUserLikeStatusQuery, int.class, userStatusParameters) == 1) userLikeStatus = true;
+            else userLikeStatus = false;
+        }
+
+        if(this.jdbcTemplate.queryForObject(checkUserScrapStatusQuery, int.class, userStatusParameters) <= 0){
+            userScrapStatus = false;
+        }
+        else{
+            if(this.jdbcTemplate.queryForObject(getUserScrapStatusQuery, int.class, userStatusParameters) == 1) userScrapStatus = true;
+            else userScrapStatus = false;
+        }
+        
         return this.jdbcTemplate.queryForObject(getPostQuery,
                 (rs, rowNum) -> new GetPostRes
                         (
@@ -270,7 +298,9 @@ public class PostDao {
                                 rs.getString("postContent"),
                                 this.jdbcTemplate.queryForObject(getLikeQuery, int.class, postIdx),
                                 this.jdbcTemplate.queryForObject(getTimeQuery, int.class, postIdx),
-                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, postIdx)
+                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, postIdx),
+                                userScrapStatus,
+                                userLikeStatus
                         ),
                 postIdx);
     }
