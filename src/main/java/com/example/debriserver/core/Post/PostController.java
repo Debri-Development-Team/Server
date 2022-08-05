@@ -265,10 +265,12 @@ public class PostController {
 
              if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
+            int userIdx = jwt.getUserIdx(jwtToken);
+
              if (postProvider.checkPostExist(postIdx) == 0)
                  return new BasicResponse<>(BasicServerStatus.POSTS_EMPTY_POST_ID);
 
-             GetPostRes getPostRes = postProvider.getPost(postIdx);
+             GetPostRes getPostRes = postProvider.getPost(postIdx, userIdx);
 
              return new BasicResponse<>(getPostRes);
 
