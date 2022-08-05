@@ -46,28 +46,29 @@ public class CurriController {
     *   [POST]: localhost:8521/api/curri/create
     */
 
-//    @ResponseBody
-//    @PostMapping("/create")
-//    public BasicResponse<PostCurriCreateRes> createCurri(@RequestBody PostCurriCreateReq postCurriCreateReq) {
-//        try{
-//            // jwtToken 인증
-//            String jwtToken = jwt.getJwt();
-//            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
-//
-//            // curri 제목 미입력시
-//            if(postCurriCreateReq.getCurriName().equals(""))
-//            {
-//                throw new BasicException(BasicServerStatus.CURRI_EMPTY_NAME);
-//            }
-//
-//
-//            PostCurriCreateRes postCurriCreateRes = curriService.createCurri(postCurriCreateReq);
-//
-//            return new BasicResponse<>(postCurriCreateRes);
-//        } catch (BasicException exception){
-//            return new BasicResponse<>((exception.getStatus()));
-//        }
-//    }
+    @ResponseBody
+    @PostMapping("/create")
+    public BasicResponse<PostCurriCreateRes> createCurri(@RequestBody PostCurriCreateReq postCurriCreateReq) {
+        try{
+            // jwtToken 인증
+            String jwtToken = jwt.getJwt();
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            // curri 제목 미입력시
+            if(postCurriCreateReq.getCurriName().equals(""))
+            {
+                throw new BasicException(BasicServerStatus.CURRI_EMPTY_NAME);
+            }
+
+            int userIdx = jwt.getUserIdx();
+
+            PostCurriCreateRes postCurriCreateRes = curriService.createCurri(postCurriCreateReq, userIdx);
+
+            return new BasicResponse<>(postCurriCreateRes);
+        } catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
 
     /**
@@ -110,9 +111,11 @@ public class CurriController {
 
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            GetThisCurriRes getThisCurriRes = curriService.getThisCurri(getThisCurriReq);
-            return new BasicResponse<>(getThisCurriRes);
+            int userIdx = jwt.getUserIdx();
 
+            GetThisCurriRes getThisCurriRes = curriService.getThisCurri(getThisCurriReq, userIdx);
+
+            return new BasicResponse<>(getThisCurriRes);
         } catch (BasicException exception) {
             return new BasicResponse<>((exception.getStatus()));
         }
@@ -130,7 +133,9 @@ public class CurriController {
 
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            curriService.deleteCurri(curriIdx);
+            int userIdx = jwt.getUserIdx();
+
+            curriService.deleteCurri(curriIdx, userIdx);
             String result = "삭제를 성공했습니다.";
             return new BasicResponse<>(result);
         } catch (BasicException exception) {

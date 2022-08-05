@@ -17,16 +17,6 @@ public class PostCurriCreateReq {
     private String curriAuthor;
     private String visibleStatus;
     private String langTag;
-    private int ownerIdx;
 
-    private List<MaterialDate> materialDate;
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class MaterialDate{
-        private int lectureIdx;
-        private int materialOrder;
-    }
+    List<LectureForCurriCreateReq> lectureLiser;
 }

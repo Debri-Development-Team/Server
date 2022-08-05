@@ -11,6 +11,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetThisCurriReq {
-    private int curriIdx;
+public class LectureForCurriCreateReq {
+
+    private String lectureIdx;
+
 }

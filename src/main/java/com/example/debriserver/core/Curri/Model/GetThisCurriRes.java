@@ -17,10 +17,10 @@ public class GetThisCurriRes {
     private String visibleStatus;
     private String langTag;
     private Float progressRate;
-    private int createdAt;
     private String status;
     private int completeAt;
     private int dDay;
+    private int createdAt;
 
     List<LectureListInCurriRes> lectureListResList;
 
