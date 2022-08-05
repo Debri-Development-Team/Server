@@ -74,11 +74,11 @@ public class PostProvider {
         }
     }
 
-    public GetPostRes getPost(int postIdx) throws BasicException {
+    public GetPostRes getPost(int postIdx, int userIdx) throws BasicException {
 
         try{
 
-            return postDao.getPost(postIdx);
+            return postDao.getPost(postIdx, userIdx);
         }catch(Exception exception){
             throw new BasicException(DB_ERROR);
         }
