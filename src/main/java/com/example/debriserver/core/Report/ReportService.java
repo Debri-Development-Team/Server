@@ -37,7 +37,7 @@ public class ReportService {
             throw new BasicException(USERS_EMPTY_USER_ID);
         }
 
-        if(reportProvider.checkUserExist(postPostReportReq.getPostIdx()) == 0) {
+        if(reportProvider.checkPostExist(postPostReportReq.getPostIdx()) == 0) {
             throw new BasicException(POSTS_EMPTY_POST_ID);
         }
 

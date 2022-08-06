@@ -159,7 +159,7 @@ public class PostDao {
 
         String getLikeCountQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
 
-        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE';";
         return this.jdbcTemplate.query(getScrapPostsQuery,
                 (rs, rowNum) -> new GetScrapRes(
                         rs.getInt("postIdx"),
@@ -203,7 +203,7 @@ public class PostDao {
 
         String getLikeCountQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
 
-        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE';";
 
         return this.jdbcTemplate.query(getListQuery,
                 (rs, rowNum) -> new GetPostListRes
@@ -234,7 +234,7 @@ public class PostDao {
 
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
 
-        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE;'";
 
         return this.jdbcTemplate.query(getPostSearchListQuery,
                 (rs, rowNum) -> new GetPostSearchListRes
@@ -260,7 +260,7 @@ public class PostDao {
 
         String getLikeQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
-        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE';";
         String checkUserLikeStatusQuery = "SELECT COUNT(*) FROM PostLike WHERE postIdx = ? and userIdx = ?;";
         String checkUserScrapStatusQuery = "SELECT COUNT(*) FROM PostMarked WHERE postIdx = ? and userIdx = ?;";
         String getUserLikeStatusQuery = "SELECT IF(likeStatus = 'LIKE', true, false) FROM PostLike WHERE postIdx = ? and userIdx = ?;";
