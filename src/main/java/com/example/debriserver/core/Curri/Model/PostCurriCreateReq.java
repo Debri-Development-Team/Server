@@ -18,5 +18,5 @@ public class PostCurriCreateReq {
     private String visibleStatus;
     private String langTag;
 
-    List<LectureForCurriCreateReq> lectureLiser;
+    List<LectureForCurriCreateReq> lectureList;
 }

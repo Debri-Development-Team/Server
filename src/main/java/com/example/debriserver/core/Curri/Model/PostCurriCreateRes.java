@@ -11,7 +11,4 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PostCurriCreateRes {
     private int curriIdx;
-    private String curriName;
-    private String curriAuthor;
-    private int createdAt;
 }

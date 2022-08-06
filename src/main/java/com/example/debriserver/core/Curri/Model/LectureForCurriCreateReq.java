@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class LectureForCurriCreateReq {
 
-    private String lectureIdx;
+    private int lectureIdx;
     private int lectureOrder;
 
 }
