@@ -112,7 +112,7 @@ public class PostService {
         }
 
         try {
-            int result = postDao.deletePostLike(postIdx);
+            int result = postDao.deletePostLike(postIdx, userIdx);
             if (result == 0) {
                 throw new BasicException(DB_ERROR);
             }
