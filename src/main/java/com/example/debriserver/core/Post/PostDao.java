@@ -176,17 +176,35 @@ public class PostDao {
 
     public int insertPostLike(PostPostLikeReq postPostLikeReq) {
         String insertPostLikeQuery = "INSERT INTO PostLike(postIdx, userIdx, likeStatus) VALUES(?,?,?)";
-        Object []insertPostLikeParams = new Object[]{
+        String checkExistQuery = "SELECT EXISTS(SELECT postIdx FROM PostLike WHERE postIdx = ? and userIdx = ?);";
+        String updatePostLikeQuery = "UPDATE PostLike SET likeStatus = 'LIKE' WHERE postIdx = ? and userIdx = ?;";
+
+        Object[] insertPostLikeParams = new Object[]{
                 postPostLikeReq.getPostIdx(),
                 postPostLikeReq.getUserIdx(),
                 postPostLikeReq.getLikeStatus()
         };
-        return this.jdbcTemplate.update(insertPostLikeQuery, insertPostLikeParams);
+
+        Object[] checkExistParameters = new Object[]{
+                postPostLikeReq.getPostIdx(),
+                postPostLikeReq.getUserIdx()
+        };
+
+        int check = this.jdbcTemplate.queryForObject(checkExistQuery, int.class, checkExistParameters);
+
+        if(check == 0) return this.jdbcTemplate.update(insertPostLikeQuery, insertPostLikeParams);
+        else return this.jdbcTemplate.update(updatePostLikeQuery, checkExistParameters);
     }
 
-    public int deletePostLike(int postIdx) {
-        String insertPostLikeQuery = "UPDATE PostLike SET likeStatus='NULL' WHERE postIdx=?";
-        int insertPostLikeParams = postIdx;
+    public int deletePostLike(int postIdx, int userIdx) {
+
+        String insertPostLikeQuery = "UPDATE PostLike SET likeStatus = 'NULL' WHERE postIdx=? and userIdx = ?";
+
+        Object[] insertPostLikeParams = new Object[]{
+                postIdx,
+                userIdx
+        };
+
         return this.jdbcTemplate.update(insertPostLikeQuery, insertPostLikeParams);
     }
     

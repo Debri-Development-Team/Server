@@ -157,11 +157,14 @@ public class CommentDao {
         String deleteQuery = "UPDATE Comment\n" +
                 "SET status = 'DELETE'\n" +
                 "WHERE commentIdx = ? and status = 'ACTIVE' or status = 'INACTIVE';";
+        String deleteTailQuery = "UPDATE Comment SET status ='DELETE' WHERE groupNum = ?;";
         String getDeletedInfoQuery = "SELECT commentIdx, postIdx, class, commentOrder, groupNum\n" +
                 "FROM Comment\n" +
                 "WHERE commentIdx = ? and status = 'DELETE';";
 
         int result = this.jdbcTemplate.update(deleteQuery, commentIdx);
+        this.jdbcTemplate.update(deleteTailQuery, commentIdx);
+
         if(result == 0)
         {
             patchCommentRes = new PatchCommentRes();
