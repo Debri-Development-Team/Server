@@ -2,12 +2,14 @@ package com.example.debriserver.core.Lecture;
 
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.core.Lecture.Model.*;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 public class LectureDao {
@@ -21,8 +23,9 @@ public class LectureDao {
     /**
      * 전체 강의 리스트 조회
      */
-    public List<GetLectureListRes> getLectureList() {
+    public List<GetLectureListRes> getLectureList(int userIdx) {
         String getQuery = "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture WHERE status = 'ACTIVE';";
+        String scrapStatusQuery = "SELECT status FROM LectureScrap WHERE userIdx = ? and lectureIdx = ?;";
 
         return this.jdbcTemplate.query(getQuery, (rs, rowNum) -> new GetLectureListRes(
                         rs.getInt("lectureIdx"),
@@ -30,7 +33,8 @@ public class LectureDao {
                         rs.getInt("chNumber"),
                         rs.getString("langTag"),
                         rs.getString("pricing"),
-                        rs.getString("type")
+                        rs.getString("type"),
+                        Objects.requireNonNull(this.jdbcTemplate.queryForObject(scrapStatusQuery, String.class, userIdx, rs.getInt("lectureIdx"))).equalsIgnoreCase("ACTIVE")
                 )
         );
     }
@@ -81,7 +85,6 @@ public class LectureDao {
                 "FROM Lecture as L LEFT JOIN LectureScrap as LC ON L.lectureIdx = LC.lectureIdx\n" +
                 "WHERE L.status = 'ACTIVE' and LC.status = 'ACTIVE' and LC.userIdx = ?;";
 
-
         return this.jdbcTemplate.query(getQuery,(rs, rowNum)
                 -> new GetLectureListRes(
                     rs.getInt("lectureIdx"),
@@ -89,7 +92,8 @@ public class LectureDao {
                     rs.getInt("chNumber"),
                     rs.getString("langTag"),
                     rs.getString("pricing"),
-                    rs.getString("type")
+                    rs.getString("type"),
+                    true
         ), userIdx);
     }
     /**
@@ -132,7 +136,7 @@ public class LectureDao {
     /**
      * 강의 검색
      * */
-    public List<GetLectureListRes> searchLecture(String langTag, String typeTag, String pricing, String keyword) {
+    public List<GetLectureSearchListRes> searchLecture(String langTag, String typeTag, String pricing, String keyword) {
         String getQuery =
                 "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture\n" +
                 "WHERE\n" +
@@ -147,6 +151,7 @@ public class LectureDao {
                 "lectureName LIKE" + "'%" + keyword + "%'\n" +
                 "and status = 'ACTIVE';";
 
+
         Object[] parameters = new Object[]{
                 langTag,
                 langTag,
@@ -159,7 +164,7 @@ public class LectureDao {
         };
 
         return this.jdbcTemplate.query(getQuery,
-                (rs, rowNum) -> new GetLectureListRes(
+                (rs, rowNum) -> new GetLectureSearchListRes(
                         rs.getInt("lectureIdx"),
                         rs.getString("lectureName"),
                         rs.getInt("chNumber"),
