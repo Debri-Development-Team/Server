@@ -136,7 +136,7 @@ public class LectureDao {
     /**
      * 강의 검색
      * */
-    public List<GetLectureSearchListRes> searchLecture(String langTag, String typeTag, String pricing, String keyword) {
+    public List<GetLectureSearchListRes> searchLecture(String langTag, String typeTag, String pricing, String keyword, int userIdx) {
         String getQuery =
                 "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture\n" +
                 "WHERE\n" +
@@ -151,6 +151,7 @@ public class LectureDao {
                 "lectureName LIKE" + "'%" + keyword + "%'\n" +
                 "and status = 'ACTIVE';";
 
+        String scrapStatusQuery = "SELECT status FROM LectureScrap WHERE userIdx = ? and lectureIdx = ?;";
 
         Object[] parameters = new Object[]{
                 langTag,
@@ -170,7 +171,8 @@ public class LectureDao {
                         rs.getInt("chNumber"),
                         rs.getString("langTag"),
                         rs.getString("pricing"),
-                        rs.getString("type")
+                        rs.getString("type"),
+                        Objects.requireNonNull(this.jdbcTemplate.queryForObject(scrapStatusQuery, String.class, userIdx, rs.getInt("lectureIdx"))).equalsIgnoreCase("ACTIVE")
                 ), parameters);
     }
 

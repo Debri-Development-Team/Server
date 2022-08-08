@@ -14,4 +14,5 @@ public class GetLectureSearchListRes {
     private String langTag;
     private String pricing;
     private String materialType;
+    private boolean userScrap;
 }
