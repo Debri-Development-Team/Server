@@ -160,7 +160,9 @@ public class LectureController {
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            return new BasicResponse<>(lectureService.searchLecture(langTag, typeTag, pricing, keyword));
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            return new BasicResponse<>(lectureService.searchLecture(langTag, typeTag, pricing, keyword, userIdx));
 
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
