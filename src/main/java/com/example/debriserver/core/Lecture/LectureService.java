@@ -2,10 +2,7 @@ package com.example.debriserver.core.Lecture;
 
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicServerStatus;
-import com.example.debriserver.core.Lecture.Model.GetLectureListRes;
-import com.example.debriserver.core.Lecture.Model.GetLectureRes;
-import com.example.debriserver.core.Lecture.Model.GetRoadmapListRes;
-import com.example.debriserver.core.Lecture.Model.GetRoadmapRes;
+import com.example.debriserver.core.Lecture.Model.*;
 import com.example.debriserver.utility.jwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,9 +42,9 @@ public class LectureService {
         }
     }
 
-    public List<GetLectureListRes> getLectureList() throws BasicException{
+    public List<GetLectureListRes> getLectureList(int userIdx) throws BasicException{
         try{
-            return lectureDao.getLectureList();
+            return lectureDao.getLectureList(userIdx);
         }catch (Exception exception){
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
@@ -70,7 +67,7 @@ public class LectureService {
         }
     }
 
-    public List<GetLectureListRes> searchLecture(String langTag, String typeTag, String pricing, String keyword) throws BasicException {
+    public List<GetLectureSearchListRes> searchLecture(String langTag, String typeTag, String pricing, String keyword) throws BasicException {
         try {
             if (!lectureProvider.checkSearchRowExist(langTag, typeTag, pricing, keyword)) throw new BasicException(BasicServerStatus.SEARCH_TARGET_NOT_EXIST);
 
