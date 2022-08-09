@@ -322,4 +322,34 @@ public class PostDao {
                         ),
                 postIdx);
     }
+
+    public List<GetPostListRes> getBoardPostList(String key, int boardIdx, int userIdx) {
+        String getPostSearchListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus, pm.status as scrapStatus\n" +
+                "FROM Post as p\n" +
+                "    LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
+                "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
+                "    LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
+                "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
+                "WHERE p.status = 'ACTIVE' AND p.postName like '%" + key + "%' AND p.boardIdx = ? AND reportedUserIdx is null";
+
+        String getLikeCountQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
+
+        String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
+
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE;'";
+
+        return this.jdbcTemplate.query(getPostSearchListQuery,
+                (rs, rowNum) -> new GetPostListRes
+                        (
+                                rs.getInt("boardIdx"),
+                                rs.getInt("postIdx"),
+                                rs.getString("nickName"),
+                                rs.getString("postName"),
+                                this.jdbcTemplate.queryForObject(getLikeCountQuery, int.class, rs.getInt("postIdx")),
+                                rs.getString("likeStatus"),
+                                rs.getString("scrapStatus"),
+                                this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
+                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx"))
+                        ), boardIdx);
+    }
 }
