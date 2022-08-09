@@ -1,6 +1,7 @@
 package com.example.debriserver.core.Post;
 
 import com.example.debriserver.basicModels.BasicException;
+import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.core.Post.model.GetScrapRes;
 import com.example.debriserver.core.Post.model.PatchPostsReq;
 import com.example.debriserver.core.Post.model.PostPostsReq;
@@ -200,4 +201,11 @@ public class PostService {
         return getPosts;
     }
 
+    public List<GetPostListRes> getBoardPostList(String key, int boardIdx, int userIdx) throws BasicException{
+        try{
+            return postDao.getBoardPostList(key, boardIdx, userIdx);
+        }catch (Exception exception){
+            throw new BasicException(DB_ERROR);
+        }
+    }
 }

@@ -45,4 +45,16 @@ public class AuthDao {
 
         this.jdbcTemplate.update(insertRefreshQuery, insertRefreshParameters);
     }
+
+    public boolean checkFirstLogin(String userId){
+
+        String checkQuery = "SELECT COUNT(*) FROM User WHERE isFirst = 'TRUE' and userId = ?;";
+        String updateQuery = "UPDATE User SET isFirst = 'FALSE' WHERE userId = ?;";
+
+        boolean result = this.jdbcTemplate.queryForObject(checkQuery, int.class, userId) > 0;
+
+        if(result) this.jdbcTemplate.update(updateQuery, userId);
+
+        return result;
+    }
 }

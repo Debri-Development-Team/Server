@@ -14,4 +14,5 @@ public class PostLoginRes {
     private String userBirthday;
     private String jwt;
     private String refreshToken;
+    private boolean firstLogin;
 }
