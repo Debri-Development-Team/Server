@@ -278,5 +278,28 @@ public class PostController {
              return new BasicResponse<>((exception.getStatus()));
          }
      }
+
+     /**
+      * 3.7.2 특정 게시판 키워드 조회
+      * */
+     @GetMapping("/boardPostList/{boardIdx}")
+    public BasicResponse<List<GetPostListRes>> getBoardPostList(@RequestParam String key, @PathVariable int boardIdx){
+
+         try{
+             String jwtToken = jwt.getJwt();
+
+             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+             int userIdx = jwt.getUserIdx(jwtToken);
+
+             if (!postProvider.checkBoardExist(boardIdx))
+                 return new BasicResponse<>(BasicServerStatus.BOARD_NOT_EXIST);
+
+             return new BasicResponse<>(postService.getBoardPostList(key, boardIdx, userIdx));
+
+         }catch (BasicException exception){
+             return new BasicResponse<>((exception.getStatus()));
+         }
+     }
 }
 
