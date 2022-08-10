@@ -1,6 +1,7 @@
 package com.example.debriserver.core.Board;
 
 import com.example.debriserver.basicModels.BasicException;
+import com.example.debriserver.core.Board.model.GetBoardSearchListRes;
 import com.example.debriserver.core.Board.model.GetScrapBoardCountRes;
 import com.example.debriserver.core.Board.model.GetScrapBoardListRes;
 import com.example.debriserver.core.Post.model.GetScrapRes;
@@ -111,6 +112,16 @@ public class BoardService {
         try{
             return boardDao.getAllBoardList();
         }catch (Exception exception){
+            System.out.println(exception.getMessage());
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
+    public List<GetBoardSearchListRes> getBoardSearchList(String key, int userIdx) throws BasicException{
+        try{
+            return boardDao.getBoardSearchList(key, userIdx);
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
             throw new BasicException(DB_ERROR);
         }
     }
