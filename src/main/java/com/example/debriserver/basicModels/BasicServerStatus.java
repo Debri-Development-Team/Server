@@ -72,6 +72,7 @@ public enum BasicServerStatus {
     BOARD_INSERT_FAIL(false, 3065, "스크랩 게시판에 생성에 실패했습니다"),
     BOARD_GET_SCRAP_LIST_FAIL(false,3066,"스크랩된 게시판이 존재하지 않습니다"),
 
+    BOARD_SEARCH_LIST_NOT_EXIST(false, 3067, "검색 결과가 존재하지 않습니다."),
 
     /**
      * 4000 : Response 오류
