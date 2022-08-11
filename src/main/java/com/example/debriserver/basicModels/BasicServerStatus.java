@@ -101,7 +101,6 @@ public enum BasicServerStatus {
      * 7000: 커리큘럼 API에서 사용 7000번 부터 찜니가 사용, 7300번 부터 루키가 사용, 7600번 부터 루카가 사용
      * */
 
-
     SCRAP_Curri_EXIST(false, 7000, "이미 스크랩한 커리큘럼 입니다."),
 
     SCRAP_TARGET_LECTURE_NOT_EXIST(false, 7300, "스크랩 대상 강의가 존재하지 않습니다."),
@@ -111,7 +110,13 @@ public enum BasicServerStatus {
     SCRAP_DELETE_FAIL(false, 7304, "스크랩 삭제 실패"),
     SCRAP_ACTIVE_NOT_EXIST(false, 7305, "스크랩한 강의가 존재하지 않습니다."),
     LECTURE_NOT_EXIST(false, 7306, "강의가 존재하지 않습니다."),
-    SEARCH_TARGET_NOT_EXIST(false, 7307, "검색 결과가 존재하지 않습니다.");
+    SEARCH_TARGET_NOT_EXIST(false, 7307, "검색 결과가 존재하지 않습니다."),
+    // CURRI
+    CURRI_EMPTY_NAME(false, 7610, "커리큘럼 제목을 입력해주세요"),
+    CURRI_EMPTY_ID(false, 7611, "이미 삭제된 커리큘럼 이거나 존재하지 않습니다."),
+    CURRI_EMPTY_CHAPTER(false, 7612, "커리큘럼 상에서 해당 챕터가 존재하지 않습니다."),
+    CURRI_MODIFY_FAIL(false, 7613, "커리큘럼 수정에 실패하였습니다"),
+    CURRI_INSERT_FATL(false, 7614,"강의자료 추가에 실패하였습니다");
 
     private final boolean isSuccess;
     private final int returnCode;
