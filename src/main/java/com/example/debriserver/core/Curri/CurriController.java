@@ -3,12 +3,16 @@ package com.example.debriserver.core.Curri;
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
-import com.example.debriserver.core.Curri.model.*;
+import com.example.debriserver.core.Board.model.GetScrapBoardListRes;
+import com.example.debriserver.core.Curri.Model.*;
+import com.example.debriserver.core.Lecture.Model.GetLectureListRes;
 import com.example.debriserver.utility.jwtUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/curri")
@@ -70,6 +74,7 @@ public class CurriController {
 
 
 
+
            PostCurriScrapRes postCurriScrapRes = curriService.scrapCurri(curriIdx, userIdx);
 
             return new BasicResponse<>(postCurriScrapRes);
@@ -83,18 +88,19 @@ public class CurriController {
      * 커리큘럼 스크랩 취소 API
      */
 
-    @ResponseBody
-    @PatchMapping("/scrap/cancel/{curriIdx}")
-    public BasicResponse<String> scrapCancel(@PathVariable("curriIdx") int curriIdx) {
+
+    @PatchMapping("/unScrap/{scrapIdx}")
+    public BasicResponse<String> scrapCancel(@PathVariable("scrapIdx") int scrapIdx) {
         try {
             String jwtToken = jwt.getJwt();
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            if(curriService.checkScrapedCurriExist(curriIdx,userIdx)== true) throw new BasicException(BasicServerStatus.SCRAP_Curri_EXIST);
+            if(curriService.checkUnScrapedCurriExist(scrapIdx)== true) throw new BasicException(BasicServerStatus.UNSCRAP_Curri_EXIST);
 
 
+            curriService.scrapCancel(scrapIdx);
             String result = "스크랩이 취소 되었습니다.";
 
 
@@ -107,6 +113,26 @@ public class CurriController {
     /**
      * 스크랩한 커리큘럼 리스트 조회 API
      */
+
+    @GetMapping("/getScrapList")
+    public BasicResponse<List<GetScrapListRes>>getCurriScrapList(){
+
+        try{
+            String jwtToken = jwt.getJwt();
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+            if(curriService.checkScrapExist(userIdx)==false) throw new BasicException(BasicServerStatus.SCRAP_LIST_EMPTY);
+
+
+            return new BasicResponse<>(curriService.getCurriScrapList(userIdx));
+
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
 
     /**
      * 스크랩한 커리큘럼 상세조회 API

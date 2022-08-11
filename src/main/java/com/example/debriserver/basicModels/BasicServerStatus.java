@@ -102,6 +102,11 @@ public enum BasicServerStatus {
 
 
     SCRAP_Curri_EXIST(false, 7000, "이미 스크랩한 커리큘럼 입니다."),
+    UNSCRAP_Curri_EXIST(false, 7001, "이미 스크랩을 취소한 커리큘럼 입니다."),
+
+    UNSCRAP_Curri_fail(false, 7002, "커리큘럼 스크랩 취소에 실패했습니다."),
+
+    SCRAP_LIST_EMPTY(false, 7003, "스크랩한 커리큘럼이 없습니다."),
 
     SCRAP_TARGET_LECTURE_NOT_EXIST(false, 7300, "스크랩 대상 강의가 존재하지 않습니다."),
     SCRAP_FAIL(false, 7301, "스크랩 실패"),

@@ -1,11 +1,14 @@
 package com.example.debriserver.core.Curri;
 
-import com.example.debriserver.core.Curri.model.PostCurriScrapRes;
+import com.example.debriserver.core.Curri.Model.GetScrapListRes;
+import com.example.debriserver.core.Curri.Model.PostCurriScrapRes;
+import com.example.debriserver.core.Lecture.Model.GetLectureListRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 @Repository
 public class CurriDao {
@@ -24,20 +27,19 @@ public class CurriDao {
      */
     public PostCurriScrapRes scrapCurri(int curriIdx, int userIdx) {
 
-        String insertQuery = "INSERT INTO Curriculum (curriName,curriAuthor,visibleStatus,langTag,progressRate,status,scraped,ownerIdx) " +
-                "SELECT curriName,curriAuthor,visibleStatus,langTag,progressRate,status,scraped,ownerIdx FROM Curriculum where curriIdx = ?";
-        int insertParams = curriIdx;
+        // 변경
 
-        this.jdbcTemplate.update(insertQuery,insertParams);
+        if(checkUnScrapedCurriExist2(curriIdx,userIdx)==true){
+            rescrap(curriIdx,userIdx);
 
-        String updateQuery = "UPDATE Curriculum SET progressRate = 0, scraped = 'TRUE', ownerIdx = ? WHERE curriIdx = (SELECT LAST_INSERT_ID()) ";
-        int updateParams = userIdx;
+        }else {
+            String insertQuery = "INSERT INTO CurriScrap (curriIdx, scrapUserIdx, status) VALUES ((SELECT curriIdx FROM Curriculum WHERE Curriculum.curriIdx=?) , ? , 'ACTIVE')";
+            int insertParams = curriIdx;
+            int insertParams2 = userIdx;
 
-        this.jdbcTemplate.update(updateQuery,updateParams);
-
-        String getScrapedCurriQuery = "SELECT curriIdx,curriName,curriAuthor,visibleStatus,langTag,progressRate,status,scraped,ownerIdx " +
-                "FROM Curriculum WHERE curriIdx = (SELECT LAST_INSERT_ID()) ";
-
+            this.jdbcTemplate.update(insertQuery, insertParams, insertParams2);
+        }
+        String getScrapedCurriQuery = "SELECT distinctrow A.* FROM Curriculum as A INNER JOIN CurriScrap as B ON A.curriIdx = B.curriIdx WHERE B.curriIdx= ? and B.status = 'ACTIVE' and A.status = 'ACTIVE' and B.scrapUserIdx = ?";
 
         return this.jdbcTemplate.queryForObject(getScrapedCurriQuery,
                 (rs, rowNum) -> new PostCurriScrapRes(
@@ -48,15 +50,20 @@ public class CurriDao {
                         rs.getString("langTag"),
                         rs.getFloat("progressRate"),
                         rs.getString("status"),
-                        rs.getString("scraped"),
                         rs.getInt("ownerIdx")
 
-                ));
+                ),curriIdx ,userIdx);
 
     }
-    public int scrapCancel(String userId){
-        String deleteUserQuery = "UPDATE Curriculum SET status='DELETE' WHERE userId = ? and status = 'ACTIVE'";
-        String deleteUserParams = userId;
+
+    /**
+     * 스크랩취소
+     * @param scrapIdx
+     * @return
+     */
+    public int scrapCancel(int scrapIdx){
+        String deleteUserQuery = "UPDATE CurriScrap SET status='INACTIVE' WHERE scrapIdx = ? and status = 'ACTIVE'";
+        int deleteUserParams = scrapIdx;
         return this.jdbcTemplate.update(deleteUserQuery,
                 deleteUserParams);
     }
@@ -67,11 +74,76 @@ public class CurriDao {
      * @return
      */
     public boolean checkScrapedCurriExist(int curriIdx, int userIdx) {
-        String checkQuery = "SELECT COUNT(*) FROM Curriculum WHERE curriName = (SELECT curriName FROM Curriculum WHERE curriIdx =?) and curriAuthor = (SELECT curriAuthor FROM Curriculum WHERE curriIdx =?)and scraped = 'TRUE' and ownerIdx =? ";
+        String checkQuery = "SELECT COUNT(*) FROM CurriScrap WHERE curriIdx =? and scrapUserIdx =? and status ='ACTIVE'";
 
-        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, curriIdx,curriIdx,userIdx);
+        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, curriIdx, userIdx);
 
         if(result == 0) return false;
         else return true;
     }
+
+    /**
+     * 스크랩취소된 커리큘럼 존재유무
+     * @param scrapIdx
+     * @return
+     */
+    public boolean checkUnScrapedCurriExist(int scrapIdx) {
+        String checkQuery = "SELECT COUNT(*) FROM CurriScrap WHERE scrapIdx = ? and status = 'INACTIVE'";
+
+        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, scrapIdx);
+
+        if(result == 0) return false;
+        else return true;
+    }
+
+    public boolean checkUnScrapedCurriExist2(int curriIdx, int userIdx) {
+        String checkQuery = "SELECT COUNT(*) FROM CurriScrap WHERE curriIdx = ? and scrapUserIdx =? and status = 'INACTIVE'";
+
+        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, curriIdx, userIdx);
+
+        if(result == 0) return false;
+        else return true;
+    }
+
+    /**
+     * 취소한 스크랩 커리큘럼 되돌리기
+     */
+    public void rescrap(int curriIdx ,int userIdx) {
+        String updateQuery = "UPDATE CurriScrap SET status = 'ACTIVE' WHERE curriIdx = ? and scrapUserIdx = ? and status = 'INACTIVE' ";
+
+        this.jdbcTemplate.update(updateQuery, curriIdx, userIdx);
+
+
+
+    }
+
+
+    /**
+     * 커리큘럼 스크랩 리스트 조회
+     */
+    public List<GetScrapListRes> getCurriScrapList(int userIdx) {
+        String getQuery =
+                "SELECT A.curriIdx, A.curriName, A.curriAuthor, A.langTag, A.progressRate \n" +
+                        "FROM Curriculum as A JOIN CurriScrap as B ON A.curriIdx = B.curriIdx\n" +
+                        "WHERE B.status = 'ACTIVE' and A.status = 'ACTIVE' and B.scrapUserIdx = ?;";
+
+        return this.jdbcTemplate.query(getQuery,(rs, rowNum)
+                -> new GetScrapListRes(
+                rs.getInt("curriIdx"),
+                rs.getString("curriName"),
+                rs.getString("curriAuthor"),
+                rs.getString("langTag"),
+                rs.getFloat("progressRate")
+        ), userIdx);
+    }
+
+    public boolean checkScrapExist(int userIdx) {
+        String checkQuery = "SELECT COUNT(*) FROM CurriScrap WHERE scrapUserIdx = ? and status ='ACTIVE' ";
+
+        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, userIdx);
+
+        if(result !=0)return true;
+        else return  false;
+    }
+
 }
