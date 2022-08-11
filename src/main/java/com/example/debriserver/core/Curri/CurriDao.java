@@ -184,8 +184,7 @@ public class CurriDao {
                 "LEFT JOIN Curriculum C on C.curriIdx = chlc.curriIdx\n" +
                 "WHERE chlc.curriIdx = ? and ownerIdx = ?";
 
-        String insertDdayQuery = "UPDATE Curriculum SET dDay = ?\n" +
-                "WHERE curriIdx = ?;";
+        String insertDdayQuery = "UPDATE Curriculum SET dDay = ?, dDayAt = ? WHERE curriIdx = ? and ownerIdx = ?;";
 
         String getChIdxQurey = "SELECT MIN(chIdx)\n" +
                 "FROM Ch_Lecture as chl\n" +
@@ -266,9 +265,17 @@ public class CurriDao {
         int beforeDday = this.jdbcTemplate.queryForObject(getDdayQurey, int.class, getDdayParams);
         int afterDday = beforeDday + Dday;
 
+        Timestamp origianl = new Timestamp(retryDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(origianl.getTime());
+        cal.add(Calendar.DAY_OF_MONTH, afterDday);
+        Timestamp later = new Timestamp(cal.getTime().getTime());
+
         Object[] insertDdayParams = new Object[]{
                 afterDday,
-                curriIdx
+                later,
+                curriIdx,
+                userIdx
         };
 
         int result = this.jdbcTemplate.update(insertDdayQuery, insertDdayParams);
