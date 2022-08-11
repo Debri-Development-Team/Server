@@ -16,6 +16,5 @@ public class ChapterListInCurriRes {
     private String langTag;
     private String chComplete;
     private int progressOrder;
-    private int lectureIdx;
     private int completeChNumber;
 }

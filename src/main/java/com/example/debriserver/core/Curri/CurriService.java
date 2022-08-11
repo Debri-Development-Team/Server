@@ -90,7 +90,6 @@ public class CurriService {
     public GetThisCurriRes getThisCurri(GetThisCurriReq getThisCurriReq, int userIdx) throws BasicException{
         try{
             return curriDao.getThisCurri(getThisCurriReq, userIdx);
-
         } catch (Exception exception){
             System.out.println(exception.getMessage());
             throw new BasicException(DB_ERROR);

@@ -70,12 +70,20 @@ public class CurriDao {
                 "    WHERE curriIdx = ? and chlc.lectureIdx = ? and chl.chIdx = chlc.chIdx\n" +
                 "    );";
 
+        String insertLectureRateQurey = "insert Lecture_Rate SET lectureIdx = ?, userIdx = ?;";
+
+        String checkLectureRateQurey = "SELECT exists(\n" +
+                "    SELECT lectureIdx\n" +
+                "    FROM Lecture_Rate\n" +
+                "    WHERE lectureIdx = ? and userIdx = ?\n" +
+                "           );";
+
         int lectureIdx = lecture.getLectureIdx();
         int chNumInLecture = this.jdbcTemplate.queryForObject(getChNumInLectureQurey, int.class, lectureIdx);
 
-        for (int i = 1; i <= chNumInLecture; i++){
+        for (int i = 1; i <= chNumInLecture; i++) {
 
-            if (i > chNumInLecture){
+            if (i > chNumInLecture) {
                 index += 1;
                 lecture = postCurriCreateReq.getLectureList().get(index);
                 lectureIdx = lecture.getLectureIdx();
@@ -89,13 +97,24 @@ public class CurriDao {
 
             int chIdx = this.jdbcTemplate.queryForObject(getChIdxQurey, int.class, getChIdxParams);
 
-            Object[] insertLectureParams = new Object[] {
+            Object[] insertLectureParams = new Object[]{
                     chIdx,
                     lectureIdx,
                     curriIdx,
                     lecture.getLectureOrder(),
                     i
             };
+
+            Object[] insertLectureRateParams = new Object[]{
+                    lectureIdx,
+                    userIdx
+            };
+
+            int a = this.jdbcTemplate.queryForObject(checkLectureRateQurey, int.class, insertLectureRateParams);
+
+            if (a == 0 ) {
+                this.jdbcTemplate.update(insertLectureRateQurey, insertLectureRateParams);
+            }
 
             this.jdbcTemplate.update(insertLectureQuery, insertLectureParams);
         }
@@ -278,6 +297,24 @@ public class CurriDao {
                 userIdx
         };
 
+        String insertLectureRateQurey = "insert Lecture_Rate SET lectureIdx = ?, userIdx = ?;";
+
+        String checkLectureRateQurey = "SELECT exists(\n" +
+                "    SELECT lectureIdx\n" +
+                "    FROM Lecture_Rate\n" +
+                "    WHERE lectureIdx = ? and userIdx = ?\n" +
+                "           );";
+
+        Object[] insertLectureRateParams = new Object[] {
+                postInsertLectureReq.getLectureIdx(),
+                userIdx
+        };
+
+        int a = this.jdbcTemplate.queryForObject(checkLectureRateQurey, int.class, insertLectureRateParams);
+
+        if (a == 0 ) {
+            this.jdbcTemplate.update(insertLectureRateQurey, insertLectureRateParams);
+        }
         int result = this.jdbcTemplate.update(insertDdayQuery, insertDdayParams);
 
         return result != 0;
@@ -521,6 +558,10 @@ public class CurriDao {
                 "LEFT JOIN Lecture_Rate as lr on l.lectureIdx = lr.lectureIdx\n" +
                 "WHERE chlc.curriIdx = ?;";
 
+        String getCompleteChNumQurey = "SELECT COUNT(chIdx)\n" +
+                "FROM Ch_Lecture_Curri as chlc\n" +
+                "WHERE chlc.curriIdx = ? and chlc.lectureIdx = ? and chlc.chComplete = 'TRUE';";
+
         String getChapterListQurey = "SELECT distinct chlc.chIdx, c.chName, l.chNumber,l.langTag, chlc.chComplete, chlc.progressOrder, l.lectureIdx\n" +
                 "FROM Ch_Lecture_Curri as chlc\n" +
                 "LEFT JOIN Chapter as c on chlc.chIdx = c.chIdx\n" +
@@ -528,26 +569,23 @@ public class CurriDao {
                 "      FROM Lecture as l\n" +
                 "      JOIN Ch_Lecture_Curri as chlc\n" +
                 "      WHERE chlc.lectureIdx = l.lectureIdx) as l\n" +
-                "WHERE chlc.curriIdx = ? and l.lectureIdx = chlc.lectureIdx;";
+                "LEFT JOIN Curriculum as C2 on chlc.curriIdx = C2.curriIdx\n"+
+                "WHERE chlc.curriIdx = ? and l.lectureIdx = chlc.lectureIdx and chlc.progressOrder = ? and C2.ownerIdx = ?;";
 
-        String getCompleteNumQurey = "SELECT COUNT(chIdx)\n" +
-                "FROM Ch_Lecture_Curri as chlc\n" +
-                "WHERE chlc.curriIdx = ? and chlc.lectureIdx = ? and chlc.chComplete = 'TRUE'";
-
-        String getCreatedAtQuery = "SELECT distinct UNIX_TIMESTAMP(c.createdAt)\n" +
+        String getCreatedAtQuery = "SELECT distinct c.createdAt\n" +
                 "FROM Curriculum as c\n" +
                 "JOIN User as u\n" +
                 "WHERE c.curriIdx = ? AND c.status NOT IN ('DELETE');";
 
-        String getStatusQurey = "SELECT status\n" +
+        String getStatusQurey = "SELECT IFNULL(status, '0') AS RESULT\n" +
                 "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
+                "WHERE curriIdx = ? and ownerIdx = ? and status = 'ACTIVE';";
 
         String getDdayNowQurey = "SELECT (TIMESTAMPDIFF(DAY , now(), dDayAt) + 1) AS RESULT\n" +
                 "FROM Curriculum\n" +
                 "WHERE curriIdx = ? and ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
 
-        String getChangCreatedQurey = "SELECT (TIMESTAMPDIFF(DAY , statusChangedAt, createdAt) + 1) AS RESULT\n" +
+        String getChangCreatedQurey = "SELECT IFNULL((TIMESTAMPDIFF(DAY , statusChangedAt, createdAt) + 1), 0) AS RESULT\n" +
                 "FROM Curriculum\n" +
                 "WHERE curriIdx = ? and ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
 
@@ -556,20 +594,64 @@ public class CurriDao {
                 userIdx
         };
 
-        Object[] Status = new Object[]{
-                this.jdbcTemplate.queryForObject(getStatusQurey, String.class, getThisCurriParams)
-        };
+        String Status = this.jdbcTemplate.queryForObject(getStatusQurey, String.class, getThisCurriParams);
+
+        System.out.println(Status);
 
         int dDay;
 
-        if (Status[0] == "ACTIVE"){
+        if (Status != "0"){
             dDay = this.jdbcTemplate.queryForObject(getDdayNowQurey, int.class, getThisCurriParams);
         } else {
             dDay = this.jdbcTemplate.queryForObject(getChangCreatedQurey, int.class, getThisCurriParams);
         }
 
+
+        System.out.println(dDay);
+
+        String getTotalDdayQurey = "SELECT dDay\n" +
+                "FROM Curriculum\n" +
+                "WHERE curriIdx = ? and ownerIdx = ?;";
+
+        int totalDday = this.jdbcTemplate.queryForObject(getTotalDdayQurey, int.class,getThisCurriParams);
+        int a = totalDday / 7;
+        int b = dDay / 7;
+        int c;
+
+        if (a == b){
+            c = 1;
+        }  else {
+            c = (a - (a - b)) * 3 + 1;
+        }
+
+        List<ChapterListInCurriRes> getChapterListResList = new ArrayList<>();
+        ChapterListInCurriRes chapterListInCurriRes;
+
+        for (int i = 0; i < 3; i++){
+            Object[] getChapterParams = new Object[] {
+                    curriIdx,
+                    c,
+                    userIdx
+            };
+
+            chapterListInCurriRes = this.jdbcTemplate.queryForObject(getChapterListQurey, (rs, rowNum)
+                    -> new ChapterListInCurriRes
+                    (
+                            rs.getInt("chIdx"),
+                            rs.getString("chName"),
+                            rs.getInt("chNumber"),
+                            rs.getString("langTag"),
+                            rs.getString("chComplete"),
+                            rs.getInt("progressOrder"),
+                            this.jdbcTemplate.queryForObject(getCompleteChNumQurey, int.class, getThisCurriParams)
+                    ) , getChapterParams);
+            getChapterListResList.add(i, chapterListInCurriRes);
+
+            c ++;
+        }
+
         return this.jdbcTemplate.queryForObject(getThisCurriQurey, (rs, rowNum)
-                -> new GetThisCurriRes(
+                -> new GetThisCurriRes (
                 rs.getInt("curriIdx"),
                 rs.getString("curriName"),
                 rs.getString("visibleStatus"),
@@ -578,7 +660,7 @@ public class CurriDao {
                 rs.getString("status"),
                 rs.getInt("completeAt"),
                 dDay,
-                this.jdbcTemplate.queryForObject(getCreatedAtQuery, int.class, rs.getInt("curriIdx")),
+                this.jdbcTemplate.queryForObject(getCreatedAtQuery, Timestamp.class, rs.getInt("curriIdx")),
 
                 this.jdbcTemplate.query(getLectureListQurey, ((rs2, rowNum2)
                         -> new LectureListInCurriRes(
@@ -589,20 +671,7 @@ public class CurriDao {
                         rs2.getFloat("progressRate")
                 )), curriIdx),
 
-                this.jdbcTemplate.query(getChapterListQurey, ((rs1, rsNum1)
-                        -> new ChapterListInCurriRes(
-                        rs1.getInt("chIdx"),
-                        rs1.getString("chName"),
-                        rs1.getInt("chNumber"),
-                        rs1.getString("langTag"),
-                        rs1.getString("chComplete"),
-                        rs1.getInt("progressOrder"),
-                        rs1.getInt("lectureIdx"),
-                        this.jdbcTemplate.queryForObject(getCompleteNumQurey, int.class,
-                                new Object[]{
-                                        curriIdx, rs1.getInt("lectureIdx")
-                                })
-                )), curriIdx)
+                getChapterListResList
         ), getThisCurriParams);
     }
 }

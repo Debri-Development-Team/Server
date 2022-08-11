@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Getter
@@ -20,7 +21,7 @@ public class GetThisCurriRes {
     private String status;
     private int completeAt;
     private int dDay;
-    private int createdAt;
+    private Timestamp createdAt;
 
     List<LectureListInCurriRes> lectureListResList;
 
