@@ -1,5 +1,6 @@
 package com.example.debriserver.core.Board;
 
+import com.example.debriserver.core.Board.model.GetBoardSearchListRes;
 import com.example.debriserver.core.Board.model.GetScrapBoardCountRes;
 import com.example.debriserver.core.Board.model.GetUnscrapBoardListRes;
 import com.example.debriserver.core.Board.model.GetScrapBoardListRes;
@@ -125,5 +126,49 @@ public class BoardDao {
 
         return result == 0;
 
+    }
+
+    public List<GetScrapBoardListRes> getAllBoardList() {
+        String getListQuery = "SELECT * FROM Board WHERE status = 'ACTIVE';";
+
+        return this.jdbcTemplate.query(getListQuery,
+                (rs, rowNum) -> new GetScrapBoardListRes(
+                        rs.getInt("boardIdx"),
+                        rs.getString("boardName"),
+                        rs.getString("boardAdmin"),
+                        rs.getString("createdAt"),
+                        rs.getString("updatedAt"),
+                        rs.getString("status")
+                ));
+    }
+
+    public List<GetBoardSearchListRes> getBoardSearchList(String key, int userIdx) {
+        String searchQuery =
+                "SELECT boardIdx, boardName, boardAdmin, createdAt, updatedAt, status\n" +
+                "FROM Board\n" +
+                "WHERE boardName LIKE '%" + key + "%' and status = 'ACTIVE';";
+        String getScrapStatusQuery = "SELECT COUNT(*) FROM BoardSubscription WHERE userIdx = ? and boardIdx = ? and status = 'ACTIVE';";
+
+        return this.jdbcTemplate.query(searchQuery,
+                (rs, rowNum) -> new GetBoardSearchListRes(
+                        rs.getInt("boardIdx"),
+                        rs.getString("boardName"),
+                        rs.getString("boardAdmin"),
+                        rs.getString("createdAt"),
+                        rs.getString("updatedAt"),
+                        rs.getString("status"),
+                        this.jdbcTemplate.queryForObject(getScrapStatusQuery, int.class, userIdx, rs.getInt("boardIdx")) > 0
+                ));
+
+
+    }
+
+    public boolean checkSearchExist(String key) {
+        String checkQuery =
+                "SELECT COUNT(*)\n" +
+                "FROM Board\n" +
+                "WHERE boardName LIKE '%" + key + "%' and status = 'ACTIVE';";
+
+        return this.jdbcTemplate.queryForObject(checkQuery, int.class) <= 0;
     }
 }

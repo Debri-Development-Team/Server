@@ -147,54 +147,81 @@ public class PostDao {
      **/
     public List<GetScrapRes> getScrapPosts(int userIdx)
     {
-        String getScrapPostsQuery = "select PM.postIdx, P.boardIdx, U.nickname, P.postName\n" +
-                "FROM Post as P\n" +
-                "left join(select postIdx, userIdx, status from PostMarked) PM on P.postIdx = PM.postIdx\n" +
-                "left join User as U on P.userIdx = U.userIdx\n" +
-                "where PM.userIdx = ? and P.status = 'ACTIVE'";
+        String getScrapPostsQuery = "select p.postIdx, p.boardIdx, u.nickName, p.postName, pl.likeStatus, pm.status as scrapStatus\n" +
+                "FROM Post as p\n" +
+                "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
+                "    LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
+                "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
+                "    LEFT JOIN User as u on p.userIdx = u.userIdx\n" +
+                "where p.status = 'ACTIVE' AND pm.status = 'ACTIVE' AND reportedUserIdx is null";
+
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
 
         String getLikeCountQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
 
-        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE';";
         return this.jdbcTemplate.query(getScrapPostsQuery,
                 (rs, rowNum) -> new GetScrapRes(
                         rs.getInt("postIdx"),
                         rs.getInt("boardIdx"),
                         rs.getString("nickName"),
                         rs.getString("postName"),
+                        rs.getString("likeStatus"),
+                        rs.getString("scrapStatus"),
                         this.jdbcTemplate.queryForObject(getLikeCountQuery, int.class, rs.getInt("postIdx")),
                         this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
                         this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx"))
-                ), userIdx);
-
+                ));
     }
 
     public int insertPostLike(PostPostLikeReq postPostLikeReq) {
         String insertPostLikeQuery = "INSERT INTO PostLike(postIdx, userIdx, likeStatus) VALUES(?,?,?)";
-        Object []insertPostLikeParams = new Object[]{
+        String checkExistQuery = "SELECT EXISTS(SELECT postIdx FROM PostLike WHERE postIdx = ? and userIdx = ?);";
+        String updatePostLikeQuery = "UPDATE PostLike SET likeStatus = 'LIKE' WHERE postIdx = ? and userIdx = ?;";
+
+        Object[] insertPostLikeParams = new Object[]{
                 postPostLikeReq.getPostIdx(),
                 postPostLikeReq.getUserIdx(),
                 postPostLikeReq.getLikeStatus()
         };
-        return this.jdbcTemplate.update(insertPostLikeQuery, insertPostLikeParams);
+
+        Object[] checkExistParameters = new Object[]{
+                postPostLikeReq.getPostIdx(),
+                postPostLikeReq.getUserIdx()
+        };
+
+        int check = this.jdbcTemplate.queryForObject(checkExistQuery, int.class, checkExistParameters);
+
+        if(check == 0) return this.jdbcTemplate.update(insertPostLikeQuery, insertPostLikeParams);
+        else return this.jdbcTemplate.update(updatePostLikeQuery, checkExistParameters);
     }
 
-    public int deletePostLike(int postIdx) {
-        String insertPostLikeQuery = "UPDATE PostLike SET likeStatus='NULL' WHERE postIdx=?";
-        int insertPostLikeParams = postIdx;
+    public int deletePostLike(int postIdx, int userIdx) {
+
+        String insertPostLikeQuery = "UPDATE PostLike SET likeStatus = 'NULL' WHERE postIdx=? and userIdx = ?";
+
+        Object[] insertPostLikeParams = new Object[]{
+                postIdx,
+                userIdx
+        };
+
         return this.jdbcTemplate.update(insertPostLikeQuery, insertPostLikeParams);
     }
-
-    public List<GetPostListRes> getPostList(int boardIdx){
-        String getListQuery = "SELECT distinct p.boardIdx, p.postIdx, u.nickname, p.postName\n" +
-                "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx WHERE boardIdx = ?;";
+    
+    public List<GetPostListRes> getPostList(int userIdx, int boardIdx){
+        String getListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus, pm.status as scrapStatus\n" +
+                "FROM Post as p\n" +
+                "    LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
+                "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
+                "    LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
+                "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
+                "WHERE p.status = 'ACTIVE' AND boardIdx = ? AND reportedUserIdx is null;";
 
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
 
         String getLikeCountQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
 
-        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE';";
 
         return this.jdbcTemplate.query(getListQuery,
                 (rs, rowNum) -> new GetPostListRes
@@ -204,24 +231,28 @@ public class PostDao {
                                 rs.getString("nickName"),
                                 rs.getString("postName"),
                                 this.jdbcTemplate.queryForObject(getLikeCountQuery, int.class, rs.getInt("postIdx")),
+                                rs.getString("likeStatus"),
+                                rs.getString("scrapStatus"),
                                 this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
                                 this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx"))
                         ),
                 boardIdx);
     }
 
-    public List<GetPostSearchListRes> getPostSearchList(String keyword){
-        String getPostSearchListQuery = "SELECT distinct p.boardIdx, p.postIdx, u.nickname, p.postName\n" +
-                                        "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
-                                        "WHERE p.status = 'ACTIVE' AND p.postName like '%" +
-                                        keyword +
-                                        "%'";
+    public List<GetPostSearchListRes> getPostSearchList(int userIdx, String keyword){
+        String getPostSearchListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus, pm.status as scrapStatus\n" +
+                "FROM Post as p\n" +
+                "    LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
+                "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
+                "    LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
+                "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
+                "WHERE p.status = 'ACTIVE' AND p.postName like '%" + keyword + "%' AND reportedUserIdx is null";
 
         String getLikeCountQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
 
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
 
-        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE;'";
 
         return this.jdbcTemplate.query(getPostSearchListQuery,
                 (rs, rowNum) -> new GetPostSearchListRes
@@ -231,19 +262,49 @@ public class PostDao {
                                 rs.getString("nickName"),
                                 rs.getString("postName"),
                                 this.jdbcTemplate.queryForObject(getLikeCountQuery, int.class, rs.getInt("postIdx")),
+                                rs.getString("likeStatus"),
+                                rs.getString("scrapStatus"),
                                 this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
                                 this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx"))
-                        )
-        );
+                        ));
     }
 
-    public GetPostRes getPost(int postIdx){
+    public GetPostRes getPost(int postIdx, int userIdx){
+        boolean userLikeStatus;
+        boolean userScrapStatus;
+
         String getPostQuery = "SELECT distinct p.boardIdx, p.postIdx, p.postName, u.nickname, p.postContent, p.userIdx\n" +
-                "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx WHERE postIdx = ?;";
+                "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx WHERE postIdx = ? and p.status = 'ACTIVE';";
+
         String getLikeQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
-        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ?;";
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE';";
+        String checkUserLikeStatusQuery = "SELECT COUNT(*) FROM PostLike WHERE postIdx = ? and userIdx = ?;";
+        String checkUserScrapStatusQuery = "SELECT COUNT(*) FROM PostMarked WHERE postIdx = ? and userIdx = ?;";
+        String getUserLikeStatusQuery = "SELECT IF(likeStatus = 'LIKE', true, false) FROM PostLike WHERE postIdx = ? and userIdx = ?;";
+        String getUserScrapStatusQuery = "SELECT IF(status = 'ACTIVE', true, false) FROM PostMarked WHERE postIdx = ? and userIdx = ?;";
 
+        Object[] userStatusParameters = new Object[]{
+                postIdx,
+                userIdx
+        };
+
+        if(this.jdbcTemplate.queryForObject(checkUserLikeStatusQuery, int.class, userStatusParameters) <= 0){
+            userLikeStatus = false;
+        }
+        else{
+            if(this.jdbcTemplate.queryForObject(getUserLikeStatusQuery, int.class, userStatusParameters) == 1) userLikeStatus = true;
+            else userLikeStatus = false;
+        }
+
+        if(this.jdbcTemplate.queryForObject(checkUserScrapStatusQuery, int.class, userStatusParameters) <= 0){
+            userScrapStatus = false;
+        }
+        else{
+            if(this.jdbcTemplate.queryForObject(getUserScrapStatusQuery, int.class, userStatusParameters) == 1) userScrapStatus = true;
+            else userScrapStatus = false;
+        }
+        
         return this.jdbcTemplate.queryForObject(getPostQuery,
                 (rs, rowNum) -> new GetPostRes
                         (
@@ -255,8 +316,40 @@ public class PostDao {
                                 rs.getString("postContent"),
                                 this.jdbcTemplate.queryForObject(getLikeQuery, int.class, postIdx),
                                 this.jdbcTemplate.queryForObject(getTimeQuery, int.class, postIdx),
-                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, postIdx)
+                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, postIdx),
+                                userScrapStatus,
+                                userLikeStatus
                         ),
                 postIdx);
+    }
+
+    public List<GetPostListRes> getBoardPostList(String key, int boardIdx, int userIdx) {
+        String getPostSearchListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus, pm.status as scrapStatus\n" +
+                "FROM Post as p\n" +
+                "    LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
+                "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
+                "    LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
+                "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
+                "WHERE p.status = 'ACTIVE' AND p.postName like '%" + key + "%' AND p.boardIdx = ? AND reportedUserIdx is null";
+
+        String getLikeCountQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
+
+        String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
+
+        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE;'";
+
+        return this.jdbcTemplate.query(getPostSearchListQuery,
+                (rs, rowNum) -> new GetPostListRes
+                        (
+                                rs.getInt("boardIdx"),
+                                rs.getInt("postIdx"),
+                                rs.getString("nickName"),
+                                rs.getString("postName"),
+                                this.jdbcTemplate.queryForObject(getLikeCountQuery, int.class, rs.getInt("postIdx")),
+                                rs.getString("likeStatus"),
+                                rs.getString("scrapStatus"),
+                                this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
+                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx"))
+                        ), boardIdx);
     }
 }

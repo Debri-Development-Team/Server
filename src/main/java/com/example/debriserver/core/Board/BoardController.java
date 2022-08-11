@@ -3,6 +3,7 @@ package com.example.debriserver.core.Board;
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
+import com.example.debriserver.core.Board.model.GetBoardSearchListRes;
 import com.example.debriserver.core.Board.model.GetUnscrapBoardListRes;
 import com.example.debriserver.core.Board.model.GetScrapBoardListRes;
 import com.example.debriserver.utility.jwtUtility;
@@ -41,7 +42,7 @@ public class BoardController {
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
             boardService.scrapBoard(boardIdx, userIdx);
 
             String result = "게시판이 스크랩 되었습니다.";
@@ -63,7 +64,7 @@ public class BoardController {
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
             boardService.cancelScrapBoard(boardIdx, userIdx);
 
             String result = "게시판 스크랩이 취소 되었습니다.";
@@ -85,7 +86,7 @@ public class BoardController {
 
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
             List<GetScrapBoardListRes> getScrapBoardListRes = boardService.getScrapBoardList(userIdx);
 
             return new BasicResponse<>(getScrapBoardListRes);
@@ -106,7 +107,7 @@ public class BoardController {
 
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
 
             if(boardProvider.checkUserExist(userIdx) == 0)
             {
@@ -121,4 +122,47 @@ public class BoardController {
             return new BasicResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 2.5 전체 게시판 리스트 조회
+     * */
+    @GetMapping("/allList")
+    public BasicResponse<List<GetScrapBoardListRes>> getAllBoardList(){
+
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            List<GetScrapBoardListRes> getScrapBoardListRes = boardService.getAllBoardList();
+
+            return new BasicResponse<>(getScrapBoardListRes);
+
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 2.6 게시판 검색 api
+     * */
+    @GetMapping("/searchList")
+    public BasicResponse<List<GetBoardSearchListRes>> getBoardSearchList(@RequestParam String key){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            if(boardProvider.checkSearchExist(key)) throw new BasicException(BasicServerStatus.BOARD_SEARCH_LIST_NOT_EXIST);
+
+            List<GetBoardSearchListRes> getBoardSearchListRes = boardService.getBoardSearchList(key, userIdx);
+
+            return new BasicResponse<>(getBoardSearchListRes);
+        }catch (BasicException exception){
+            return new BasicResponse<>(exception.getStatus());
+        }
+    }
+
 }

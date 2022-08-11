@@ -16,6 +16,8 @@ public class GetPostSearchListRes {
     private String authorName;
     private String postName;
     private int likeNumber;
+    private String likeStatus;
+    private String scrapStatus;
     private int timeAfterCreated;
     private int commentNumber;
 

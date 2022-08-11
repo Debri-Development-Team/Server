@@ -110,7 +110,7 @@ public class PostController {
             String jwtToken = jwt.getJwt();
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
 
             String result = "스크랩이 설정되었습니다.";
             postService.scrapPost(postIdx, userIdx);
@@ -173,7 +173,7 @@ public class PostController {
             String jwtToken = jwt.getJwt();
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx();
+            int userIdx = jwt.getUserIdx(jwtToken);
 
             String result = "스크랩이 해제되었습니다.";
             postService.unScrapPost(postIdx, userIdx);
@@ -197,7 +197,8 @@ public class PostController {
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             String keyword = getPostSearchListReq.getKeyword();
-            List<GetPostSearchListRes> getPostSearchListRes = postProvider.getPostSearchList(keyword);
+            int userIdx = jwt.getUserIdx(jwtToken);
+            List<GetPostSearchListRes> getPostSearchListRes = postProvider.getPostSearchList(userIdx, keyword);
 
             return  new BasicResponse<>(getPostSearchListRes);
 
@@ -222,7 +223,8 @@ public class PostController {
              if (!postProvider.checkBoardExist(boardIdx))
                  return new BasicResponse<>(BasicServerStatus.BOARD_NOT_EXIST);
 
-             List<GetPostListRes> getPostListRes = postProvider.getPostList(boardIdx);
+             int userIdx = jwt.getUserIdx(jwtToken);
+             List<GetPostListRes> getPostListRes = postProvider.getPostList(userIdx, boardIdx);
 
              return new BasicResponse<>(getPostListRes);
          } catch (BasicException exception) {
@@ -241,7 +243,7 @@ public class PostController {
              String jwtToken = jwt.getJwt();
              if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-             int userIdx = jwt.getUserIdx();
+             int userIdx = jwt.getUserIdx(jwtToken);
 
              List<GetScrapRes> getPosts = postService.getScrapPosts(userIdx);
              return new BasicResponse<>(getPosts);
@@ -263,14 +265,39 @@ public class PostController {
 
              if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
+            int userIdx = jwt.getUserIdx(jwtToken);
+
              if (postProvider.checkPostExist(postIdx) == 0)
                  return new BasicResponse<>(BasicServerStatus.POSTS_EMPTY_POST_ID);
 
-             GetPostRes getPostRes = postProvider.getPost(postIdx);
+             GetPostRes getPostRes = postProvider.getPost(postIdx, userIdx);
 
              return new BasicResponse<>(getPostRes);
 
          } catch (BasicException exception) {
+             return new BasicResponse<>((exception.getStatus()));
+         }
+     }
+
+     /**
+      * 3.7.2 특정 게시판 키워드 조회
+      * */
+     @GetMapping("/boardPostList/{boardIdx}")
+    public BasicResponse<List<GetPostListRes>> getBoardPostList(@RequestParam String key, @PathVariable int boardIdx){
+
+         try{
+             String jwtToken = jwt.getJwt();
+
+             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+             int userIdx = jwt.getUserIdx(jwtToken);
+
+             if (!postProvider.checkBoardExist(boardIdx))
+                 return new BasicResponse<>(BasicServerStatus.BOARD_NOT_EXIST);
+
+             return new BasicResponse<>(postService.getBoardPostList(key, boardIdx, userIdx));
+
+         }catch (BasicException exception){
              return new BasicResponse<>((exception.getStatus()));
          }
      }

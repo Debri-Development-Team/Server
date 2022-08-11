@@ -62,4 +62,12 @@ public class BoardProvider {
             throw new BasicException(DB_ERROR);
         }
     }
+
+    public boolean checkSearchExist(String key) throws BasicException{
+        try{
+            return boardDao.checkSearchExist(key);
+        }catch (Exception exception){
+            throw new BasicException(DB_ERROR);
+        }
+    }
 }

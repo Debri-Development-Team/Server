@@ -20,7 +20,7 @@ public class AuthDao {
 
     public User getUser(PostLoginReq postLoginReq)
     {
-        String getUserQuery = "select userIdx, userId, password, nickname, birthday from User where userId = ?";
+        String getUserQuery = "select userIdx, userId, password, nickname, birthday from User where userId = ? and status = 'ACTIVE'";
         String getUserParams = postLoginReq.getEmail();
 
 
@@ -37,12 +37,24 @@ public class AuthDao {
     }
 
     public void insertRefresh(String Refresh,String userId){
-        String insertRefreshQuery = "UPDATE User SET jwtRefreshToken = ? WHERE userId =?;";
+        String insertRefreshQuery = "UPDATE User SET jwtRefreshToken = ? WHERE userId =? and status = 'ACTIVE';";
         Object[] insertRefreshParameters = new Object[] {
                 Refresh,
                 userId
         };
 
         this.jdbcTemplate.update(insertRefreshQuery, insertRefreshParameters);
+    }
+
+    public boolean checkFirstLogin(String userId){
+
+        String checkQuery = "SELECT COUNT(*) FROM User WHERE isFirst = 'TRUE' and userId = ?;";
+        String updateQuery = "UPDATE User SET isFirst = 'FALSE' WHERE userId = ?;";
+
+        boolean result = this.jdbcTemplate.queryForObject(checkQuery, int.class, userId) > 0;
+
+        if(result) this.jdbcTemplate.update(updateQuery, userId);
+
+        return result;
     }
 }
