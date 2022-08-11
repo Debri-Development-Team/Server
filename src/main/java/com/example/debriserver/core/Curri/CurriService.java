@@ -36,14 +36,18 @@ public class CurriService {
         }
     }
 
+    public boolean curriModify(PostCurriModifyReq postCurriModifyReq, int userIdx) throws BasicException{
+        try{
+            return curriDao.curriModify(postCurriModifyReq, userIdx);
+        } catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
     public void deleteCurri(int curriIdx, int userIdx) throws BasicException {
         int result;
 
         try{
-            if (curriProvider.checkCurriExist(curriIdx) == 0){
-                throw new BasicException(CURRI_EMPTY_ID);
-            }
-
             if (curriProvider.checkCurriScrap(curriIdx) > 0 ){
                 curriDao.disconnectAllScrap(curriIdx);
             }
@@ -87,6 +91,15 @@ public class CurriService {
         try{
             return curriDao.getThisCurri(getThisCurriReq, userIdx);
 
+        } catch (Exception exception){
+            System.out.println(exception.getMessage());
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
+    public boolean insertLecture(PostInsertLectureReq postInsertLectureReq, int userIdx) throws BasicException{
+        try{
+            return curriDao.insertLecture(postInsertLectureReq, userIdx);
         } catch (Exception exception){
             System.out.println(exception.getMessage());
             throw new BasicException(DB_ERROR);

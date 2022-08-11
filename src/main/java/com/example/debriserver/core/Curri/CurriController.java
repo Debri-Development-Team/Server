@@ -71,10 +71,57 @@ public class CurriController {
     }
 
 
-    /**
+    /*
     *   커리큘럼 수정 API
+    *   [POST]: localhost:8521/api/curri/modify
     * */
+    @ResponseBody
+    @PostMapping("/modify")
+    public BasicResponse<String> curriModify(@RequestBody PostCurriModifyReq postCurriModifyReq){
+        try{
+            // jwtToken 인증
+            String jwtToken = jwt.getJwt();
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
+            int userIdx = jwt.getUserIdx();
+
+            boolean check = curriService.curriModify(postCurriModifyReq, userIdx);
+
+            if (!check) throw new BasicException(BasicServerStatus.CURRI_MODIFY_FAIL);
+
+            String result = "커리큘럼 수정에 성공하였습니다.";
+
+            return new BasicResponse<>(result);
+
+        } catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /*
+     *   강의자료 추가 API
+     *   [POST]: localhost:8521/api/curri/insertLecture
+     * */
+    @ResponseBody
+    @PostMapping("/insertLecture")
+    public BasicResponse<String> insertLecture(@RequestBody PostInsertLectureReq postInsertLectureReq){
+        try{
+            String jwtToken = jwt.getJwt();
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx();
+
+            boolean check = curriService.insertLecture(postInsertLectureReq, userIdx);
+
+            if (!check) throw new BasicException(BasicServerStatus.CURRI_INSERT_FATL);
+
+            String result = "강의자료가 성공적으로 추가 되었습니다.";
+
+            return new BasicResponse<>(result);
+        } catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
     /*
     *   커리큘럼 리스트 조회 API
@@ -123,10 +170,10 @@ public class CurriController {
 
     /*
     *   커리큘럼 삭제 API
-    *   [PATCH]: localhost:8521/api/curri/{curriIdx}/delete
+    *   [PATCH]: localhost:8521/api/curri/delete/{curriIdx}
     * */
     @ResponseBody
-    @PatchMapping("/{curriIdx}/delete")
+    @PatchMapping("/delete/{curriIdx}")
     public BasicResponse<String> deleteCurri(@PathVariable ("curriIdx") int curriIdx) {
         try {
             String jwtToken = jwt.getJwt();
@@ -148,7 +195,7 @@ public class CurriController {
     *   [PATCH]: localhost:8521/api/curri/chapter/status
     * */
     @ResponseBody
-    @PatchMapping("/chapter/complete")
+    @PatchMapping("/chapter/status")
     public BasicResponse<String> chapterStatus(@RequestBody PatchChapterStatuReq patchChapterCompleteReq) {
         try{
             String jwtToken = jwt.getJwt();

@@ -45,13 +45,6 @@ public class CurriProvider {
         }
     }
 
-    public int checkCurriExist(int curriIdx) throws BasicException{
-        try {
-            return curriDao.checkCurriExist(curriIdx);
-        } catch (Exception exception){
-            throw new BasicException(DB_ERROR);
-        }
-    }
 
     public boolean checkChapterStatus(PatchChapterStatuReq patchChapterStatuReq) throws BasicException{
         try {

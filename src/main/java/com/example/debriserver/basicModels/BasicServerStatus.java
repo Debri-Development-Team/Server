@@ -103,7 +103,9 @@ public enum BasicServerStatus {
     // CURRI
     CURRI_EMPTY_NAME(false, 7610, "커리큘럼 제목을 입력해주세요"),
     CURRI_EMPTY_ID(false, 7611, "이미 삭제된 커리큘럼 이거나 존재하지 않습니다."),
-    CURRI_EMPTY_CHAPTER(false, 7612, "커리큘럼 상에서 해당 챕터가 존재하지 않습니다.");
+    CURRI_EMPTY_CHAPTER(false, 7612, "커리큘럼 상에서 해당 챕터가 존재하지 않습니다."),
+    CURRI_MODIFY_FAIL(false, 7613, "커리큘럼 수정에 실패하였습니다"),
+    CURRI_INSERT_FATL(false, 7614,"강의자료 추가에 실패하였습니다");
 
     private final boolean isSuccess;
     private final int returnCode;
