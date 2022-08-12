@@ -3,6 +3,7 @@ package com.example.debriserver.core.Board;
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
+import com.example.debriserver.core.Board.model.GetBoardSearchListRes;
 import com.example.debriserver.core.Board.model.GetUnscrapBoardListRes;
 import com.example.debriserver.core.Board.model.GetScrapBoardListRes;
 import com.example.debriserver.utility.jwtUtility;
@@ -125,7 +126,7 @@ public class BoardController {
     /**
      * 2.5 전체 게시판 리스트 조회
      * */
-    @GetMapping("allList")
+    @GetMapping("/allList")
     public BasicResponse<List<GetScrapBoardListRes>> getAllBoardList(){
 
         try{
@@ -141,4 +142,27 @@ public class BoardController {
             return new BasicResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 2.6 게시판 검색 api
+     * */
+    @GetMapping("/searchList")
+    public BasicResponse<List<GetBoardSearchListRes>> getBoardSearchList(@RequestParam String key){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            if(boardProvider.checkSearchExist(key)) throw new BasicException(BasicServerStatus.BOARD_SEARCH_LIST_NOT_EXIST);
+
+            List<GetBoardSearchListRes> getBoardSearchListRes = boardService.getBoardSearchList(key, userIdx);
+
+            return new BasicResponse<>(getBoardSearchListRes);
+        }catch (BasicException exception){
+            return new BasicResponse<>(exception.getStatus());
+        }
+    }
+
 }
