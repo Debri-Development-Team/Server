@@ -17,4 +17,6 @@ public class GetCommentRes {
     private int timeAfterCreated;
     private String commentContent;
     private String authorName;
+    private boolean likeStatus;
+    private int likeCount;
 }
