@@ -47,6 +47,7 @@ public enum BasicServerStatus {
     MODIFY_IT_IS_NOT_AUTHOR_ERROR(false, 3054, "삭제를 시도한 유저 자신이 작성한 댓글이 아닙니다."),
     MODIFY_ALREADY_DELETED_COMMENT(false, 3055, "댓글이 삭제되어 수정이 불가합니다."),
     COMMENT_ROOT_POST_NOT_EXIST(false, 3056, "댓글을 조회하려는 게시물이 존재하지 않습니다."),
+    ALREADY_COMMENT_LIKE(false, 3057, "이미 좋아요한 댓글/대댓글입니다."),
     // [POST]
     POST_USERS_EMPTY_EMAIL(false, 3020, "이메일을 입력해주세요."),
     POST_USERS_EMPTY_PASSWORD(false, 3021, "비밀번호를 입력해주세요."),
@@ -72,6 +73,7 @@ public enum BasicServerStatus {
     BOARD_INSERT_FAIL(false, 3065, "스크랩 게시판에 생성에 실패했습니다"),
     BOARD_GET_SCRAP_LIST_FAIL(false,3066,"스크랩된 게시판이 존재하지 않습니다"),
 
+    BOARD_SEARCH_LIST_NOT_EXIST(false, 3067, "검색 결과가 존재하지 않습니다."),
 
     /**
      * 4000 : Response 오류
@@ -100,7 +102,6 @@ public enum BasicServerStatus {
      * 7000: 커리큘럼 API에서 사용 7000번 부터 찜니가 사용, 7300번 부터 루키가 사용, 7600번 부터 루카가 사용
      * */
 
-
     SCRAP_Curri_EXIST(false, 7000, "이미 스크랩한 커리큘럼 입니다."),
 
     SCRAP_TARGET_LECTURE_NOT_EXIST(false, 7300, "스크랩 대상 강의가 존재하지 않습니다."),
@@ -110,7 +111,13 @@ public enum BasicServerStatus {
     SCRAP_DELETE_FAIL(false, 7304, "스크랩 삭제 실패"),
     SCRAP_ACTIVE_NOT_EXIST(false, 7305, "스크랩한 강의가 존재하지 않습니다."),
     LECTURE_NOT_EXIST(false, 7306, "강의가 존재하지 않습니다."),
-    SEARCH_TARGET_NOT_EXIST(false, 7307, "검색 결과가 존재하지 않습니다.");
+    SEARCH_TARGET_NOT_EXIST(false, 7307, "검색 결과가 존재하지 않습니다."),
+    // CURRI
+    CURRI_EMPTY_NAME(false, 7610, "커리큘럼 제목을 입력해주세요"),
+    CURRI_EMPTY_ID(false, 7611, "이미 삭제된 커리큘럼 이거나 존재하지 않습니다."),
+    CURRI_EMPTY_CHAPTER(false, 7612, "커리큘럼 상에서 해당 챕터가 존재하지 않습니다."),
+    CURRI_MODIFY_FAIL(false, 7613, "커리큘럼 수정에 실패하였습니다"),
+    CURRI_INSERT_FATL(false, 7614,"강의자료 추가에 실패하였습니다");
 
     private final boolean isSuccess;
     private final int returnCode;

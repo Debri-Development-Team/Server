@@ -45,9 +45,9 @@ public class CommentService {
         }
     }
 
-    public List<GetCommentRes> getComment(int postIdx) throws BasicException{
+    public List<GetCommentRes> getComment(int postIdx, int userIdx) throws BasicException{
         try{
-            List<GetCommentRes> getCommentRes = commentDao.getComment(postIdx);
+            List<GetCommentRes> getCommentRes = commentDao.getComment(postIdx, userIdx);
 
             return getCommentRes;
         }catch (Exception exception){
@@ -115,5 +115,31 @@ public class CommentService {
         }catch (Exception exception){
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
+    }
+
+    public PostCommentLikeRes createCommentLike(int userIdx, int commentIdx) throws BasicException{
+        try{
+            return commentDao.createCommentLike(userIdx, commentIdx);
+
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public PatchCommentLikeRes deleteCommentLike(int userIdx, int commentIdx) throws BasicException{
+        try{
+            return commentDao.deleteCommentLike(userIdx, commentIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean commentExist(int commentIdx, int userIdx) throws BasicException{
+        try{
+            return commentDao.commentExist(commentIdx, userIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+
     }
 }
