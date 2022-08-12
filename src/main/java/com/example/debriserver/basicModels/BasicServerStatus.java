@@ -47,6 +47,7 @@ public enum BasicServerStatus {
     MODIFY_IT_IS_NOT_AUTHOR_ERROR(false, 3054, "삭제를 시도한 유저 자신이 작성한 댓글이 아닙니다."),
     MODIFY_ALREADY_DELETED_COMMENT(false, 3055, "댓글이 삭제되어 수정이 불가합니다."),
     COMMENT_ROOT_POST_NOT_EXIST(false, 3056, "댓글을 조회하려는 게시물이 존재하지 않습니다."),
+    ALREADY_COMMENT_LIKE(false, 3057, "이미 좋아요한 댓글/대댓글입니다."),
     // [POST]
     POST_USERS_EMPTY_EMAIL(false, 3020, "이메일을 입력해주세요."),
     POST_USERS_EMPTY_PASSWORD(false, 3021, "비밀번호를 입력해주세요."),
