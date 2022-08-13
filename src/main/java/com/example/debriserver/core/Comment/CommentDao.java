@@ -193,12 +193,14 @@ public class CommentDao {
 
     }
 
-    public List<GetCommentRes> getComment(int postIdx){
+    public List<GetCommentRes> getComment(int postIdx, int userIdx){
         String getListQuery =
                 "SELECT commentIdx, userIdx, postIdx, authorName, class, commentOrder, groupNum, commentContent\n" +
                 "FROM Comment\n" +
                 "WHERE postIdx = ? and status = 'ACTIVE';";
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Comment WHERE commentIdx = ?), CURRENT_TIMESTAMP);";
+        String checkLikeStatusQuery = "SELECT exists(SELECT * FROM CommentLike WHERE userIdx = ? and commentIdx = ? and status = 'ACTIVE');";
+        String likeNumberCountQuery = "SELECT COUNT(*) FROM CommentLike WHERE commentIdx = ? and status = 'ACTIVE';";
 
         return this.jdbcTemplate.query
                 (
@@ -213,7 +215,9 @@ public class CommentDao {
                                         rs.getInt("groupNum"),
                                         this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("commentIdx")),
                                         rs.getString("commentContent"),
-                                        rs.getString("authorName")
+                                        rs.getString("authorName"),
+                                        this.jdbcTemplate.queryForObject(checkLikeStatusQuery, int.class, userIdx, rs.getInt("commentIdx")) == 1,
+                                        this.jdbcTemplate.queryForObject(likeNumberCountQuery, int.class, rs.getInt("commentIdx"))
                                 ), postIdx
                 );
     }
@@ -288,4 +292,36 @@ public class CommentDao {
 
         return result.equalsIgnoreCase("DELETE");
     }
+
+    public PostCommentLikeRes createCommentLike(int userIdx, int commentIdx) {
+        String checkRowExistQuery = "SELECT exists(SELECT * FROM CommentLike WHERE  commentIdx = ? and userIdx = ?);";
+        String insertLikeQuery = "INSERT INTO CommentLike(userIdx, commentIdx) VALUES (?, ?);";
+        String updateLikeQuery = "UPDATE CommentLike SET status = 'ACTIVE' WHERE userIdx = ? and commentIdx = ?;";
+        String checkResultQuery = "SELECT exists(SELECT * FROM CommentLike WHERE  commentIdx = ? and userIdx = ? and status = 'ACTIVE');";
+
+        int check = this.jdbcTemplate.queryForObject(checkRowExistQuery, int.class, commentIdx, userIdx);
+
+        if(check == 1) this.jdbcTemplate.update(updateLikeQuery, userIdx, commentIdx);
+        else this.jdbcTemplate.update(insertLikeQuery, userIdx, commentIdx);
+
+        check = this.jdbcTemplate.queryForObject(checkResultQuery, int.class, commentIdx, userIdx);
+
+        if(check == 1) return new PostCommentLikeRes(true);
+        else return new PostCommentLikeRes(false);
+    }
+
+    public PatchCommentLikeRes deleteCommentLike(int userIdx, int commentIdx) {
+        String updateQuery = "UPDATE CommentLike SET status = 'INACTIVE' WHERE userIdx = ? and commentIdx = ?;";
+        this.jdbcTemplate.update(updateQuery, userIdx, commentIdx);
+
+        return new PatchCommentLikeRes(true);
+    }
+
+    public boolean commentExist(int commentIdx, int userIdx) {
+        String checkQuery = "SELECT exists(SELECT * FROM Comment WHERE commentIdx = ? and status = 'ACTIVE');";
+
+        return this.jdbcTemplate.queryForObject(checkQuery, int.class, commentIdx) == 0;
+    }
+
+
 }
