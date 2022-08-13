@@ -73,10 +73,10 @@ public class CurriController {
 
     /*
     *   커리큘럼 수정 API
-    *   [POST]: localhost:8521/api/curri/modify
+    *   [PATCH]: localhost:8521/api/curri/modify
     * */
     @ResponseBody
-    @PostMapping("/modify")
+    @PatchMapping ("/modify")
     public BasicResponse<String> curriModify(@RequestBody PostCurriModifyReq postCurriModifyReq){
         try{
             // jwtToken 인증
