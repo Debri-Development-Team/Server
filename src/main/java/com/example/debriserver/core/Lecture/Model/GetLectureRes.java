@@ -18,5 +18,9 @@ public class GetLectureRes {
     private String srcLink;
     private String materialType;
     private int chapterNumber;
+    private int usedCount;
+    private int likeNumber;
+    private boolean userLike;
+    private boolean userScrap;
     List<ChListRes> chapterList;
 }

@@ -5,6 +5,7 @@ import com.example.debriserver.basicModels.BasicServerStatus;
 import com.example.debriserver.core.Lecture.Model.*;
 import com.example.debriserver.utility.jwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.reactive.RxJava3CrudRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,7 +51,7 @@ public class LectureService {
         }
     }
 
-    public List<GetLectureListRes> getScrapLectureList(int userIdx) throws BasicException{
+    public List<GetLectureScrapListRes> getScrapLectureList(int userIdx) throws BasicException{
         try{
             return lectureDao.getScrapLectureList(userIdx);
         }catch (Exception exception){
@@ -58,9 +59,9 @@ public class LectureService {
         }
     }
 
-    public GetLectureRes getLecture(int lectureIdx) throws BasicException{
+    public GetLectureRes getLecture(int lectureIdx, int userIdx) throws BasicException{
         try{
-            return lectureDao.getLecture(lectureIdx);
+            return lectureDao.getLecture(lectureIdx, userIdx);
         }catch (Exception exception){
             System.out.println(exception.getMessage());
             throw new BasicException(BasicServerStatus.DB_ERROR);
@@ -92,6 +93,49 @@ public class LectureService {
     public List<GetRoadmapRes> getRoadmapView(int roadmapIdx) throws BasicException{
         try{
             return lectureDao.getRoadmapView(roadmapIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public LectureReviewRes createLectureReview(int lectureIdx, int authorIdx, String authorName, String content) throws BasicException{
+        try{
+            return lectureDao.createLectureReview(lectureIdx, authorIdx, authorName, content);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public List<LectureReviewRes> getLectureReviewList(int lectureIdx) throws BasicException{
+
+        try{
+            return lectureDao.getLectureReviewList(lectureIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public LectureLikeRes createLectureLike(int lectureIdx, int userIdx) throws BasicException{
+        try{
+            return lectureDao.createLectureLike(lectureIdx, userIdx);
+
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean lectureExist(int lectureIdx) throws BasicException{
+        try{
+            return lectureDao.lectureExist(lectureIdx);
+
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public LectureLikeRes deleteLectureLike(int lectureIdx, int userIdx) throws BasicException{
+        try{
+            return lectureDao.deleteLectureLike(lectureIdx, userIdx);
         }catch (Exception exception){
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }

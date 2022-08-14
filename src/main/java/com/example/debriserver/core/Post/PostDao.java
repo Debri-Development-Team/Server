@@ -160,6 +160,9 @@ public class PostDao {
         String getLikeCountQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
 
         String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE';";
+
+        String getBoardNameQuery = "SELECT boardName FROM Board WHERE boardIdx = ?;";
+
         return this.jdbcTemplate.query(getScrapPostsQuery,
                 (rs, rowNum) -> new GetScrapRes(
                         rs.getInt("postIdx"),
@@ -170,7 +173,8 @@ public class PostDao {
                         rs.getString("scrapStatus"),
                         this.jdbcTemplate.queryForObject(getLikeCountQuery, int.class, rs.getInt("postIdx")),
                         this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
-                        this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx"))
+                        this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx")),
+                        this.jdbcTemplate.queryForObject(getBoardNameQuery, String.class, rs.getInt("boardIdx"))
                 ));
     }
 
@@ -254,6 +258,8 @@ public class PostDao {
 
         String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE;'";
 
+        String getBoardNameQuery = "SELECT boardName FROM Board WHERE boardIdx = ?;";
+
         return this.jdbcTemplate.query(getPostSearchListQuery,
                 (rs, rowNum) -> new GetPostSearchListRes
                         (
@@ -265,7 +271,8 @@ public class PostDao {
                                 rs.getString("likeStatus"),
                                 rs.getString("scrapStatus"),
                                 this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
-                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx"))
+                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx")),
+                                this.jdbcTemplate.queryForObject(getBoardNameQuery, String.class, rs.getInt("boardIdx"))
                         ));
     }
 
@@ -283,6 +290,7 @@ public class PostDao {
         String checkUserScrapStatusQuery = "SELECT COUNT(*) FROM PostMarked WHERE postIdx = ? and userIdx = ?;";
         String getUserLikeStatusQuery = "SELECT IF(likeStatus = 'LIKE', true, false) FROM PostLike WHERE postIdx = ? and userIdx = ?;";
         String getUserScrapStatusQuery = "SELECT IF(status = 'ACTIVE', true, false) FROM PostMarked WHERE postIdx = ? and userIdx = ?;";
+        String getBoardNameQuery = "SELECT boardName FROM Board WHERE boardIdx = ?;";
 
         Object[] userStatusParameters = new Object[]{
                 postIdx,
@@ -318,7 +326,8 @@ public class PostDao {
                                 this.jdbcTemplate.queryForObject(getTimeQuery, int.class, postIdx),
                                 this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, postIdx),
                                 userScrapStatus,
-                                userLikeStatus
+                                userLikeStatus,
+                                this.jdbcTemplate.queryForObject(getBoardNameQuery, String.class, rs.getInt("boardIdx"))
                         ),
                 postIdx);
     }

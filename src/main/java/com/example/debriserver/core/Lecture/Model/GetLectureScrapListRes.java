@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetLectureSearchListRes {
+public class GetLectureScrapListRes {
     private int lectureIdx;
     private String lectureName;
     private int chapterNumber;
@@ -20,3 +20,4 @@ public class GetLectureSearchListRes {
     private int likeNumber;
     private boolean userLike;
 }
+
