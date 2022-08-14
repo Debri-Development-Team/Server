@@ -1,13 +1,15 @@
 package com.example.debriserver.core.Curri;
 
 import com.example.debriserver.basicModels.BasicException;
-import com.example.debriserver.basicModels.BasicServerStatus;
 import com.example.debriserver.core.Curri.model.*;
 import com.example.debriserver.core.User.UserDao;
 import com.example.debriserver.core.User.UserProvider;
 import com.example.debriserver.utility.jwtUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
 import static com.example.debriserver.basicModels.BasicServerStatus.*;
 
 @Service
@@ -205,4 +207,23 @@ public class CurriService {
             throw new BasicException(DB_ERROR);
         }
     }
+
+    public CurriReviewRes createCurriReview(PostCurriReviewReq postCurriReviewReq, int authorIdx) throws BasicException{
+        try{
+            return curriDao.createCurriReview(postCurriReviewReq, authorIdx);
+        } catch (Exception exception){
+            System.out.println(exception.getMessage());
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
+    public List<CurriReviewRes> getCurriReviewList(int curriIdx) throws BasicException{
+        try{
+            return curriDao.getCurriReviewList(curriIdx);
+        } catch (Exception exception){
+            System.out.println(exception.getMessage());
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
 }

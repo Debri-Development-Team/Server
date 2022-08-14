@@ -685,15 +685,17 @@ public class CurriDao {
                     ) , getChapterParams);
             getChapterListResList.add(i, chapterListInCurriRes);
 
-//            Object[] chapter = new Object[]{
-//                    chapterListInCurriRes.getChIdx(),
-//                    chapterListInCurriRes.getChName(),
-//                    chapterListInCurriRes.getChName(),
-//                    chapterListInCurriRes.getLangTag(),
-//                    chapterListInCurriRes.getChComplete(),
-//                    chapterListInCurriRes.getProgressOrder()
-//            };
-//
+            Object[] chapter = new Object[]{
+                    chapterListInCurriRes.getChIdx(),
+                    chapterListInCurriRes.getChName(),
+                    chapterListInCurriRes.getChName(),
+                    chapterListInCurriRes.getLangTag(),
+                    chapterListInCurriRes.getChComplete(),
+                    chapterListInCurriRes.getProgressOrder()
+            };
+
+            if(chapter == null) break;
+
 //            System.out.println("chapter : " + Arrays.toString(chapter));
 
             c ++;
@@ -723,4 +725,37 @@ public class CurriDao {
                 getChapterListResList
         ), getThisCurriParams);
     }
+
+    public CurriReviewRes createCurriReview(PostCurriReviewReq postCurriReviewReq, int authorIdx){
+        String insertQuery = "INSERT INTO CurriReview(authorIdx, curriIdx, authorName, content) VALUES (?,?,?,?);";
+
+        Object[] insertParams = new Object[]{
+                authorIdx,
+                postCurriReviewReq.getCurriIdx(),
+                postCurriReviewReq.getAuthorName(),
+                postCurriReviewReq.getContent()
+        };
+
+        this.jdbcTemplate.update(insertQuery, insertParams);
+
+        int currIdx = postCurriReviewReq.getCurriIdx();
+        String authorName = postCurriReviewReq.getAuthorName();
+        String content = postCurriReviewReq.getContent();
+
+        return new CurriReviewRes(currIdx, authorName, content);
+    }
+
+    public List<CurriReviewRes> getCurriReviewList(int curriIdx){
+        String getQuery = "SELECT curriIdx, authorName, content\n" +
+                "FROM CurriReview\n" +
+                "WHERE curriIdx = ?;";
+
+        return this.jdbcTemplate.query(getQuery,
+                (rs, rowNum) -> new CurriReviewRes(
+                        rs.getInt("curriIdx"),
+                        rs.getString("authorName"),
+                        rs.getString("content")
+                ), curriIdx);
+    }
+
 }
