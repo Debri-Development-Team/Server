@@ -113,7 +113,7 @@ public class LectureController {
      * [GET] 127.0.0.1:8521/api/lecture/getScrapList/{userIdx}
      * */
     @GetMapping("/getScrapList/{userIdx}")
-    public BasicResponse<List<GetLectureListRes>>getScrapLectureList(@PathVariable int userIdx){
+    public BasicResponse<List<GetLectureScrapListRes>>getScrapLectureList(@PathVariable int userIdx){
 
         try{
             String jwtToken = jwt.getJwt();
@@ -142,7 +142,9 @@ public class LectureController {
 
             if(!lectureProvider.checkLectureExist(lectureIdx)) throw new BasicException(BasicServerStatus.LECTURE_NOT_EXIST);
 
-            return new BasicResponse<>(lectureService.getLecture(lectureIdx));
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            return new BasicResponse<>(lectureService.getLecture(lectureIdx, userIdx));
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
         }
@@ -206,6 +208,87 @@ public class LectureController {
             return new BasicResponse<>(getRoadmapRes);
         }catch (BasicException exception){
             return new BasicResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 7.6 강의 리뷰 작성 api
+     * POST	api/lecture/review/create
+     * */
+    @PostMapping("/review/create")
+    public BasicResponse<LectureReviewRes> createLectureReview(@RequestBody PostLectureReviewReq postLectureReviewReq){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int authorIdx = jwt.getUserIdx(jwtToken);
+            int lectureIdx = postLectureReviewReq.getLectureIdx();
+            String authorName = postLectureReviewReq.getAuthorName();
+            String content = postLectureReviewReq.getContent();
+
+            return new BasicResponse<>(lectureService.createLectureReview(lectureIdx, authorIdx, authorName, content));
+
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+    /**
+     * 7.6.1 강의 리뷰 조회 api
+     * GET	api/lecture/review/get
+     * */
+    @GetMapping("/review/get")
+    public BasicResponse<List<LectureReviewRes>> getLectureReviewList(@RequestParam int lectureIdx) {
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            return new BasicResponse<>(lectureService.getLectureReviewList(lectureIdx));
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 7.7 강의 좋아요 api
+     * POST	api/lecture/like/create
+     * */
+    @PostMapping("/like/create")
+    public BasicResponse<LectureLikeRes> createLectureLike(@RequestParam int lectureIdx){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            if(lectureService.lectureExist(lectureIdx)) throw new BasicException(BasicServerStatus.LECTURE_NOT_EXIST);
+
+            return new BasicResponse<>(lectureService.createLectureLike(lectureIdx, userIdx));
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+    /**
+     * 7.7.1 강의 좋아요 삭제 api
+     * PATCH	api/lecture/like/delete
+     * */
+
+    @PatchMapping("/like/delete")
+    public BasicResponse<LectureLikeRes> deleteLectureLike(@RequestParam int lectureIdx){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            if(lectureService.lectureExist(lectureIdx)) throw new BasicException(BasicServerStatus.LECTURE_NOT_EXIST);
+
+            return new BasicResponse<>(lectureService.deleteLectureLike(lectureIdx, userIdx));
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
         }
     }
 }
