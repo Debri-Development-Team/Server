@@ -71,112 +71,11 @@ public class CurriDao {
                 userIdx
         };
 
-        String insertDdayQuery = "UPDATE Curriculum SET dDay = ?, dDayAt = ? WHERE curriIdx = ? and ownerIdx = ?;";
-
         this.jdbcTemplate.update(insertQuery, insertCurriParameters);
-
-        // lecture 정보 insert
-        String insertLectureQuery = "INSERT\n" +
-                "INTO Ch_Lecture_Curri(chIdx, lectureIdx, curriIdx, lectureOrder, progressOrder)\n" +
-                "VALUES (?, ?, ?, ?, ?);";
-
-        String getSumChNumQurey = "SELECT SUM(distinct l.chNumber)\n" +
-                "FROM Lecture as l\n" +
-                "LEFT JOIN Ch_Lecture_Curri as chlc on chlc.lectureIdx = l.lectureIdx\n" +
-                "WHERE chlc.curriIdx = ?;";
 
         String getCurriIdxQurey = "SELECT MAX(curriIdx) FROM Curriculum where ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
 
         int curriIdx = this.jdbcTemplate.queryForObject(getCurriIdxQurey, int.class, userIdx);
-
-        int index = 0;
-
-        LectureForCurriCreateReq lecture = postCurriCreateReq.getLectureList().get(index);
-
-        String getChNumInLectureQurey = "SELECT chNumber FROM Lecture WHERE lectureIdx = ?;";
-
-        String getChIdxQurey = "SELECT MIN(chIdx)\n" +
-                "FROM Ch_Lecture as chl\n" +
-                "WHERE NOT EXISTS(\n" +
-                "    SELECT chIdx\n" +
-                "    FROM Ch_Lecture_Curri as chlc\n" +
-                "    WHERE curriIdx = ? and chlc.lectureIdx = ? and chl.chIdx = chlc.chIdx\n" +
-                "    );";
-
-        String insertLectureRateQurey = "insert Lecture_Rate SET lectureIdx = ?, userIdx = ?;";
-
-        String checkLectureRateQurey = "SELECT exists(\n" +
-                "    SELECT lectureIdx\n" +
-                "    FROM Lecture_Rate\n" +
-                "    WHERE lectureIdx = ? and userIdx = ?\n" +
-                "           );";
-
-        int lectureIdx = lecture.getLectureIdx();
-        int chNumInLecture = this.jdbcTemplate.queryForObject(getChNumInLectureQurey, int.class, lectureIdx);
-
-        for (int i = 1; i <= chNumInLecture; i++) {
-
-            if (i > chNumInLecture) {
-                index += 1;
-                lecture = postCurriCreateReq.getLectureList().get(index);
-                lectureIdx = lecture.getLectureIdx();
-                chNumInLecture += this.jdbcTemplate.queryForObject(getChNumInLectureQurey, int.class, lectureIdx);
-            }
-
-            Object[] getChIdxParams = new Object[]{
-                    curriIdx,
-                    lectureIdx
-            };
-
-            int chIdx = this.jdbcTemplate.queryForObject(getChIdxQurey, int.class, getChIdxParams);
-
-            Object[] insertLectureParams = new Object[]{
-                    chIdx,
-                    lectureIdx,
-                    curriIdx,
-                    lecture.getLectureOrder(),
-                    i
-            };
-
-            Object[] insertLectureRateParams = new Object[]{
-                    lectureIdx,
-                    userIdx
-            };
-
-            int a = this.jdbcTemplate.queryForObject(checkLectureRateQurey, int.class, insertLectureRateParams);
-
-            if (a == 0 ) {
-                this.jdbcTemplate.update(insertLectureRateQurey, insertLectureRateParams);
-            }
-
-            this.jdbcTemplate.update(insertLectureQuery, insertLectureParams);
-        }
-
-        int chNum = this.jdbcTemplate.queryForObject(getSumChNumQurey, int.class, curriIdx);
-
-        float a = (float) chNum / 3;
-        int b = chNum / 3;
-        int Dday;
-        if(b < a ){
-            Dday = (b + 1) * 7;
-        } else {
-            Dday = b * 7;
-        }
-
-        Timestamp origianl = new Timestamp(retryDate);
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(origianl.getTime());
-        cal.add(Calendar.DAY_OF_MONTH, Dday);
-        Timestamp later = new Timestamp(cal.getTime().getTime());
-
-        Object[] insertDdayParams = new Object[]{
-                Dday,
-                later.toString(),
-                curriIdx,
-                userIdx
-        };
-
-        this.jdbcTemplate.update(insertDdayQuery, insertDdayParams);
 
         PostCurriCreateRes postCurriCreateRes = new PostCurriCreateRes();
 
