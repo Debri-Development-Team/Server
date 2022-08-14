@@ -118,6 +118,93 @@ public class CurriDao {
         return result != 0;
     }
 
+    public boolean curriNameModify(PacthCurriNameModifyReq pacthCurriNameModifyReq, int userIdx) {
+
+        String curriNameModifyQuery = "UPDATE Curriculum SET curriName = ? WHERE curriIdx = ? and ownerIdx = ?;";
+
+        Object[] curriNameModifyParams = new Object[]{
+                pacthCurriNameModifyReq.getCurriName(),
+                pacthCurriNameModifyReq.getCurriIdx(),
+                userIdx
+        };
+
+        int result = this.jdbcTemplate.update(curriNameModifyQuery, curriNameModifyParams);
+
+//        System.out.println("nameModify : " + result);
+
+        return result != 0;
+    }
+
+    public boolean curriVisibleStatusModify(PacthCurriVisibleStatusModifyReq pacthCurriVisibleStatusModifyReq, int userIdx) {
+
+        String curriVisibleStatusModifyQuery = "UPDATE Curriculum SET visibleStatus = ? WHERE curriIdx = ? and ownerIdx = ?;";
+
+        Object[] curriVisibleStatusModifyParams = new Object[]{
+                pacthCurriVisibleStatusModifyReq.getVisibleStatus(),
+                pacthCurriVisibleStatusModifyReq.getCurriIdx(),
+                userIdx
+        };
+
+        int result = this.jdbcTemplate.update(curriVisibleStatusModifyQuery, curriVisibleStatusModifyParams);
+
+//        System.out.println(result);
+
+        return result != 0;
+    }
+
+    public boolean curriStatusModify(PacthCurriStatusModifyReq pacthCurriStatusModifyReq, int userIdx) {
+        String curriStatusModifyQuery = "UPDATE Curriculum SET status = ? WHERE curriIdx = ? and ownerIdx = ?;";
+
+        Object[] curriStatusModifyParams = new Object[]{
+                pacthCurriStatusModifyReq.getStatus(),
+                pacthCurriStatusModifyReq.getCurriIdx(),
+                userIdx
+        };
+
+        String checkStatusQuery = "SELECT status\n" +
+                "FROM Curriculum\n" +
+                "WHERE curriIdx = ? and ownerIdx = ?;";
+
+        Object[] forStatusParams = new Object[] {
+                pacthCurriStatusModifyReq.getCurriIdx(),
+                userIdx
+        };
+
+        String beforeStatus = this.jdbcTemplate.queryForObject(checkStatusQuery, String.class, forStatusParams);
+
+        int result = this.jdbcTemplate.update(curriStatusModifyQuery, curriStatusModifyParams);
+
+        String updateStatusChangedAtQuery = "UPDATE Curriculum SET statusChangedAt = NOW() WHERE curriIdx = ? and ownerIdx = ?;";
+
+        if (Objects.equals(beforeStatus, "ACTIVE")) this.jdbcTemplate.update(updateStatusChangedAtQuery, forStatusParams);
+
+//        System.out.println(result);
+
+        return result != 0;
+    }
+
+    public boolean checkCurriExist(int curriIdx, int userIdx) {
+
+        String checkCurriExistQuery = "SELECT EXISTS(\n" +
+                "    SELECT curriIdx\n" +
+                "    FROM Curriculum\n" +
+                "    WHERE curriIdx = ? and ownerIdx = ? and status != 'DELETE'\n" +
+                "           ) as RESULT";
+
+        Object[] checkCurriExistParams = new Object[] {
+                curriIdx,
+                userIdx
+        };
+
+        int result = this.jdbcTemplate.queryForObject(checkCurriExistQuery, int.class, checkCurriExistParams);
+
+//        System.out.println(result);
+//
+//        System.out.println("확인용 : " + (result != 0));
+
+        return result != 0;
+    }
+
     public boolean insertLecture(PostInsertLectureReq postInsertLectureReq, int userIdx){
         // ch-l-c에 강의 연결
         String insertLectureQuery = "INSERT\n" +
@@ -497,9 +584,7 @@ public class CurriDao {
         return result;
     }
 
-    public GetThisCurriRes getThisCurri(GetThisCurriReq getThisCurriReq, int userIdx) {
-
-        int curriIdx = getThisCurriReq.getCurriIdx();
+    public GetThisCurriRes getThisCurri(int curriIdx, int userIdx) {
 
         String getThisCurriQurey = "SELECT distinct curriIdx, curriName, visibleStatus, langTag, progressRate, status, completeAt\n" +
                 "FROM Curriculum\n" +
@@ -543,7 +628,7 @@ public class CurriDao {
                 "WHERE curriIdx = ? and ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
 
         Object[] getThisCurriParams = new Object[]{
-                getThisCurriReq.getCurriIdx(),
+                curriIdx,
                 userIdx
         };
 
@@ -574,7 +659,7 @@ public class CurriDao {
         if (a == b){
             c = 1;
         }  else {
-            c = (a - (a - b)) * 3 + 1;
+            c = ((a - (a - b))-1) * 3 + 1;
         }
 
         List<ChapterListInCurriRes> getChapterListResList = new ArrayList<>();
@@ -599,6 +684,17 @@ public class CurriDao {
                             this.jdbcTemplate.queryForObject(getCompleteChNumQurey, int.class, getThisCurriParams)
                     ) , getChapterParams);
             getChapterListResList.add(i, chapterListInCurriRes);
+
+//            Object[] chapter = new Object[]{
+//                    chapterListInCurriRes.getChIdx(),
+//                    chapterListInCurriRes.getChName(),
+//                    chapterListInCurriRes.getChName(),
+//                    chapterListInCurriRes.getLangTag(),
+//                    chapterListInCurriRes.getChComplete(),
+//                    chapterListInCurriRes.getProgressOrder()
+//            };
+//
+//            System.out.println("chapter : " + Arrays.toString(chapter));
 
             c ++;
         }

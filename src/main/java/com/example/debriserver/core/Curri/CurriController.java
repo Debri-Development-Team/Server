@@ -99,6 +99,87 @@ public class CurriController {
     }
 
     /*
+     *   커리큘럼 제목 수정 API
+     *   [PATCH]: localhost:8521/api/curri/modify/name
+     * */
+    @ResponseBody
+    @PatchMapping ("/modify/name")
+    public BasicResponse<String> curriNameModify(@RequestBody PacthCurriNameModifyReq pacthCurriNameModifyReq){
+        try{
+            // jwtToken 인증
+            String jwtToken = jwt.getJwt();
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            boolean check = curriService.curriNameModify(pacthCurriNameModifyReq, userIdx);
+
+            if (!check) throw new BasicException(BasicServerStatus.CURRI_MODIFY_FAIL);
+
+            String result = "커리큘럼 제목 수정 성공";
+
+            return new BasicResponse<>(result);
+
+        } catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /*
+     *   커리큘럼 제목 수정 API
+     *   [PATCH]: localhost:8521/api/curri/modify/name
+     * */
+    @ResponseBody
+    @PatchMapping ("/modify/visibleStatus")
+    public BasicResponse<String> curriVisibleStatusModify(@RequestBody PacthCurriVisibleStatusModifyReq pacthCurriVisibleStatusModifyReq){
+        try{
+            // jwtToken 인증
+            String jwtToken = jwt.getJwt();
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            boolean check = curriService.curriVisibleStatusModify(pacthCurriVisibleStatusModifyReq, userIdx);
+
+            if (!check) throw new BasicException(BasicServerStatus.CURRI_MODIFY_FAIL);
+
+            String result = "커리큘럼 공유 상태 수정 성공";
+
+            return new BasicResponse<>(result);
+
+        } catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /*
+     *   커리큘럼 활성 상태 수정 API
+     *   [PATCH]: localhost:8521/api/curri/modify/name
+     * */
+    @ResponseBody
+    @PatchMapping ("/modify/status")
+    public BasicResponse<String> curriStatusModify(@RequestBody PacthCurriStatusModifyReq pacthCurriStatusModifyReq){
+        try{
+            // jwtToken 인증
+            String jwtToken = jwt.getJwt();
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            boolean check = curriService.curriStatusModify(pacthCurriStatusModifyReq, userIdx);
+
+            if (!check) throw new BasicException(BasicServerStatus.CURRI_MODIFY_FAIL);
+
+            String result = "커리큘럼 활성 상태 수정 성공";
+
+            return new BasicResponse<>(result);
+
+        } catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /*
      *   강의자료 추가 API
      *   [POST]: localhost:8521/api/curri/insertLecture
      * */
@@ -151,8 +232,8 @@ public class CurriController {
     *   [GET]: localhost:8521/api/curri/getThisCurri
     * */
     @ResponseBody
-    @GetMapping("/getThisCurri")
-    public BasicResponse<GetThisCurriRes> getThisCurri(@RequestBody GetThisCurriReq getThisCurriReq){
+    @GetMapping("/getThisCurri/{curriIdx}")
+    public BasicResponse<GetThisCurriRes> getThisCurri(@PathVariable ("curriIdx") int curriIdx){
         try {
             String jwtToken = jwt.getJwt();
 
@@ -160,7 +241,7 @@ public class CurriController {
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            GetThisCurriRes getThisCurriRes = curriService.getThisCurri(getThisCurriReq, userIdx);
+            GetThisCurriRes getThisCurriRes = curriService.getThisCurri(curriIdx, userIdx);
 
             return new BasicResponse<>(getThisCurriRes);
         } catch (BasicException exception) {

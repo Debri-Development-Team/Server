@@ -5,17 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostCurriCreateReq {
+public class PacthCurriStatusModifyReq {
 
-    private String curriName;
-    private String curriAuthor;
-    private String visibleStatus;
-    private String langTag;
+    private int curriIdx;
+
+    private String status;
 
 }
