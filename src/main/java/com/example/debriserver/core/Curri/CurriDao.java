@@ -584,13 +584,35 @@ public class CurriDao {
         return result;
     }
 
+    public float rate(int lectureIdx, int curriIdx){
+        String getCompleteQuery = "SELECT COUNT(chlc.chIdx)\n" +
+                "FROM Ch_Lecture_Curri as chlc\n" +
+                "WHERE chlc.lectureIdx = ? and chlc.curriIdx = ? and chlc.chComplete = 'TRUE';";
+
+        String getTotalQuery = "SELECT COUNT(chidx)\n" +
+                "FROM Ch_Lecture_Curri\n" +
+                "WHERE lectureIdx = ? and curriIdx = ?;";
+
+        Object[] getParams = new Object[]{
+                lectureIdx,
+                curriIdx
+        };
+
+        int complete = this.jdbcTemplate.queryForObject(getCompleteQuery, int.class, getParams);
+        int total = this.jdbcTemplate.queryForObject(getTotalQuery, int.class, getParams);
+
+        float result = complete / total * 100;
+
+        return  result;
+    }
+
     public GetThisCurriRes getThisCurri(int curriIdx, int userIdx) {
 
         String getThisCurriQurey = "SELECT distinct curriIdx, curriName, visibleStatus, langTag, progressRate, status, completeAt\n" +
                 "FROM Curriculum\n" +
                 "WHERE curriIdx = ? and ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
 
-        String getLectureListQurey = "SELECT distinct l.lectureIdx, l.lectureName, l.langTag, l.chNumber, lr.progressRate\n" +
+        String getLectureListQurey = "SELECT distinct l.lectureIdx, l.lectureName, l.langTag, l.chNumber\n" +
                 "FROM Lecture as l\n" +
                 "LEFT JOIN Ch_Lecture_Curri as chlc on l.lectureIdx = chlc.lectureIdx\n" +
                 "LEFT JOIN Lecture_Rate as lr on l.lectureIdx = lr.lectureIdx\n" +
@@ -662,6 +684,9 @@ public class CurriDao {
             c = ((a - (a - b))-1) * 3 + 1;
         }
 
+
+
+
         List<ChapterListInCurriRes> getChapterListResList = new ArrayList<>();
         ChapterListInCurriRes chapterListInCurriRes;
 
@@ -717,7 +742,7 @@ public class CurriDao {
                         rs2.getString("lectureName"),
                         rs2.getString("langTag"),
                         rs2.getInt("chNumber"),
-                        rs2.getFloat("progressRate")
+                        rate(rs2.getInt("lectureIdx"), curriIdx)
                 )), curriIdx),
 
                 getChapterListResList
