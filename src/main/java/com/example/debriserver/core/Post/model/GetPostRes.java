@@ -21,4 +21,5 @@ public class GetPostRes {
     private int commentNumber;
     private boolean UserScrap;
     private boolean UserLike;
+    private String boardName;
 }
