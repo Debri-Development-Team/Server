@@ -42,6 +42,15 @@ public class CurriProvider {
         }
     }
 
+    public boolean checkCurriExist(int curriIdx, int userIdx) throws BasicException{
+        try{
+            return curriDao.checkCurriExist(curriIdx, userIdx);
+        } catch (Exception exception){
+            System.out.println(exception.getMessage());
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
 
     public boolean checkChapterStatus(PatchChapterStatuReq patchChapterStatuReq) throws BasicException{
         try {

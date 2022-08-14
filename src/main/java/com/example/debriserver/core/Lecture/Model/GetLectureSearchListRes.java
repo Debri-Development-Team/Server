@@ -15,4 +15,8 @@ public class GetLectureSearchListRes {
     private String pricing;
     private String materialType;
     private boolean userScrap;
+    private int scrapNumber;
+    private int usedCount;
+    private int likeNumber;
+    private boolean userLike;
 }

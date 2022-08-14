@@ -106,6 +106,45 @@ public class CurriService {
         }
     }
 
+    public boolean curriNameModify(PacthCurriNameModifyReq pacthCurriNameModifyReq, int userIdx) throws BasicException{
+        try{
+            int curriIdx = pacthCurriNameModifyReq.getCurriIdx();
+
+            if(!curriProvider.checkCurriExist(curriIdx, userIdx)) throw new BasicException(CURRI_EMPTY_ID);
+
+            return curriDao.curriNameModify(pacthCurriNameModifyReq, userIdx);
+        } catch (Exception exception){
+            System.out.println(exception.getMessage());
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
+    public boolean curriVisibleStatusModify(PacthCurriVisibleStatusModifyReq pacthCurriVisibleStatusModifyReq, int userIdx) throws BasicException{
+        try{
+            int curriIdx = pacthCurriVisibleStatusModifyReq.getCurriIdx();
+
+            if(!curriProvider.checkCurriExist(curriIdx, userIdx)) throw new BasicException(CURRI_EMPTY_ID);
+
+            return curriDao.curriVisibleStatusModify(pacthCurriVisibleStatusModifyReq, userIdx);
+        } catch (Exception exception){
+            System.out.println(exception.getMessage());
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
+    public boolean curriStatusModify(PacthCurriStatusModifyReq pacthCurriStatusModifyReq, int userIdx) throws BasicException{
+        try{
+            int curriIdx = pacthCurriStatusModifyReq.getCurriIdx();
+
+            if(!curriProvider.checkCurriExist(curriIdx, userIdx)) throw new BasicException(CURRI_EMPTY_ID);
+
+            return curriDao.curriStatusModify(pacthCurriStatusModifyReq, userIdx);
+        } catch (Exception exception){
+            System.out.println(exception.getMessage());
+            throw new BasicException(DB_ERROR);
+        }
+    }
+
     public void deleteCurri(int curriIdx, int userIdx) throws BasicException {
         int result;
 
@@ -149,9 +188,9 @@ public class CurriService {
         }
     }
 
-    public GetThisCurriRes getThisCurri(GetThisCurriReq getThisCurriReq, int userIdx) throws BasicException{
+    public GetThisCurriRes getThisCurri(int curriIdx, int userIdx) throws BasicException{
         try{
-            return curriDao.getThisCurri(getThisCurriReq, userIdx);
+            return curriDao.getThisCurri(curriIdx, userIdx);
         } catch (Exception exception){
             System.out.println(exception.getMessage());
             throw new BasicException(DB_ERROR);

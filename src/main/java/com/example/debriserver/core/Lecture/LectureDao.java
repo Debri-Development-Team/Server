@@ -79,30 +79,42 @@ public class LectureDao {
     /**
      * 스크랩한 강의 리스트 조회
      * */
-    public List<GetLectureListRes> getScrapLectureList(int userIdx) {
+    public List<GetLectureScrapListRes> getScrapLectureList(int userIdx) {
         String getQuery =
                 "SELECT L.lectureIdx, lectureName, chNumber, langTag, pricing, type\n" +
                 "FROM Lecture as L LEFT JOIN LectureScrap as LC ON L.lectureIdx = LC.lectureIdx\n" +
                 "WHERE L.status = 'ACTIVE' and LC.status = 'ACTIVE' and LC.userIdx = ?;";
+        String scrapCountQuery = "SELECT COUNT(*) FROM LectureScrap WHERE lectureIdx = ? and status = 'ACTIVE';";
+        String usedCountQuery = "SELECT COUNT(*) FROM Ch_Lecture_Curri WHERE lectureIdx = ?;";
+        String likeCountQuery = "SELECT COUNT(*) FROM lectureLike WHERE lectureIdx = ? and status = 'ACTIVE';";
+        String checkLikeQuery = "SELECT EXISTS(SELECT * FROM lectureLike WHERE lectureIdx = ? and userIdx = ? and status = 'ACTIVE');";
 
         return this.jdbcTemplate.query(getQuery,(rs, rowNum)
-                -> new GetLectureListRes(
+                -> new GetLectureScrapListRes(
                     rs.getInt("lectureIdx"),
                     rs.getString("lectureName"),
                     rs.getInt("chNumber"),
                     rs.getString("langTag"),
                     rs.getString("pricing"),
                     rs.getString("type"),
-                    true
+                    true,
+                    this.jdbcTemplate.queryForObject(scrapCountQuery, int.class, rs.getInt("lectureIdx")),
+                    this.jdbcTemplate.queryForObject(usedCountQuery, int.class, rs.getInt("lectureIdx")),
+                    this.jdbcTemplate.queryForObject(likeCountQuery, int.class, rs.getInt("lectureIdx")),
+                    this.jdbcTemplate.queryForObject(checkLikeQuery, int.class, rs.getInt("lectureIdx"), userIdx) == 1
         ), userIdx);
     }
     /**
      * 강의 상세 내용 조회
      * */
-    public GetLectureRes getLecture(int lectureIdx) {
+    public GetLectureRes getLecture(int lectureIdx, int userIdx) {
         String updateQuery = "UPDATE Lecture SET chNumber = (SELECT COUNT(*) FROM (SELECT chIdx FROM Ch_Lecture WHERE lectureIdx = ?) as sub) WHERE lectureIdx = ?;";
         String getQuery = "SELECT lectureIdx, lectureName, lectureDesc, langTag, pricing, srcLink, type, chNumber FROM Lecture WHERE lectureIdx = ? and status = 'ACTIVE';";
         String getListQuery = "SELECT chIdx, lectureIdx, chName, chOrder FROM Chapter WHERE lectureIdx = ? and status = 'ACTIVE';";
+        String usedCountQuery = "SELECT COUNT(*) FROM Ch_Lecture_Curri WHERE lectureIdx = ?;";
+        String likeCountQuery = "SELECT COUNT(*) FROM lectureLike WHERE lectureIdx = ? and status = 'ACTIVE';";
+        String checkLikeQuery = "SELECT EXISTS(SELECT * FROM lectureLike WHERE lectureIdx = ? and userIdx = ? and status = 'ACTIVE');";
+        String scrapStatusQuery = "SELECT COUNT(status) FROM LectureScrap WHERE userIdx = ? and lectureIdx = ? and status = 'ACTIVE';";
 
         Object[] updateParameter = new Object[]{
                 lectureIdx,
@@ -121,6 +133,10 @@ public class LectureDao {
                 rs.getString("srcLink"),
                 rs.getString("type"),
                 rs.getInt("chNumber"),
+                this.jdbcTemplate.queryForObject(usedCountQuery, int.class, rs.getInt("lectureIdx")),
+                this.jdbcTemplate.queryForObject(likeCountQuery, int.class, rs.getInt("lectureIdx")),
+                this.jdbcTemplate.queryForObject(checkLikeQuery, int.class, rs.getInt("lectureIdx"), userIdx) == 1,
+                Objects.requireNonNull(this.jdbcTemplate.queryForObject(scrapStatusQuery, int.class, userIdx, rs.getInt("lectureIdx"))) != 0,
                 this.jdbcTemplate.query(getListQuery,((rs1, rowNum1)
                         -> new ChListRes(
                                 rs1.getInt("chIdx"),
@@ -152,6 +168,10 @@ public class LectureDao {
                 "and status = 'ACTIVE';";
 
         String scrapStatusQuery = "SELECT COUNT(status) FROM LectureScrap WHERE userIdx = ? and lectureIdx = ? and status = 'ACTIVE';";
+        String scrapCountQuery = "SELECT COUNT(*) FROM LectureScrap WHERE lectureIdx = ? and status = 'ACTIVE';";
+        String usedCountQuery = "SELECT COUNT(*) FROM Ch_Lecture_Curri WHERE lectureIdx = ?;";
+        String likeCountQuery = "SELECT COUNT(*) FROM lectureLike WHERE lectureIdx = ? and status = 'ACTIVE';";
+        String checkLikeQuery = "SELECT EXISTS(SELECT * FROM lectureLike WHERE lectureIdx = ? and userIdx = ? and status = 'ACTIVE');";
 
         Object[] parameters = new Object[]{
                 langTag,
@@ -172,7 +192,11 @@ public class LectureDao {
                         rs.getString("langTag"),
                         rs.getString("pricing"),
                         rs.getString("type"),
-                        Objects.requireNonNull(this.jdbcTemplate.queryForObject(scrapStatusQuery, int.class, userIdx, rs.getInt("lectureIdx"))) != 0
+                        Objects.requireNonNull(this.jdbcTemplate.queryForObject(scrapStatusQuery, int.class, userIdx, rs.getInt("lectureIdx"))) != 0,
+                        this.jdbcTemplate.queryForObject(scrapCountQuery, int.class, rs.getInt("lectureIdx")),
+                        this.jdbcTemplate.queryForObject(usedCountQuery, int.class, rs.getInt("lectureIdx")),
+                        this.jdbcTemplate.queryForObject(likeCountQuery, int.class, rs.getInt("lectureIdx")),
+                        this.jdbcTemplate.queryForObject(checkLikeQuery, int.class, rs.getInt("lectureIdx"), userIdx) == 1
                 ), parameters);
     }
 
@@ -328,4 +352,53 @@ public class LectureDao {
     }
 
 
+    public LectureReviewRes createLectureReview(int lectureIdx, int authorIdx, String authorName, String content) {
+        String insertQuery = "INSERT INTO lectureReview(lectureIdx, authorIdx, authorName, content) VALUES (?,?,?,?);";
+        Object[] insertParameters = new Object[]{
+                lectureIdx, authorIdx, authorName, content
+        };
+
+        this.jdbcTemplate.update(insertQuery, insertParameters);
+
+        return new LectureReviewRes(lectureIdx, authorName, content);
+    }
+
+    public List<LectureReviewRes> getLectureReviewList(int lectureIdx) {
+        String getQuery = "SELECT lectureIdx, authorName, content FROM lectureReview WHERE lectureidx = ?;";
+
+        return this.jdbcTemplate.query(getQuery,
+                (rs, rowNum) -> new LectureReviewRes(
+                        rs.getInt("lectureIdx"),
+                        rs.getString("authorName"),
+                        rs.getString("content")
+                ), lectureIdx);
+    }
+
+    public boolean lectureExist(int lectureIdx) {
+        String checkQuery = "SELECT EXISTS(SELECT * FROM Lecture WHERE lectureIdx = ?);";
+
+        return this.jdbcTemplate.queryForObject(checkQuery, int.class, lectureIdx) == 0;
+    }
+
+    public LectureLikeRes createLectureLike(int lectureIdx, int userIdx) {
+        String insertQuery = "INSERT INTO lectureLike(lectureIdx, userIdx) VALUES (?,?);";
+        String updateQuery = "UPDATE lectureLike SET status = 'ACTIVE' WHERE lectureIdx = ? and userIdx = ?;";
+        String checkQuery = "SELECT EXISTS((SELECT * FROM lectureLike WHERE lectureIdx = ? and userIdx = ?));";
+
+        boolean result = this.jdbcTemplate.queryForObject(checkQuery, int.class, lectureIdx, userIdx) == 0;
+
+        System.out.println(result);
+        if(result) this.jdbcTemplate.update(insertQuery, lectureIdx, userIdx);
+        else this.jdbcTemplate.update(updateQuery, lectureIdx, userIdx);
+
+        return new LectureLikeRes(true);
+    }
+
+    public LectureLikeRes deleteLectureLike(int lectureIdx, int userIdx) {
+        String updateQuery = "UPDATE lectureLike SET status = 'INACTIVE' WHERE lectureIdx = ? and userIdx = ?;";
+
+        this.jdbcTemplate.update(updateQuery, lectureIdx, userIdx);
+
+        return new LectureLikeRes(true);
+    }
 }

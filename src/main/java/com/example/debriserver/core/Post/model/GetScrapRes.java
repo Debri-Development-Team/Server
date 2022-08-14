@@ -18,4 +18,5 @@ public class GetScrapRes {
     private int likeNumber;
     private int timeAfterCreated;
     private int commentNumber;
+    private String boardName;
 }
