@@ -1,7 +1,7 @@
 package com.example.debriserver.core.Curri;
 
 import com.example.debriserver.basicModels.BasicException;
-import com.example.debriserver.core.Curri.model.*;
+import com.example.debriserver.core.Curri.Model.*;
 import com.example.debriserver.core.User.UserDao;
 import com.example.debriserver.core.User.UserProvider;
 import com.example.debriserver.utility.jwtUtility;
