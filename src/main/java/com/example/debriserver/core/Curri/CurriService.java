@@ -208,14 +208,14 @@ public class CurriService {
         }
     }
 
-//    public boolean curriReset(int curriIdx, int userIdx)throws BasicException{
-//        try{
-//            return curriDao.curriReset(curriIdx, userIdx);
-//        } catch (Exception exception){
-//            System.out.println(exception.getMessage());
-//            throw new BasicException(DB_ERROR);
-//        }
-//    }
+    public boolean curriReset(int curriIdx, int userIdx)throws BasicException{
+        try{
+            return curriDao.curriReset(curriIdx, userIdx);
+        } catch (Exception exception){
+            System.out.println(exception.getMessage());
+            throw new BasicException(DB_ERROR);
+        }
+    }
 
     public CurriReviewRes createCurriReview(PostCurriReviewReq postCurriReviewReq, int authorIdx) throws BasicException{
         try{

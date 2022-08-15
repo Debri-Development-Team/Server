@@ -844,8 +844,8 @@ public class CurriDao {
                 ), curriIdx);
     }
 
-//    public boolean curriReset(int curriIdx, int userIdx){
-//
-//    }
+    public boolean curriReset(int curriIdx, int userIdx){
+
+    }
 
 }
