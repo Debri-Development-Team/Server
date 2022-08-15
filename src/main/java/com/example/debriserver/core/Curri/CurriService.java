@@ -159,10 +159,10 @@ public class CurriService {
         }
     }
 
-    public void completeChapter(PatchChapterStatuReq patchChapterCompleteReq, int userIdx) throws BasicException {
+    public void completeChapter(PatchChapterStatuReq patchChapterCompleteReq) throws BasicException {
         try {
 
-            int result = curriDao.completeChapter(patchChapterCompleteReq, userIdx);
+            int result = curriDao.completeChapter(patchChapterCompleteReq);
             if (result == 0){
                 throw new BasicException(DB_ERROR);
             }
@@ -171,9 +171,9 @@ public class CurriService {
         }
     }
 
-    public void cancelCompleteChapter(PatchChapterStatuReq patchChapterStatuReq, int userIdx) throws BasicException{
+    public void cancelCompleteChapter(PatchChapterStatuReq patchChapterStatuReq) throws BasicException{
         try {
-            int result = curriDao.completecancelChapter(patchChapterStatuReq, userIdx);
+            int result = curriDao.completecancelChapter(patchChapterStatuReq);
             if (result == 0){
                 throw new BasicException(DB_ERROR);
             }
