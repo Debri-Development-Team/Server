@@ -1,6 +1,6 @@
 package com.example.debriserver.core.Curri;
 
-import com.example.debriserver.core.Curri.model.*;
+import com.example.debriserver.core.Curri.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -672,6 +672,8 @@ public class CurriDao {
 
         int count = this.jdbcTemplate.queryForObject(chCount, int.class, curriIdx);
 
+        System.out.println(count);
+
         Object[] getThisCurriParams = new Object[]{
                 curriIdx,
                 userIdx
@@ -679,7 +681,7 @@ public class CurriDao {
 
         if (count > 0) {
             int a = 3;
-            if (count - (c+2) < 3) a = count - (c+2);
+            if ((c+2) - count > 0) a = (c+2) - count;
             for (int i = 0; i < a; i++) {
                 Object[] getChapterParams = new Object[]{
                         curriIdx,
@@ -739,7 +741,7 @@ public class CurriDao {
                 "FROM Curriculum\n" +
                 "WHERE curriIdx = ? and ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
 
-        String getChangCreatedQurey = "SELECT IFNULL((TIMESTAMPDIFF(DAY , statusChangedAt, createdAt) + 1), 0) AS RESULT\n" +
+        String getChangCreatedQurey = "SELECT IFNULL((TIMESTAMPDIFF(DAY , createdAt, statusChangedAt) + 1), 0) AS RESULT\n" +
                 "FROM Curriculum\n" +
                 "WHERE curriIdx = ? and ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
 
@@ -782,11 +784,11 @@ public class CurriDao {
         int b = dDay / 7;
         int c;
 
-        if ( a != 0 && b != 0) {
+        if (a != 0) {
             if (a == b) {
                 c = 1;
             } else {
-                c = ((a - (a - b)) - 1) * 3 + 1;
+                c = (a - (a - b)) * 3 + 1;
             }
         } else {
             c = 0;
