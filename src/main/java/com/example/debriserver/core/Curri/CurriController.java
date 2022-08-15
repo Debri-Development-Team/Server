@@ -312,9 +312,7 @@ public class CurriController {
 
             if(curriService.checkScrapedCurriExist(curriIdx,userIdx)== true) throw new BasicException(BasicServerStatus.SCRAP_Curri_EXIST);
 
-
-
-           PostCurriScrapRes postCurriScrapRes = curriService.scrapCurri(curriIdx, userIdx);
+            PostCurriScrapRes postCurriScrapRes = curriService.scrapCurri(curriIdx, userIdx);
 
             return new BasicResponse<>(postCurriScrapRes);
 
@@ -325,23 +323,22 @@ public class CurriController {
 
     /**
      *  8.9 커리큘럼 좋아요(추천) 취소 API
-     *  [PATCH]: localhost:8521/api/curri/scrap/cancel/{curriIdx0}
+     *  [PATCH]: localhost:8521/api/curri/unScrap/{scrapIdx}
      */
 
     @ResponseBody
-    @PatchMapping("/scrap/cancel/{curriIdx}")
-    public BasicResponse<String> scrapCancel(@PathVariable("curriIdx") int curriIdx) {
+    @PatchMapping("/unScrap/{scrapIdx}")
+    public BasicResponse<String> scrapCancel(@PathVariable("scrapIdx") int scrapIdx) {
         try {
             String jwtToken = jwt.getJwt();
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            if(curriService.checkScrapedCurriExist(curriIdx,userIdx)== true) throw new BasicException(BasicServerStatus.SCRAP_Curri_EXIST);
+            if(curriService.checkUnScrapedCurriExist(scrapIdx)== true) throw new BasicException(BasicServerStatus.UNSCRAP_Curri_EXIST);
 
-
-            String result = "좋아요(추천)가 취소 되었습니다.";
-
+            curriService.scrapCancel(scrapIdx);
+            String result = "스크랩이 취소 되었습니다.";
 
             return new BasicResponse<>(result);
 
@@ -354,6 +351,24 @@ public class CurriController {
      *  8.10 커리큘럼 좋아요(추천) 리스트 조회 API
      *  [GET]: localhost:8521/api/curri/scrap/getList
      */
+    @GetMapping("/getScrapList")
+    public BasicResponse<List<GetScrapListRes>>getCurriScrapList(){
+
+        try{
+            String jwtToken = jwt.getJwt();
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+            if(curriService.checkScrapExist(userIdx)==false) throw new BasicException(BasicServerStatus.SCRAP_LIST_EMPTY);
+
+
+            return new BasicResponse<>(curriService.getCurriScrapList(userIdx));
+
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
 
     /**

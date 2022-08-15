@@ -1,6 +1,7 @@
 package com.example.debriserver.core.Curri;
 
 import com.example.debriserver.basicModels.BasicException;
+import com.example.debriserver.basicModels.BasicServerStatus;
 import com.example.debriserver.core.Curri.Model.*;
 import com.example.debriserver.core.User.UserDao;
 import com.example.debriserver.core.User.UserProvider;
@@ -40,53 +41,25 @@ public class CurriService {
      * @return
      * @throws BasicException
      */
+
     public PostCurriScrapRes scrapCurri(int curriIdx, int userIdx) throws BasicException {
-
         try {
-
             PostCurriScrapRes postCurriScrapRes = curriDao.scrapCurri(curriIdx,userIdx);
-
             return postCurriScrapRes;
-
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
-            throw new BasicException(DB_ERROR);
+            throw new BasicException(BasicServerStatus.DB_ERROR);
         }
 
     }
 
-    public void scrapCancel(String userId) throws BasicException {
-
-        try{
-            if (userProvider.checkUserExist(userId) == false) {
-                throw new BasicException(USERS_EMPTY_USER_ID);
-            }
-
-            UserDao userDao = new UserDao();
-
-            int result = userDao.deleteUser(userId);
-            if (result == 0) {
-                throw new BasicException(DB_ERROR);
-            }
-        }
-        catch (Exception exception) {
-            throw new BasicException(DB_ERROR);
-        }
-    }
-
-    public boolean checkScrapedCurriExist(int curriIdx ,int userIdx) throws BasicException {
-
+    public void scrapCancel(int scrapIdx) throws BasicException {
         try {
-
-            boolean result = curriDao.checkScrapedCurriExist(curriIdx,userIdx);
-
-            return result;
-
+            curriDao.scrapCancel(scrapIdx);
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
             throw new BasicException(DB_ERROR);
         }
-
     }
 
     public PostCurriCreateRes createCurri(PostCurriCreateReq postCurriCreateReq, int userIdx) throws BasicException{
@@ -232,6 +205,56 @@ public class CurriService {
         } catch (Exception exception){
             System.out.println(exception.getMessage());
             throw new BasicException(DB_ERROR);
+        }
+    }
+
+    public boolean checkScrapedCurriExist(int curriIdx ,int userIdx) throws BasicException {
+        try {
+            boolean result = curriDao.checkScrapedCurriExist(curriIdx,userIdx);
+            return result;
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean checkUnScrapedCurriExist(int scrapIdx) throws BasicException {
+        try {
+            boolean result = curriDao.checkUnScrapedCurriExist(scrapIdx);
+            return result;
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean checkUnScrapedCurriExist2(int curriIdx, int userIdx) throws BasicException {
+        try {
+            boolean result = curriDao.checkUnScrapedCurriExist2(curriIdx, userIdx);
+            return result;
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public List<GetScrapListRes> getCurriScrapList(int userIdx) throws BasicException {
+        try {
+            List<GetScrapListRes> getCurriScrapListRes = curriDao.getCurriScrapList(userIdx);
+            return getCurriScrapListRes;
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean checkScrapExist (int userIdx)throws BasicException{
+        try{
+            boolean result = curriDao.checkScrapExist(userIdx);
+            return result;
+        }catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }
 

@@ -5,20 +5,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Timestamp;
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostCurriScrapRes {
-
+public class GetScrapListRes {
     private int curriIdx;
     private String curriName;
     private String curriAuthor;
-    private String visibleStatus;
     private String langTag;
     private float progressRate;
-    private String status;
-    private int ownerIdx;
-
-
 }

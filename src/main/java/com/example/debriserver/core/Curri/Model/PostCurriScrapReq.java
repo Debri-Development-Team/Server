@@ -9,16 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostCurriScrapRes {
-
+public class PostCurriScrapReq {
+    private int scrapIdx;
     private int curriIdx;
-    private String curriName;
-    private String curriAuthor;
-    private String visibleStatus;
-    private String langTag;
-    private float progressRate;
-    private String status;
-    private int ownerIdx;
-
-
 }
