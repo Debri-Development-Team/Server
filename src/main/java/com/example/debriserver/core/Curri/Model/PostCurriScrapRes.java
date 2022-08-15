@@ -8,11 +8,17 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
-public class PacthCurriVisibleStatusModifyReq {
+
+public class PostCurriScrapRes {
 
     private int curriIdx;
-
+    private String curriName;
+    private String curriAuthor;
     private String visibleStatus;
+    private String langTag;
+    private float progressRate;
+    private String status;
+    private int ownerIdx;
+
 
 }

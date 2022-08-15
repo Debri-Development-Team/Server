@@ -227,6 +227,8 @@ public class PostDao {
 
         String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE';";
 
+        String getBoardNameQuery = "SELECT boardName FROM Board WHERE boardIdx = ?;";
+
         return this.jdbcTemplate.query(getListQuery,
                 (rs, rowNum) -> new GetPostListRes
                         (
@@ -238,7 +240,8 @@ public class PostDao {
                                 rs.getString("likeStatus"),
                                 rs.getString("scrapStatus"),
                                 this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
-                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx"))
+                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx")),
+                                this.jdbcTemplate.queryForObject(getBoardNameQuery, String.class, rs.getInt("boardIdx"))
                         ),
                 boardIdx);
     }
@@ -347,6 +350,8 @@ public class PostDao {
 
         String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE;'";
 
+        String getBoardNameQuery = "SELECT boardName FROM Board WHERE boardIdx = ?;";
+
         return this.jdbcTemplate.query(getPostSearchListQuery,
                 (rs, rowNum) -> new GetPostListRes
                         (
@@ -358,7 +363,8 @@ public class PostDao {
                                 rs.getString("likeStatus"),
                                 rs.getString("scrapStatus"),
                                 this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("postIdx")),
-                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx"))
+                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, rs.getInt("postIdx")),
+                                this.jdbcTemplate.queryForObject(getBoardNameQuery, String.class, rs.getInt("boardIdx"))
                         ), boardIdx);
     }
 }

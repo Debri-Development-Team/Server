@@ -9,10 +9,12 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PacthCurriStatusModifyReq {
+public class CurriReviewRes {
 
     private int curriIdx;
 
-    private String status;
+    private String authorName;
+
+    private String content;
 
 }

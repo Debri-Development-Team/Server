@@ -1,4 +1,4 @@
-package com.example.debriserver.core.Curri.model;
+package com.example.debriserver.core.Curri.Model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,18 +8,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
-public class PostCurriScrapRes {
+
+public class GetScrapListRes {
 
     private int curriIdx;
     private String curriName;
     private String curriAuthor;
-    private String visibleStatus;
     private String langTag;
     private float progressRate;
-    private String status;
-    private String scraped;
-    private int ownerIdx;
 
 
 }
