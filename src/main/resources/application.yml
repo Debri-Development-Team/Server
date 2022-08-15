@@ -15,11 +15,18 @@ spring:
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+
 #Logger
 logging:
+
   file:
     name: ${user.dir}/log/test.log
   logback:
     rollingpolicy:
       max-history: 7
+<<<<<<< HEAD
       max-file-size: 10MB
+=======
+      max-file-size: 10MB
+
+>>>>>>> 89b4b6d6f56ae977ae3b1d13ca3e5e730b1aa74a
