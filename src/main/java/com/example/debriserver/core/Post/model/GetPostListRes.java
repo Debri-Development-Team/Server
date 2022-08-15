@@ -20,4 +20,5 @@ public class GetPostListRes {
     private String scrapStatus;
     private int timeAfterCreated;
     private int commentNumber;
+    private String boardName;
 }
