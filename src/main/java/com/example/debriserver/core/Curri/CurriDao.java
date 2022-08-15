@@ -28,8 +28,6 @@ public class CurriDao {
      */
     public PostCurriScrapRes scrapCurri(int curriIdx, int userIdx) {
 
-        // 변경
-
         if(checkUnScrapedCurriExist2(curriIdx,userIdx)==true){
             rescrap(curriIdx,userIdx);
 
@@ -52,7 +50,9 @@ public class CurriDao {
                         rs.getFloat("progressRate"),
                         rs.getString("status"),
                         rs.getInt("ownerIdx")
-                ));
+
+                ),curriIdx ,userIdx);
+
     }
 
     public PostCurriCreateRes createCurri(PostCurriCreateReq postCurriCreateReq, int userIdx) {
@@ -343,7 +343,6 @@ public class CurriDao {
                 ), userIdx);
     }
 
-
     public float rate(int lectureIdx, int curriIdx){
         String getCompleteQuery = "SELECT COUNT(chlc.chIdx)\n" +
                 "FROM Ch_Lecture_Curri as chlc\n" +
@@ -392,6 +391,29 @@ public class CurriDao {
         else return true;
     }
 
+    public boolean checkUnScrapedCurriExist(int scrapIdx) {
+        String checkQuery = "SELECT COUNT(*) FROM CurriScrap WHERE scrapIdx = ? and status = 'INACTIVE'";
+
+        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, scrapIdx);
+        if(result == 0) return false;
+        else return true;
+    }
+
+    public boolean checkUnScrapedCurriExist2(int curriIdx, int userIdx) {
+        String checkQuery = "SELECT COUNT(*) FROM CurriScrap WHERE curriIdx = ? and scrapUserIdx =? and status = 'INACTIVE'";
+
+        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, curriIdx, userIdx);
+        if(result == 0) return false;
+        else return true;
+    }
+
+    public void rescrap(int curriIdx ,int userIdx) {
+        String updateQuery = "UPDATE CurriScrap SET status = 'ACTIVE' WHERE curriIdx = ? and scrapUserIdx = ? and status = 'INACTIVE' ";
+
+        this.jdbcTemplate.update(updateQuery, curriIdx, userIdx);
+    }
+
+
     public int deleteCurri(int curriIdx, int userIdx) {
         String deleteCurriQuery = "UPDATE Curriculum SET status = 'DELETE' WHERE curriIdx = ? and ownerIdx = ?;";
 
@@ -416,6 +438,31 @@ public class CurriDao {
         return result;
     }
 
+    public List<GetScrapListRes> getCurriScrapList(int userIdx) {
+        String getQuery =
+                "SELECT A.curriIdx, A.curriName, A.curriAuthor, A.langTag, A.progressRate \n" +
+                        "FROM Curriculum as A JOIN CurriScrap as B ON A.curriIdx = B.curriIdx\n" +
+                        "WHERE B.status = 'ACTIVE' and A.status = 'ACTIVE' and B.scrapUserIdx = ?;";
+
+        return this.jdbcTemplate.query(getQuery,(rs, rowNum)
+                -> new GetScrapListRes(
+                rs.getInt("curriIdx"),
+                rs.getString("curriName"),
+                rs.getString("curriAuthor"),
+                rs.getString("langTag"),
+                rs.getFloat("progressRate")
+        ), userIdx);
+    }
+
+    public boolean checkScrapExist(int userIdx) {
+        String checkQuery = "SELECT COUNT(*) FROM CurriScrap WHERE scrapUserIdx = ? and status ='ACTIVE' ";
+
+        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, userIdx);
+
+        if(result !=0)return true;
+        else return  false;
+    }
+
     public void disconnectAllScrap(int curriIdx) {
         String disconnectAllScrap = "UPDATE CurriScrap\n" +
                 "SET status = 'INACTIVE'\n" +
@@ -434,7 +481,6 @@ public class CurriDao {
         int result = this.jdbcTemplate.queryForObject(checkChapterStatusQuery, int.class, checkChapterStatusParams);
         return result != 0;
     }
-
 
     public boolean checkChapterExist(PatchChapterStatuReq patchChapterStatuReq) {
         String checkChapterExistQuery = "SELECT exists(\n" +
@@ -723,68 +769,5 @@ public class CurriDao {
 //    public boolean curriReset(int curriIdx, int userIdx){
 //
 //    }
-
-    /**
-     * 스크랩취소된 커리큘럼 존재유무
-     * @param scrapIdx
-     * @return
-     */
-    public boolean checkUnScrapedCurriExist(int scrapIdx) {
-        String checkQuery = "SELECT COUNT(*) FROM CurriScrap WHERE scrapIdx = ? and status = 'INACTIVE'";
-
-        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, scrapIdx);
-
-        if(result == 0) return false;
-        else return true;
-    }
-
-    public boolean checkUnScrapedCurriExist2(int curriIdx, int userIdx) {
-        String checkQuery = "SELECT COUNT(*) FROM CurriScrap WHERE curriIdx = ? and scrapUserIdx =? and status = 'INACTIVE'";
-
-        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, curriIdx, userIdx);
-
-        if(result == 0) return false;
-        else return true;
-    }
-
-    /**
-     * 취소한 스크랩 커리큘럼 되돌리기
-     */
-    public void rescrap(int curriIdx ,int userIdx) {
-        String updateQuery = "UPDATE CurriScrap SET status = 'ACTIVE' WHERE curriIdx = ? and scrapUserIdx = ? and status = 'INACTIVE' ";
-
-        this.jdbcTemplate.update(updateQuery, curriIdx, userIdx);
-
-
-
-    }
-
-    /**
-     * 커리큘럼 스크랩 리스트 조회
-     */
-    public List<GetScrapListRes> getCurriScrapList(int userIdx) {
-        String getQuery =
-                "SELECT A.curriIdx, A.curriName, A.curriAuthor, A.langTag, A.progressRate \n" +
-                        "FROM Curriculum as A JOIN CurriScrap as B ON A.curriIdx = B.curriIdx\n" +
-                        "WHERE B.status = 'ACTIVE' and A.status = 'ACTIVE' and B.scrapUserIdx = ?;";
-
-        return this.jdbcTemplate.query(getQuery,(rs, rowNum)
-                -> new GetScrapListRes(
-                rs.getInt("curriIdx"),
-                rs.getString("curriName"),
-                rs.getString("curriAuthor"),
-                rs.getString("langTag"),
-                rs.getFloat("progressRate")
-        ), userIdx);
-    }
-
-    public boolean checkScrapExist(int userIdx) {
-        String checkQuery = "SELECT COUNT(*) FROM CurriScrap WHERE scrapUserIdx = ? and status ='ACTIVE' ";
-
-        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, userIdx);
-
-        if(result !=0)return true;
-        else return  false;
-    }
 
 }
