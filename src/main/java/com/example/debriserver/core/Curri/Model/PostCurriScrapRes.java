@@ -18,7 +18,6 @@ public class PostCurriScrapRes {
     private String langTag;
     private float progressRate;
     private String status;
-    private String scraped;
     private int ownerIdx;
 
 
