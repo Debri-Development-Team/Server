@@ -1,6 +1,6 @@
 package com.example.debriserver.core.Curri;
 
-import com.example.debriserver.core.Curri.model.*;
+import com.example.debriserver.core.Curri.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;

@@ -1,4 +1,4 @@
-package com.example.debriserver.core.Curri.model;
+package com.example.debriserver.core.Curri.Model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,10 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PacthCurriStatusModifyReq {
+public class LectureForCurriCreateReq {
 
-    private int curriIdx;
-
-    private String status;
+    private int lectureIdx;
+    private int lectureOrder;
 
 }

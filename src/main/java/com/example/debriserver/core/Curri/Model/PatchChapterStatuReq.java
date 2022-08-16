@@ -1,4 +1,4 @@
-package com.example.debriserver.core.Curri.model;
+package com.example.debriserver.core.Curri.Model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,11 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostCurriModifyReq {
-
+public class PatchChapterStatuReq {
+    private int chIdx;
     private int curriIdx;
-    private String curriName;
-    private String visibleStatus;
-    private String status;
-
+    private int lectureIdx;
 }
