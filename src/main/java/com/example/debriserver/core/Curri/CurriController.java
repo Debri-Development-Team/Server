@@ -450,7 +450,7 @@ public class CurriController {
     }
 
     @ResponseBody
-    @GetMapping("/getScrapTopList")
+    @GetMapping("/scrap/topList")
     public BasicResponse<List<GetScrapTopListRes>> getScrapTopList(){
         try{
             String jwtToken = jwt.getJwt();
