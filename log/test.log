@@ -227,3 +227,29 @@
 2022-08-17 03:53:03.101  INFO 17888 --- [http-nio-8521-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
 2022-08-17 03:53:03.101  INFO 17888 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2022-08-17 03:53:03.102  INFO 17888 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2022-08-17 04:03:50.572  INFO 19573 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Starting DebriServerApplication using Java 11.0.15.1 on Soo-namui-iMac.local with PID 19573 (/Users/soo-namchoi/Dropbox/내 Mac (Soo-nam의 iMac)/Desktop/최선규/gitProject/Debri_Server/build/classes/java/main started by soo-namchoi in /Users/soo-namchoi/Dropbox/내 Mac (Soo-nam의 iMac)/Desktop/최선규/gitProject/Debri_Server)
+2022-08-17 04:03:50.574  INFO 19573 --- [restartedMain] c.e.debriserver.DebriServerApplication   : No active profile set, falling back to 1 default profile: "default"
+2022-08-17 04:03:50.609  INFO 19573 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2022-08-17 04:03:50.609  INFO 19573 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2022-08-17 04:03:51.300  INFO 19573 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2022-08-17 04:03:51.321  INFO 19573 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 12 ms. Found 0 JPA repository interfaces.
+2022-08-17 04:03:51.829  INFO 19573 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8521 (http)
+2022-08-17 04:03:51.837  INFO 19573 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-08-17 04:03:51.838  INFO 19573 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
+2022-08-17 04:03:51.893  INFO 19573 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-08-17 04:03:51.893  INFO 19573 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1283 ms
+2022-08-17 04:03:52.034  INFO 19573 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-08-17 04:03:52.407  INFO 19573 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-08-17 04:03:52.463  INFO 19573 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-08-17 04:03:52.528  INFO 19573 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-08-17 04:03:52.724  INFO 19573 --- [restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-08-17 04:03:52.826  INFO 19573 --- [restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2022-08-17 04:03:52.943  INFO 19573 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-08-17 04:03:52.953  INFO 19573 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2022-08-17 04:03:53.113  WARN 19573 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2022-08-17 04:03:53.538  INFO 19573 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2022-08-17 04:03:53.567  INFO 19573 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8521 (http) with context path ''
+2022-08-17 04:03:53.577  INFO 19573 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Started DebriServerApplication in 3.478 seconds (JVM running for 4.293)
+2022-08-17 04:03:56.695  INFO 19573 --- [http-nio-8521-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-08-17 04:03:56.696  INFO 19573 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-08-17 04:03:56.697  INFO 19573 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
