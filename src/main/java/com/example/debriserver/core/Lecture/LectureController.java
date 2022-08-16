@@ -193,17 +193,16 @@ public class LectureController {
     /**
      * 7.6.2 로드맵 상세 조회 api
      * */
-    @GetMapping("/roadmap/{roadmapIdx}")
-    public BasicResponse<List<GetRoadmapRes>> getRoadmapView(@PathVariable int roadmapIdx){
+    @GetMapping("/roadmap/view")
+    public BasicResponse<List<GetRoadmapRes>> getRoadmapView(@RequestParam String mod){
         try{
             String jwtToken = jwt.getJwt();
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            // 이거 변경 할 것!
-            if(lectureProvider.checkRoadmapExist(roadmapIdx)) throw new BasicException(BasicServerStatus.DB_ERROR);
+            int userIdx = jwt.getUserIdx(jwtToken);
 
-            List<GetRoadmapRes> getRoadmapRes = lectureService.getRoadmapView(roadmapIdx);
+            List<GetRoadmapRes> getRoadmapRes = lectureService.getRoadmapView(mod, userIdx);
 
             return new BasicResponse<>(getRoadmapRes);
         }catch (BasicException exception){
