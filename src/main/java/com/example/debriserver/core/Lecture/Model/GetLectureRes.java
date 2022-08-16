@@ -22,5 +22,6 @@ public class GetLectureRes {
     private int likeNumber;
     private boolean userLike;
     private boolean userScrap;
+    private String publisher;
     List<ChListRes> chapterList;
 }
