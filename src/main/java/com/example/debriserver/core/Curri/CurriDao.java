@@ -611,7 +611,7 @@ public class CurriDao {
                 "FROM Ch_Lecture_Curri as chlc\n" +
                 "WHERE chlc.curriIdx = ? and chlc.lectureIdx = ? and chlc.chComplete = 'TRUE';";
 
-        String getChapterListQurey = "SELECT distinct chlc.chIdx, c.chName, l.chNumber,l.langTag, chlc.chComplete, chlc.progressOrder, l.lectureIdx\n" +
+        String getChapterListQurey = "SELECT distinct chlc.chIdx, chlc.lectureIdx, c.chName, l.chNumber,l.langTag, chlc.chComplete, chlc.progressOrder, l.lectureIdx\n" +
                 "FROM Ch_Lecture_Curri as chlc\n" +
                 "LEFT JOIN Chapter as c on chlc.chIdx = c.chIdx\n" +
                 "JOIN (SELECT langTag, chNumber, l.lectureIdx\n" +
@@ -646,6 +646,8 @@ public class CurriDao {
                         -> new ChapterListInCurriRes
                         (
                                 rs.getInt("chIdx"),
+                                rs.getInt("lectureIdx"),
+                                curriIdx,
                                 rs.getString("chName"),
                                 rs.getInt("chNumber"),
                                 rs.getString("langTag"),
