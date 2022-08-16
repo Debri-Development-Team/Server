@@ -15,8 +15,10 @@ spring:
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+
 #Logger
 logging:
+
   file:
     name: ${user.dir}/log/test.log
   logback:

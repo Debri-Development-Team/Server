@@ -20,6 +20,7 @@ public class GetThisCurriRes {
     private Float progressRate;
     private String status;
     private int completeAt;
+    private String curriAuthor;
     private int dDay;
     private Timestamp createdAt;
 

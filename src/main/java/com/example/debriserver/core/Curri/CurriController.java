@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import static com.example.debriserver.basicModels.BasicServerStatus.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/curri")
 public class CurriController {
@@ -36,13 +38,7 @@ public class CurriController {
 
 
     /*
-    *  커리큘럼 제작 API
-    *   - 1. Lecture 테이블에서 강의자료를 선택
-    *   - 2. 선택한 자료를 Curri_Lecture(이하 CL)에 저장
-    *   - 3. CL에 저장한 자료를 한가지 CurriIdx에 매칭
-    *   - 받아야 할 값 : 선택된 Lecture에 대한 정보
-    *   - 반환할 값 : 성공 여부 및 생성된 CurriIdx
-    *   - 저장 할 값 : Curriculum 테이블 꽉꽉
+    *   8.1 커리큘럼 제작 API
     *   [POST]: localhost:8521/api/curri/create
     */
 
@@ -70,9 +66,53 @@ public class CurriController {
         }
     }
 
+    /*
+     *   8.2 커리큘럼 리스트 조회 API
+     *   [GET]: localhost:8521/api/curri/getList
+     */
+    @ResponseBody
+    @GetMapping("/getList")
+    public BasicResponse<List<GetCurriListRes>> getList(){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            List<GetCurriListRes> getCurriListResList = curriProvider.getList(userIdx);
+
+            return new BasicResponse<>(getCurriListResList);
+
+        } catch (BasicException exception) {
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
     /*
-    *   커리큘럼 수정 API
+     *   8.3 커리큘럼 상세 조회 API
+     *   [GET]: localhost:8521/api/curri/getThisCurri
+     * */
+    @ResponseBody
+    @GetMapping("/getThisCurri/{curriIdx}")
+    public BasicResponse<GetThisCurriRes> getThisCurri(@PathVariable ("curriIdx") int curriIdx){
+        try {
+            String jwtToken = jwt.getJwt();
+
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            GetThisCurriRes getThisCurriRes = curriService.getThisCurri(curriIdx, userIdx);
+
+            return new BasicResponse<>(getThisCurriRes);
+        } catch (BasicException exception) {
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /*
+    *   8.4 커리큘럼 수정 API
     *   [PATCH]: localhost:8521/api/curri/modify
     * */
     @ResponseBody
@@ -99,7 +139,7 @@ public class CurriController {
     }
 
     /*
-     *   커리큘럼 제목 수정 API
+     *   8.4.1 커리큘럼 제목 수정 API
      *   [PATCH]: localhost:8521/api/curri/modify/name
      * */
     @ResponseBody
@@ -126,8 +166,8 @@ public class CurriController {
     }
 
     /*
-     *   커리큘럼 제목 수정 API
-     *   [PATCH]: localhost:8521/api/curri/modify/name
+     *   8.4.2 커리큘럼 공유 상태 수정 API
+     *   [PATCH]: localhost:8521/api/curri/modify/visibleStatus
      * */
     @ResponseBody
     @PatchMapping ("/modify/visibleStatus")
@@ -153,8 +193,8 @@ public class CurriController {
     }
 
     /*
-     *   커리큘럼 활성 상태 수정 API
-     *   [PATCH]: localhost:8521/api/curri/modify/name
+     *   8.4.3 커리큘럼 활성 상태 수정 API
+     *   [PATCH]: localhost:8521/api/curri/modify/status
      * */
     @ResponseBody
     @PatchMapping ("/modify/status")
@@ -180,7 +220,7 @@ public class CurriController {
     }
 
     /*
-     *   강의자료 추가 API
+     *   8.5 강의자료 추가 API
      *   [POST]: localhost:8521/api/curri/insertLecture
      * */
     @ResponseBody
@@ -191,6 +231,9 @@ public class CurriController {
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             int userIdx = jwt.getUserIdx(jwtToken);
+            int curriIdx = postInsertLectureReq.getCurriIdx();
+
+            if(!curriProvider.checkCurriExist(curriIdx, userIdx)) throw new BasicException(CURRI_EMPTY_ID);
 
             boolean check = curriService.insertLecture(postInsertLectureReq, userIdx);
 
@@ -205,52 +248,7 @@ public class CurriController {
     }
 
     /*
-    *   커리큘럼 리스트 조회 API
-    *   [GET]: localhost:8521/api/curri/getList
-     */
-    @ResponseBody
-    @GetMapping("/getList")
-    public BasicResponse<List<GetCurriListRes>> getList(){
-        try{
-            String jwtToken = jwt.getJwt();
-
-            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
-
-            int userIdx = jwt.getUserIdx(jwtToken);
-
-            List<GetCurriListRes> getCurriListResList = curriProvider.getList(userIdx);
-
-            return new BasicResponse<>(getCurriListResList);
-
-        } catch (BasicException exception) {
-            return new BasicResponse<>((exception.getStatus()));
-        }
-    }
-
-    /*
-    *   커리큘럼 상세 조회 API
-    *   [GET]: localhost:8521/api/curri/getThisCurri
-    * */
-    @ResponseBody
-    @GetMapping("/getThisCurri/{curriIdx}")
-    public BasicResponse<GetThisCurriRes> getThisCurri(@PathVariable ("curriIdx") int curriIdx){
-        try {
-            String jwtToken = jwt.getJwt();
-
-            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
-
-            int userIdx = jwt.getUserIdx(jwtToken);
-
-            GetThisCurriRes getThisCurriRes = curriService.getThisCurri(curriIdx, userIdx);
-
-            return new BasicResponse<>(getThisCurriRes);
-        } catch (BasicException exception) {
-            return new BasicResponse<>((exception.getStatus()));
-        }
-    }
-
-    /*
-    *   커리큘럼 삭제 API
+    *   8.6 커리큘럼 삭제 API
     *   [PATCH]: localhost:8521/api/curri/delete/{curriIdx}
     * */
     @ResponseBody
@@ -272,7 +270,7 @@ public class CurriController {
     }
 
     /*
-    *   챕터 완료 및 취소 API
+    *   8.7 챕터 완료 및 취소 API
     *   [PATCH]: localhost:8521/api/curri/chapter/status
     * */
     @ResponseBody
@@ -284,18 +282,16 @@ public class CurriController {
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             // 해당 쳅터가 현재 커리에 들어있는지 확인
-            if(curriProvider.checkChapterExist(patchChapterCompleteReq)) throw new BasicException(CURRI_EMPTY_CHAPTER);
-
-            int userIdx = jwt.getUserIdx(jwtToken);
+            if(!curriProvider.checkChapterExist(patchChapterCompleteReq)) throw new BasicException(CURRI_EMPTY_CHAPTER);
 
             String result;
             // 챕터 완료인지 취소인지 확인
-            if(curriProvider.checkChapterStatus(patchChapterCompleteReq)){
-                curriService.completeChapter(patchChapterCompleteReq, userIdx);
-                result = "칭찬도장 꾸-욱!";
+            if(!curriProvider.checkChapterStatus(patchChapterCompleteReq)){
+                curriService.completeChapter(patchChapterCompleteReq);
+                result = "챕터 완료 성공";
             } else{
-                curriService.cancelCompleteChapter(patchChapterCompleteReq, userIdx);
-                result = "넌 항상 이런식이야";
+                curriService.cancelCompleteChapter(patchChapterCompleteReq);
+                result = "챕터 완료 취소 성공";
             }
 
             return new BasicResponse<>(result);
@@ -305,7 +301,8 @@ public class CurriController {
     }
 
     /**
-     * 커리큘럼 스크랩 API
+     *  8.8 커리큘럼 좋아요(추천) API
+     *  [POST]: localhost:8521/api/curri/scrap/{curriIdx}
      */
     @ResponseBody
     @PostMapping("/scrap/{curriIdx}")
@@ -318,9 +315,7 @@ public class CurriController {
 
             if(curriService.checkScrapedCurriExist(curriIdx,userIdx)== true) throw new BasicException(BasicServerStatus.SCRAP_Curri_EXIST);
 
-
-
-           PostCurriScrapRes postCurriScrapRes = curriService.scrapCurri(curriIdx, userIdx);
+            PostCurriScrapRes postCurriScrapRes = curriService.scrapCurri(curriIdx, userIdx);
 
             return new BasicResponse<>(postCurriScrapRes);
 
@@ -330,23 +325,22 @@ public class CurriController {
     }
 
     /**
-     * 커리큘럼 스크랩 취소 API
+     *  8.9 커리큘럼 좋아요(추천) 취소 API
+     *  [PATCH]: localhost:8521/api/curri/unScrap/{scrapIdx}
      */
-
     @ResponseBody
-    @PatchMapping("/scrap/cancel/{curriIdx}")
-    public BasicResponse<String> scrapCancel(@PathVariable("curriIdx") int curriIdx) {
+    @PatchMapping("/unScrap/{scrapIdx}")
+    public BasicResponse<String> scrapCancel(@PathVariable("scrapIdx") int scrapIdx) {
         try {
             String jwtToken = jwt.getJwt();
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            if(curriService.checkScrapedCurriExist(curriIdx,userIdx)== true) throw new BasicException(BasicServerStatus.SCRAP_Curri_EXIST);
+            if(curriService.checkUnScrapedCurriExist(scrapIdx)== true) throw new BasicException(BasicServerStatus.UNSCRAP_Curri_EXIST);
 
-
+            curriService.scrapCancel(scrapIdx);
             String result = "스크랩이 취소 되었습니다.";
-
 
             return new BasicResponse<>(result);
 
@@ -354,11 +348,100 @@ public class CurriController {
             return new BasicResponse<>((exception.getStatus()));
         }
     }
-    /**
-     * 스크랩한 커리큘럼 리스트 조회 API
-     */
 
     /**
-     * 스크랩한 커리큘럼 상세조회 API
+     *  8.10 커리큘럼 좋아요(추천) 리스트 조회 API
+     *  [GET]: localhost:8521/api/curri/scrap/getList
      */
+    @GetMapping("/getScrapList")
+    public BasicResponse<List<GetScrapListRes>>getCurriScrapList(){
+
+        try{
+            String jwtToken = jwt.getJwt();
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+            if(curriService.checkScrapExist(userIdx)==false) throw new BasicException(BasicServerStatus.SCRAP_LIST_EMPTY);
+
+            return new BasicResponse<>(curriService.getCurriScrapList(userIdx));
+
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+
+    /**
+     *  8.10.1 커리큘럼 좋아요(추천) top 10 리스트 조회 API
+     *  [GET]: localhost:8521/api/curri/scrap/topList
+     */
+
+
+    /**
+     *  8.11 커리큘럼 리셋 API
+     *  [PATCH]: localhost:8521/api/curri/reset/{curriIdx}
+     */
+//    @ResponseBody
+//    @PatchMapping("/reset/{curriIdx}")
+//    public BasicResponse<String> curriReset(@PathVariable ("curriIdx") int curriIdx){
+//        try{
+//            String jwtToken = jwt.getJwt();
+//
+//            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+//
+//            int userIdx = jwt.getUserIdx(jwtToken);
+//
+//            if(curriService.curriReset(curriIdx, userIdx)) throw new BasicException(CURRI_RESET_FAIL);
+//
+//            String result = "커리큘럼 리셋 성공";
+//
+//            return new BasicResponse<>(result);
+//        } catch (BasicException exception){
+//            return new BasicResponse<>((exception.getStatus()));
+//        }
+//    }
+
+    /**
+     *  8.12 커리큘럼 리뷰 작성 API
+     *  [POST]: localhost:8521/api/curri/review/create
+     */
+    @ResponseBody
+    @PostMapping("/review/create")
+    public BasicResponse<CurriReviewRes> createCurriReview(@RequestBody PostCurriReviewReq postCurriReviewReq){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int authorIdx = jwt.getUserIdx(jwtToken);
+
+            CurriReviewRes curriReviewRes = curriService.createCurriReview(postCurriReviewReq, authorIdx);
+
+            return new BasicResponse<>(curriReviewRes);
+        } catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     *  8.12.1 커리큘럼 리뷰 조회 API
+     *  [GET]: localhost:8521/api/curri/review/getList
+     */
+    @ResponseBody
+    @GetMapping("/review/getList/{curriIdx}")
+    public BasicResponse<List<CurriReviewRes>> getCurriReviewList(@PathVariable ("curriIdx") int curriIdx){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            List<CurriReviewRes> curriReviewList = curriService.getCurriReviewList(curriIdx);
+
+            return new BasicResponse<>(curriReviewList);
+        } catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
 }
