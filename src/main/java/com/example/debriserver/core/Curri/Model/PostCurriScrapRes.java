@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-
+@NoArgsConstructor
 public class PostCurriScrapRes {
 
     private int curriIdx;
@@ -18,6 +18,7 @@ public class PostCurriScrapRes {
     private String langTag;
     private float progressRate;
     private String status;
+    private String scraped;
     private int ownerIdx;
 
 
