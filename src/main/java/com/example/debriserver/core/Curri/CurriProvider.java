@@ -56,6 +56,7 @@ public class CurriProvider {
         try {
             return curriDao.checkChapterStatus(patchChapterStatuReq);
         } catch (Exception exception){
+            System.out.println(exception.getMessage());
             throw new BasicException(DB_ERROR);
         }
     }
@@ -64,6 +65,7 @@ public class CurriProvider {
         try{
             return curriDao.checkChapterExist(patchChapterStatuReq);
         } catch (Exception exception){
+            System.out.println(exception.getMessage());
             throw new BasicException(DB_ERROR);
         }
     }
