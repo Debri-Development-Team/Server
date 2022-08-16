@@ -917,4 +917,35 @@ public class CurriDao {
         else return  false;
     }
 
+
+    /**
+     * 스크랩 Top10 리스트 추출
+     * @return
+     */
+    public List<GetScrapTopListRes> getScrapTopList() {
+
+        String getCreatedAtQuery = "SELECT distinct UNIX_TIMESTAMP(c.createdAt)\n" +
+                "FROM Curriculum as c\n" +
+                "JOIN User as u\n" +
+                "WHERE c.curriIdx = ? AND c.status NOT IN ('DELETE');";
+
+
+        String get = "SELECT a.curriIdx,COUNT(*) as count, row_number() over (order by Count(*) DESC)ranking, b.curriName, b.curriAuthor ,b.visibleStatus , b.langTag, b.progressRate ,b.status FROM CurriScrap as a LEFT JOIN Curriculum as b on a.curriIdx = b.curriIdx  WHERE a.status ='ACTIVE' group by curriIdx order by COUNT(*) DESC limit 10 ";
+
+
+        return this.jdbcTemplate.query(get,
+                (rs, rowNum) -> new GetScrapTopListRes(
+                        rs.getInt("curriIdx"),
+                        rs.getInt(2),
+                        rs.getInt(3),
+                        rs.getString("curriName"),
+                        rs.getString("curriAuthor"),
+                        rs.getString("visibleStatus"),
+                        rs.getString("langTag"),
+                        rs.getFloat("progressRate"),
+                        rs.getString("status"),
+                        this.jdbcTemplate.queryForObject(getCreatedAtQuery, int.class, rs.getInt("curriIdx"))
+
+                ));
+    }
 }

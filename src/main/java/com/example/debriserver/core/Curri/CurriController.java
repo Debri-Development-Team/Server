@@ -449,4 +449,23 @@ public class CurriController {
         }
     }
 
+    @ResponseBody
+    @GetMapping("/getScrapTopList")
+    public BasicResponse<List<GetScrapTopListRes>> getScrapTopList(){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            List<GetScrapTopListRes> getScrapTopListRes = curriService.getScrapTopList();
+
+            return new BasicResponse<>(getScrapTopListRes);
+
+        } catch (BasicException exception) {
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
 }

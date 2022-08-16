@@ -285,4 +285,19 @@ public class CurriService {
 
 
     }
+
+    public List<GetScrapTopListRes> getScrapTopList() throws BasicException {
+
+        try {
+
+            List<GetScrapTopListRes> getScrapTopListRes = curriDao.getScrapTopList();
+
+            return getScrapTopListRes;
+
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+
+    }
 }
