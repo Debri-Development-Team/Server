@@ -110,7 +110,7 @@ public class CurriDao {
 
         String updateStatusChangedAtQuery = "UPDATE Curriculum SET statusChangedAt = NOW() WHERE curriIdx = ? and ownerIdx = ?;";
 
-        if ( beforeStatus == "ACTIVE") this.jdbcTemplate.update(updateStatusChangedAtQuery, forStatusParams);
+        if ( beforeStatus.equals("ACTIVE")) this.jdbcTemplate.update(updateStatusChangedAtQuery, forStatusParams);
 
         return result != 0;
     }
@@ -360,7 +360,7 @@ public class CurriDao {
         int complete = this.jdbcTemplate.queryForObject(getCompleteQuery, int.class, getParams);
         int total = this.jdbcTemplate.queryForObject(getTotalQuery, int.class, getParams);
 
-        float result = complete / total * 100;
+        float result = (float) complete / total * 100;
 
         return  result;
     }
@@ -472,13 +472,26 @@ public class CurriDao {
     }
 
     public boolean checkChapterStatus(PatchChapterStatuReq patchChapterStatuReq) {
-        String checkChapterStatusQuery = "SELECT exists(\n" +
-                "    SELECT chIdx\n" +
-                "    FROM Ch_Lecture_Curri\n" +
-                "    WHERE chIdx = ? AND chComplete = 'FALSE'\n" +
-                "    );";
-        int checkChapterStatusParams = patchChapterStatuReq.getChIdx();
-        int result = this.jdbcTemplate.queryForObject(checkChapterStatusQuery, int.class, checkChapterStatusParams);
+        String checkChapterStatusQuery = "SELECT chComplete\n" +
+                "FROM Ch_Lecture_Curri\n" +
+                "WHERE chIdx = ? AND curriIdx = ? AND lectureIdx = ?;";
+
+        Object[] checkChapterStatusParams = new Object[] {
+                patchChapterStatuReq.getChIdx(),
+                patchChapterStatuReq.getCurriIdx(),
+                patchChapterStatuReq.getLectureIdx()
+        };
+
+        String status = this.jdbcTemplate.queryForObject(checkChapterStatusQuery, String.class, checkChapterStatusParams);
+
+        int result;
+
+        if (status.equals("TRUE")){
+            result = 1;
+        } else {
+            result = 0;
+        }
+
         return result != 0;
     }
 
@@ -676,6 +689,29 @@ public class CurriDao {
                 "FROM Curriculum\n" +
                 "WHERE curriIdx = ? and ownerIdx = ?;";
 
+        String updateProgressRateQuery = "UPDATE Curriculum SET progressRate = ? WHERE curriIdx = ? and ownerIdx = ?;";
+
+        String getCompleteQuery = "SELECT COUNT(chlc.chIdx)\n" +
+                "FROM Ch_Lecture_Curri as chlc\n" +
+                "WHERE chlc.curriIdx = ? and chlc.chComplete = 'TRUE';";
+
+        String getTotalQuery = "SELECT COUNT(chidx)\n" +
+                "FROM Ch_Lecture_Curri\n" +
+                "WHERE curriIdx = ?;";
+
+        int complete = this.jdbcTemplate.queryForObject(getCompleteQuery, int.class, curriIdx);
+        int total = this.jdbcTemplate.queryForObject(getTotalQuery, int.class, curriIdx);
+
+        float progressRate = (float) complete / total * 100;
+
+        Object[] updateProgressRatePramas = new Object[]{
+                progressRate,
+                curriIdx,
+                userIdx
+        };
+
+        this.jdbcTemplate.update(updateProgressRateQuery, updateProgressRatePramas);
+
         Object[] getThisCurriParams = new Object[]{
                 curriIdx,
                 userIdx
@@ -687,7 +723,7 @@ public class CurriDao {
 
         int dDay;
         if(dDayAt == 1) {
-            if (Status == "ACTIVE") {
+            if (Status.equals("ACTIVE")) {
                 dDay = this.jdbcTemplate.queryForObject(getDdayNowQurey, int.class, getThisCurriParams);
             } else {
                 dDay = this.jdbcTemplate.queryForObject(getChangCreatedQurey, int.class, getThisCurriParams);
