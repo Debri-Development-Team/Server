@@ -109,7 +109,7 @@ public class LectureDao {
      * */
     public GetLectureRes getLecture(int lectureIdx, int userIdx) {
         String updateQuery = "UPDATE Lecture SET chNumber = (SELECT COUNT(*) FROM (SELECT chIdx FROM Ch_Lecture WHERE lectureIdx = ?) as sub) WHERE lectureIdx = ?;";
-        String getQuery = "SELECT lectureIdx, lectureName, lectureDesc, langTag, pricing, srcLink, type, chNumber FROM Lecture WHERE lectureIdx = ? and status = 'ACTIVE';";
+        String getQuery = "SELECT lectureIdx, lectureName, lectureDesc, langTag, pricing, srcLink, type, chNumber, publisher FROM Lecture WHERE lectureIdx = ? and status = 'ACTIVE';";
         String getListQuery = "SELECT chIdx, lectureIdx, chName, chOrder FROM Chapter WHERE lectureIdx = ? and status = 'ACTIVE';";
         String usedCountQuery = "SELECT COUNT(*) FROM Ch_Lecture_Curri WHERE lectureIdx = ?;";
         String likeCountQuery = "SELECT COUNT(*) FROM lectureLike WHERE lectureIdx = ? and status = 'ACTIVE';";
@@ -137,6 +137,7 @@ public class LectureDao {
                 this.jdbcTemplate.queryForObject(likeCountQuery, int.class, rs.getInt("lectureIdx")),
                 this.jdbcTemplate.queryForObject(checkLikeQuery, int.class, rs.getInt("lectureIdx"), userIdx) == 1,
                 Objects.requireNonNull(this.jdbcTemplate.queryForObject(scrapStatusQuery, int.class, userIdx, rs.getInt("lectureIdx"))) != 0,
+                rs.getString("publisher"),
                 this.jdbcTemplate.query(getListQuery,((rs1, rowNum1)
                         -> new ChListRes(
                                 rs1.getInt("chIdx"),
