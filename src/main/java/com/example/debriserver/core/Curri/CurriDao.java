@@ -802,8 +802,24 @@ public class CurriDao {
                 ), curriIdx);
     }
 
-//    public boolean curriReset(int curriIdx, int userIdx){
-//
-//    }
+    public boolean curriReset(int curriIdx, int userIdx){
+        String curriResetQurry = "UPDATE Curriculum\n" +
+                "SET progressRate = 0, createdAt = NOW(), statusChangedAt = 0, dDayAt = DATE_ADD(NOW(), INTERVAL dDay DAY )\n" +
+                "WHERE curriIdx = ? AND ownerIdx = ?;";
+
+        String chapterResetQurry = "UPDATE Ch_Lecture_Curri\n" +
+                "SET chComplete = REPLACE(chComplete, 'TRUE', 'FALSE')\n" +
+                "WHERE curriIdx = ?;";
+
+        Object[] curriResetParams = new Object[]{
+                curriIdx,
+                userIdx
+        };
+
+        int result = this.jdbcTemplate.update(curriResetQurry, curriResetParams);
+        this.jdbcTemplate.update(chapterResetQurry, curriIdx);
+
+        return result > 0;
+    }
 
 }
