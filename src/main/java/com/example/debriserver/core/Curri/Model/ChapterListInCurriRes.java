@@ -10,11 +10,15 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChapterListInCurriRes {
+
     private int chIdx;
+    private int lectureIdx;
+    private int curriIdx;
     private String chName;
     private int chNumber;
     private String langTag;
     private String chComplete;
     private int progressOrder;
     private int completeChNumber;
+
 }
