@@ -281,13 +281,15 @@ public class CurriController {
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
+            int userIdx = jwt.getUserIdx(jwtToken);
+
             // 해당 쳅터가 현재 커리에 들어있는지 확인
             if(!curriProvider.checkChapterExist(patchChapterCompleteReq)) throw new BasicException(CURRI_EMPTY_CHAPTER);
 
             String result;
             // 챕터 완료인지 취소인지 확인
             if(!curriProvider.checkChapterStatus(patchChapterCompleteReq)){
-                curriService.completeChapter(patchChapterCompleteReq);
+                curriService.completeChapter(patchChapterCompleteReq, userIdx);
                 result = "챕터 완료 성공";
             } else{
                 curriService.cancelCompleteChapter(patchChapterCompleteReq);

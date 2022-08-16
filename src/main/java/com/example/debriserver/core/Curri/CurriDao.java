@@ -55,6 +55,28 @@ public class CurriDao {
 
     }
 
+    public float rate(int lectureIdx, int curriIdx){
+        String getCompleteQuery = "SELECT COUNT(chlc.chIdx)\n" +
+                "FROM Ch_Lecture_Curri as chlc\n" +
+                "WHERE chlc.lectureIdx = ? and chlc.curriIdx = ? and chlc.chComplete = 'TRUE';";
+
+        String getTotalQuery = "SELECT COUNT(chidx)\n" +
+                "FROM Ch_Lecture_Curri\n" +
+                "WHERE lectureIdx = ? and curriIdx = ?;";
+
+        Object[] getParams = new Object[]{
+                lectureIdx,
+                curriIdx
+        };
+
+        int complete = this.jdbcTemplate.queryForObject(getCompleteQuery, int.class, getParams);
+        int total = this.jdbcTemplate.queryForObject(getTotalQuery, int.class, getParams);
+
+        float result = (float) complete / total * 100;
+
+        return  result;
+    }
+
     public PostCurriCreateRes createCurri(PostCurriCreateReq postCurriCreateReq, int userIdx) {
 
         // Curri 테이블에 데이터 저장
@@ -200,6 +222,15 @@ public class CurriDao {
                 "INTO Ch_Lecture_Curri(chIdx, lectureIdx, curriIdx, lectureOrder, progressOrder)\n" +
                 "VALUES (?, ?, ?, ?, ?);";
 
+        String insertLectureRateQuery = "INSERT INTO Lecture_Rate(lectureIdx, userIdx) VALUES (?, ?);";
+
+        Object[] insertLectureRateParams = new Object[]{
+                postInsertLectureReq.getLectureIdx(),
+                userIdx
+        };
+
+        this.jdbcTemplate.update(insertLectureRateQuery, insertLectureRateParams);
+
         // 현재 해당 커리큘럼의 max progressOrder 및 lectureOrder 가져오기
         String getLastProgressOrder = "SELECT IFNULL(MAX(progressOrder),0)\n" +
                 "FROM Ch_Lecture_Curri as chlc\n" +
@@ -341,28 +372,6 @@ public class CurriDao {
                         rs.getString("status"),
                         this.jdbcTemplate.queryForObject(getCreatedAtQuery, int.class, rs.getInt("curriIdx"))
                 ), userIdx);
-    }
-
-    public float rate(int lectureIdx, int curriIdx){
-        String getCompleteQuery = "SELECT COUNT(chlc.chIdx)\n" +
-                "FROM Ch_Lecture_Curri as chlc\n" +
-                "WHERE chlc.lectureIdx = ? and chlc.curriIdx = ? and chlc.chComplete = 'TRUE';";
-
-        String getTotalQuery = "SELECT COUNT(chidx)\n" +
-                "FROM Ch_Lecture_Curri\n" +
-                "WHERE lectureIdx = ? and curriIdx = ?;";
-
-        Object[] getParams = new Object[]{
-                lectureIdx,
-                curriIdx
-        };
-
-        int complete = this.jdbcTemplate.queryForObject(getCompleteQuery, int.class, getParams);
-        int total = this.jdbcTemplate.queryForObject(getTotalQuery, int.class, getParams);
-
-        float result = (float) complete / total * 100;
-
-        return  result;
     }
 
     /**
@@ -523,9 +532,13 @@ public class CurriDao {
         return result > 0;
     }
 
-    public int completeChapter(PatchChapterStatuReq patchChapterStatuReq) {
+    public int completeChapter(PatchChapterStatuReq patchChapterStatuReq, int userIdx) {
         String completeChapterQuery = "UPDATE Ch_Lecture_Curri SET chComplete = 'TRUE'\n" +
                 "WHERE chIdx = ? and curriIdx = ? and lectureIdx = ?;";
+
+        String completeLectureQuery = "UPDATE Lecture_Rate\n" +
+                "SET compeleteStatus = 'TRUE'\n" +
+                "WHERE lectureIdx = ? AND userIdx = ?;";
 
         Object[] completeChapterParams = new Object[]{
                 patchChapterStatuReq.getChIdx(),
@@ -533,7 +546,16 @@ public class CurriDao {
                 patchChapterStatuReq.getLectureIdx()
         };
 
+        Object[] completeLectureParams = new Object[]{
+                patchChapterStatuReq.getLectureIdx(),
+                userIdx
+        };
+
         int result = this.jdbcTemplate.update(completeChapterQuery, completeChapterParams);
+
+        float rate = rate(patchChapterStatuReq.getLectureIdx(), patchChapterStatuReq.getCurriIdx());
+
+        if(rate >= 100) this.jdbcTemplate.update(completeLectureQuery, completeLectureParams);
 
         return result;
     }

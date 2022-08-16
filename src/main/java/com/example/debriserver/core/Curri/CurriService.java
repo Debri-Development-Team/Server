@@ -154,10 +154,10 @@ public class CurriService {
         }
     }
 
-    public void completeChapter(PatchChapterStatuReq patchChapterCompleteReq) throws BasicException {
+    public void completeChapter(PatchChapterStatuReq patchChapterCompleteReq, int userIdx) throws BasicException {
         try {
 
-            int result = curriDao.completeChapter(patchChapterCompleteReq);
+            int result = curriDao.completeChapter(patchChapterCompleteReq, userIdx);
             if (result == 0){
                 throw new BasicException(DB_ERROR);
             }
