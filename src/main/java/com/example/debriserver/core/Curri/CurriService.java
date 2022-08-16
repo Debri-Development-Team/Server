@@ -42,16 +42,14 @@ public class CurriService {
      * @return
      * @throws BasicException
      */
-    public PostCurriScrapRes scrapCurri(int curriIdx, int userIdx) throws BasicException {
 
+    public PostCurriScrapRes scrapCurri(int curriIdx, int userIdx) throws BasicException {
         try {
             PostCurriScrapRes postCurriScrapRes = curriDao.scrapCurri(curriIdx,userIdx);
-
             return postCurriScrapRes;
-
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
-            throw new BasicException(DB_ERROR);
+            throw new BasicException(BasicServerStatus.DB_ERROR);
         }
 
     }
@@ -60,6 +58,7 @@ public class CurriService {
 
         try{
             curriDao.scrapCancel(scrapIdx);
+
         }
         catch (Exception exception) {
             throw new BasicException(DB_ERROR);
@@ -67,19 +66,15 @@ public class CurriService {
     }
 
     public boolean checkScrapedCurriExist(int curriIdx ,int userIdx) throws BasicException {
-
         try {
-
             boolean result = curriDao.checkScrapedCurriExist(curriIdx,userIdx);
-
             return result;
-
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
-            throw new BasicException(DB_ERROR);
+            throw new BasicException(BasicServerStatus.DB_ERROR);
         }
-
     }
+
 
     public PostCurriCreateRes createCurri(PostCurriCreateReq postCurriCreateReq, int userIdx) throws BasicException{
         try{
@@ -159,10 +154,10 @@ public class CurriService {
         }
     }
 
-    public void completeChapter(PatchChapterStatuReq patchChapterCompleteReq, int userIdx) throws BasicException {
+    public void completeChapter(PatchChapterStatuReq patchChapterCompleteReq) throws BasicException {
         try {
 
-            int result = curriDao.completeChapter(patchChapterCompleteReq, userIdx);
+            int result = curriDao.completeChapter(patchChapterCompleteReq);
             if (result == 0){
                 throw new BasicException(DB_ERROR);
             }
@@ -171,9 +166,9 @@ public class CurriService {
         }
     }
 
-    public void cancelCompleteChapter(PatchChapterStatuReq patchChapterStatuReq, int userIdx) throws BasicException{
+    public void cancelCompleteChapter(PatchChapterStatuReq patchChapterStatuReq) throws BasicException{
         try {
-            int result = curriDao.completecancelChapter(patchChapterStatuReq, userIdx);
+            int result = curriDao.completecancelChapter(patchChapterStatuReq);
             if (result == 0){
                 throw new BasicException(DB_ERROR);
             }
@@ -228,61 +223,42 @@ public class CurriService {
     }
 
     public boolean checkUnScrapedCurriExist(int scrapIdx) throws BasicException {
-
         try {
-
             boolean result = curriDao.checkUnScrapedCurriExist(scrapIdx);
-
             return result;
-
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
-
     }
 
     public boolean checkUnScrapedCurriExist2(int curriIdx, int userIdx) throws BasicException {
-
         try {
-
             boolean result = curriDao.checkUnScrapedCurriExist2(curriIdx, userIdx);
-
             return result;
-
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
-
     }
 
     public List<GetScrapListRes> getCurriScrapList(int userIdx) throws BasicException {
-
         try {
-
             List<GetScrapListRes> getCurriScrapListRes = curriDao.getCurriScrapList(userIdx);
-
             return getCurriScrapListRes;
-
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
-
     }
 
     public boolean checkScrapExist (int userIdx)throws BasicException{
         try{
             boolean result = curriDao.checkScrapExist(userIdx);
-
             return result;
-
         }catch (Exception exception) {
             System.out.println(exception.getMessage());
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
-
-
     }
 }

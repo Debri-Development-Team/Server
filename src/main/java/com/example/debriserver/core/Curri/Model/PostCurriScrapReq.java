@@ -14,6 +14,3 @@ public class PostCurriScrapReq {
     private int curriIdx;
 
 }
-
-
-

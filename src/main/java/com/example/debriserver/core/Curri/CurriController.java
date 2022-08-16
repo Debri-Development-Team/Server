@@ -232,6 +232,9 @@ public class CurriController {
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             int userIdx = jwt.getUserIdx(jwtToken);
+            int curriIdx = postInsertLectureReq.getCurriIdx();
+
+            if(!curriProvider.checkCurriExist(curriIdx, userIdx)) throw new BasicException(CURRI_EMPTY_ID);
 
             boolean check = curriService.insertLecture(postInsertLectureReq, userIdx);
 
@@ -280,18 +283,16 @@ public class CurriController {
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             // 해당 쳅터가 현재 커리에 들어있는지 확인
-            if(curriProvider.checkChapterExist(patchChapterCompleteReq)) throw new BasicException(CURRI_EMPTY_CHAPTER);
-
-            int userIdx = jwt.getUserIdx(jwtToken);
+            if(!curriProvider.checkChapterExist(patchChapterCompleteReq)) throw new BasicException(CURRI_EMPTY_CHAPTER);
 
             String result;
             // 챕터 완료인지 취소인지 확인
-            if(curriProvider.checkChapterStatus(patchChapterCompleteReq)){
-                curriService.completeChapter(patchChapterCompleteReq, userIdx);
-                result = "칭찬도장 꾸-욱!";
+            if(!curriProvider.checkChapterStatus(patchChapterCompleteReq)){
+                curriService.completeChapter(patchChapterCompleteReq);
+                result = "챕터 완료 성공";
             } else{
-                curriService.cancelCompleteChapter(patchChapterCompleteReq, userIdx);
-                result = "넌 항상 이런식이야";
+                curriService.cancelCompleteChapter(patchChapterCompleteReq);
+                result = "챕터 완료 취소 성공";
             }
 
             return new BasicResponse<>(result);
@@ -315,10 +316,7 @@ public class CurriController {
 
             if(curriService.checkScrapedCurriExist(curriIdx,userIdx)== true) throw new BasicException(BasicServerStatus.SCRAP_Curri_EXIST);
 
-
-
-
-           PostCurriScrapRes postCurriScrapRes = curriService.scrapCurri(curriIdx, userIdx);
+            PostCurriScrapRes postCurriScrapRes = curriService.scrapCurri(curriIdx, userIdx);
 
             return new BasicResponse<>(postCurriScrapRes);
 
@@ -329,10 +327,9 @@ public class CurriController {
 
     /**
      *  8.9 커리큘럼 좋아요(추천) 취소 API
-     *  [PATCH]: localhost:8521/api/curri/scrap/cancel/{curriIdx0}
+     *  [PATCH]: localhost:8521/api/curri/unScrap/{scrapIdx}
      */
-
-
+    @ResponseBody
     @PatchMapping("/unScrap/{scrapIdx}")
     public BasicResponse<String> scrapCancel(@PathVariable("scrapIdx") int scrapIdx) {
         try {
@@ -343,9 +340,8 @@ public class CurriController {
 
             if(curriService.checkUnScrapedCurriExist(scrapIdx)== true) throw new BasicException(BasicServerStatus.UNSCRAP_Curri_EXIST);
 
-            String result = "좋아요(추천)가 취소 되었습니다.";
-
             curriService.scrapCancel(scrapIdx);
+            String result = "스크랩이 취소 되었습니다.";
 
             return new BasicResponse<>(result);
 
@@ -369,13 +365,13 @@ public class CurriController {
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
             if(curriService.checkScrapExist(userIdx)==false) throw new BasicException(BasicServerStatus.SCRAP_LIST_EMPTY);
 
-
             return new BasicResponse<>(curriService.getCurriScrapList(userIdx));
 
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
         }
     }
+
 
     /**
      *  8.10.1 커리큘럼 좋아요(추천) top 10 리스트 조회 API
@@ -385,10 +381,10 @@ public class CurriController {
 
     /**
      *  8.11 커리큘럼 리셋 API
-     *  [PATCH]: localhost:8521/api/curri/reset
+     *  [PATCH]: localhost:8521/api/curri/reset/{curriIdx}
      */
 //    @ResponseBody
-//    @PatchMapping("/reset")
+//    @PatchMapping("/reset/{curriIdx}")
 //    public BasicResponse<String> curriReset(@PathVariable ("curriIdx") int curriIdx){
 //        try{
 //            String jwtToken = jwt.getJwt();
