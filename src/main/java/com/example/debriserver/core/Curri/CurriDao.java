@@ -726,15 +726,17 @@ public class CurriDao {
         int complete = this.jdbcTemplate.queryForObject(getCompleteQuery, int.class, curriIdx);
         int total = this.jdbcTemplate.queryForObject(getTotalQuery, int.class, curriIdx);
 
-        float progressRate = (float) complete / total * 100;
+        if(total != 0 && complete !=0) {
+            float progressRate = (float) complete / total * 100;
 
-        Object[] updateProgressRatePramas = new Object[]{
-                progressRate,
-                curriIdx,
-                userIdx
-        };
+            Object[] updateProgressRatePramas = new Object[]{
+                    progressRate,
+                    curriIdx,
+                    userIdx
+            };
 
-        this.jdbcTemplate.update(updateProgressRateQuery, updateProgressRatePramas);
+            this.jdbcTemplate.update(updateProgressRateQuery, updateProgressRatePramas);
+        }
 
         Object[] getThisCurriParams = new Object[]{
                 curriIdx,
