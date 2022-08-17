@@ -90,9 +90,9 @@ public class LectureService {
         }
     }
 
-    public List<GetRoadmapRes> getRoadmapView(int roadmapIdx) throws BasicException{
+    public List<GetRoadmapRes> getRoadmapView(String mod, int userIdx) throws BasicException{
         try{
-            return lectureDao.getRoadmapView(roadmapIdx);
+            return lectureDao.getRoadmapView(mod, userIdx);
         }catch (Exception exception){
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }

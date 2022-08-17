@@ -109,7 +109,7 @@ public class LectureDao {
      * */
     public GetLectureRes getLecture(int lectureIdx, int userIdx) {
         String updateQuery = "UPDATE Lecture SET chNumber = (SELECT COUNT(*) FROM (SELECT chIdx FROM Ch_Lecture WHERE lectureIdx = ?) as sub) WHERE lectureIdx = ?;";
-        String getQuery = "SELECT lectureIdx, lectureName, lectureDesc, langTag, pricing, srcLink, type, chNumber FROM Lecture WHERE lectureIdx = ? and status = 'ACTIVE';";
+        String getQuery = "SELECT lectureIdx, lectureName, lectureDesc, langTag, pricing, srcLink, type, chNumber, publisher FROM Lecture WHERE lectureIdx = ? and status = 'ACTIVE';";
         String getListQuery = "SELECT chIdx, lectureIdx, chName, chOrder FROM Chapter WHERE lectureIdx = ? and status = 'ACTIVE';";
         String usedCountQuery = "SELECT COUNT(*) FROM Ch_Lecture_Curri WHERE lectureIdx = ?;";
         String likeCountQuery = "SELECT COUNT(*) FROM lectureLike WHERE lectureIdx = ? and status = 'ACTIVE';";
@@ -137,6 +137,7 @@ public class LectureDao {
                 this.jdbcTemplate.queryForObject(likeCountQuery, int.class, rs.getInt("lectureIdx")),
                 this.jdbcTemplate.queryForObject(checkLikeQuery, int.class, rs.getInt("lectureIdx"), userIdx) == 1,
                 Objects.requireNonNull(this.jdbcTemplate.queryForObject(scrapStatusQuery, int.class, userIdx, rs.getInt("lectureIdx"))) != 0,
+                rs.getString("publisher"),
                 this.jdbcTemplate.query(getListQuery,((rs1, rowNum1)
                         -> new ChListRes(
                                 rs1.getInt("chIdx"),
@@ -305,43 +306,73 @@ public class LectureDao {
      * 로드맵 리스트 조회
      * */
     public List<GetRoadmapListRes> getRoadmapList() {
-        String getListQuery =
-                "SELECT curriIdx, curriName, langTag, status FROM Curriculum\n" +
-                "WHERE curriIdx = 1 or curriIdx = 2;";
-        String getNumberQuery = "SELECT COUNT(lectureIdx) FROM Lecture_Road_Curri WHERE roadIdx = ?;";
+        String getListQuery = "SELECT roadMapIdx, roadMapName, roadMapExp, authorName FROM Roadmap;";
 
         return this.jdbcTemplate.query(getListQuery,
                 (rs, rowNum) -> new GetRoadmapListRes(
-                        rs.getInt("curriIdx"),
-                        rs.getString("curriName"),
-                        rs.getString("langTag"),
-                        this.jdbcTemplate.queryForObject(getNumberQuery, int.class, rs.getInt("curriIdx")),
-                        rs.getString("status")
+                        rs.getInt("roadMapIdx"),
+                        rs.getString("roadMapName"),
+                        rs.getString("roadMapExp"),
+                        rs.getString("authorName")
                 ));
     }
 
     /**
      * 로드맵 상세 조회
      * */
-    public List<GetRoadmapRes> getRoadmapView(int roadmapIdx) {
+    public List<GetRoadmapRes> getRoadmapView(String mod, int userIdx) {
+        int modNumber;
 
-        String getViewQuery =
-                "SELECT C.curriIdx, curriName, curriAuthor, visibleStatus, langTag, status\n" +
-                "FROM\n" +
-                "Lecture_Road_Curri as LRC JOIN Curriculum as C on LRC.curriIdx = C.curriIdx\n" +
-                "WHERE LRC.roadIdx = ?;";
+        if(mod.equalsIgnoreCase("server")) modNumber = 1;
+        else modNumber = 2;
 
-        return this.jdbcTemplate.query(getViewQuery,
+        String baseQuery = "SELECT roadMapIdx,roadMapName, roadMapExp, authorName, requireDay FROM Roadmap WHERE roadMapIdx = ?;";
+        String childCurriListQuery = "SELECT roadMapIdx, childIdx, childOrder, curriName, lectureIdx, childDesc FROM Roadmap_Child WHERE roadmapIdx = ?;";
+
+
+        return this.jdbcTemplate.query(baseQuery,
                 (rs, rowNum) -> new GetRoadmapRes(
-                        rs.getInt("curriIdx"),
-                        rs.getString("curriName"),
-                        rs.getString("curriAuthor"),
-                        rs.getString("visibleStatus"),
-                        rs.getString("langTag"),
-                        rs.getString("status")
-                ), roadmapIdx);
+                        rs.getInt("roadMapIdx"),
+                        rs.getString("roadMapName"),
+                        rs.getString("roadMapExp"),
+                        rs.getString("authorName"),
+                        rs.getInt("requireDay"),
+                        this.jdbcTemplate.query(childCurriListQuery,
+                                (rs1, rowNum1) -> new GetRoadmapChildRes(
+                                        rs1.getInt("roadMapIdx"),
+                                        rs1.getInt("childIdx"),
+                                        rs1.getInt("childOrder"),
+                                        rs1.getString("childDesc"),
+                                        rs1.getString("curriName"),
+                                        getRoadmapChildLecture(rs1.getInt("lectureIdx"), rs1.getInt("childIdx"), userIdx)
+                                ), rs.getInt("roadMapIdx"))
+                ), modNumber);
     }
 
+    public List<GetRoadmapChildLectureList> getRoadmapChildLecture(int lectureIdx, int childIdx, int userIdx){
+        String childLectureListQuery = "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture WHERE lectureIdx = ?;";
+        String countLikeQuery = "SELECT COUNT(*) FROM lectureLike WHERE lectureIdx = ?;";
+        String checkUserLikeQuery = "SELECT EXISTS(SELECT * FROM lectureLike WHERE lectureIdx = ? and userIdx = ?);";
+        String countScrapQuery = "SELECT COUNT(*) FROM LectureScrap WHERE lectureIdx = ?;";
+        String checkScrapQuery = "SELECT EXISTS(SELECT * FROM LectureScrap WHERE lectureIdx = ? and userIdx = ?);";
+        String countUsedNumberQuery = "SELECT COUNT(*) FROM Ch_Lecture_Curri WHERE lectureIdx = ?;";
+
+        return this.jdbcTemplate.query(childLectureListQuery,
+                (rs2, rowNum2) -> new GetRoadmapChildLectureList(
+                        childIdx,
+                        rs2.getInt("lectureIdx"),
+                        rs2.getString("lectureName"),
+                        rs2.getInt("chNumber"),
+                        rs2.getString("langTag"),
+                        rs2.getString("pricing"),
+                        rs2.getString("type"),
+                        this.jdbcTemplate.queryForObject(checkScrapQuery, int.class, rs2.getInt("lectureIdx"), userIdx) == 1,
+                        this.jdbcTemplate.queryForObject(countScrapQuery, int.class, rs2.getInt("lectureIdx")),
+                        this.jdbcTemplate.queryForObject(countUsedNumberQuery, int.class, rs2.getInt("lectureIdx")),
+                        this.jdbcTemplate.queryForObject(countLikeQuery, int.class, rs2.getInt("lectureIdx")),
+                        this.jdbcTemplate.queryForObject(checkUserLikeQuery, int.class, rs2.getInt("lectureIdx"), userIdx) == 1
+                ), lectureIdx);
+    }
     /**
      * 존재하면 false 존재 안하면 true
      * */

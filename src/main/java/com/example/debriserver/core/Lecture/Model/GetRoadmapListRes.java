@@ -13,7 +13,6 @@ public class GetRoadmapListRes {
 
     private int roadmapIdx;
     private String roadmapName;
-    private String langTag;
-    private int curriNumber;
-    private String status;
+    private String roadmapExplain;
+    private String roadmapAuthor;
 }
