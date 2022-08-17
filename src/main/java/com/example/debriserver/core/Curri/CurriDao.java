@@ -726,7 +726,7 @@ public class CurriDao {
         int complete = this.jdbcTemplate.queryForObject(getCompleteQuery, int.class, curriIdx);
         int total = this.jdbcTemplate.queryForObject(getTotalQuery, int.class, curriIdx);
 
-        if(total != 0 && complete !=0) {
+        if(total != 0) {
             float progressRate = (float) complete / total * 100;
 
             Object[] updateProgressRatePramas = new Object[]{
