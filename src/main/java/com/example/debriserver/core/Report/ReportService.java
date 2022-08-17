@@ -1,8 +1,7 @@
 package com.example.debriserver.core.Report;
 
 import com.example.debriserver.basicModels.BasicException;
-import com.example.debriserver.core.Report.Model.PostCommentReportReq;
-import com.example.debriserver.core.Report.Model.PostPostReportReq;
+import com.example.debriserver.core.Report.Model.*;
 import com.example.debriserver.utility.jwtUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

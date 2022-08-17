@@ -281,13 +281,15 @@ public class CurriController {
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
+            int userIdx = jwt.getUserIdx(jwtToken);
+
             // 해당 쳅터가 현재 커리에 들어있는지 확인
             if(!curriProvider.checkChapterExist(patchChapterCompleteReq)) throw new BasicException(CURRI_EMPTY_CHAPTER);
 
             String result;
             // 챕터 완료인지 취소인지 확인
             if(!curriProvider.checkChapterStatus(patchChapterCompleteReq)){
-                curriService.completeChapter(patchChapterCompleteReq);
+                curriService.completeChapter(patchChapterCompleteReq, userIdx);
                 result = "챕터 완료 성공";
             } else{
                 curriService.cancelCompleteChapter(patchChapterCompleteReq);
@@ -382,25 +384,25 @@ public class CurriController {
      *  8.11 커리큘럼 리셋 API
      *  [PATCH]: localhost:8521/api/curri/reset/{curriIdx}
      */
-//    @ResponseBody
-//    @PatchMapping("/reset/{curriIdx}")
-//    public BasicResponse<String> curriReset(@PathVariable ("curriIdx") int curriIdx){
-//        try{
-//            String jwtToken = jwt.getJwt();
-//
-//            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
-//
-//            int userIdx = jwt.getUserIdx(jwtToken);
-//
-//            if(curriService.curriReset(curriIdx, userIdx)) throw new BasicException(CURRI_RESET_FAIL);
-//
-//            String result = "커리큘럼 리셋 성공";
-//
-//            return new BasicResponse<>(result);
-//        } catch (BasicException exception){
-//            return new BasicResponse<>((exception.getStatus()));
-//        }
-//    }
+    @ResponseBody
+    @PatchMapping("/reset/{curriIdx}")
+    public BasicResponse<String> curriReset(@PathVariable ("curriIdx") int curriIdx){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            if(!curriService.curriReset(curriIdx, userIdx)) throw new BasicException(CURRI_RESET_FAIL);
+
+            String result = "커리큘럼 리셋 성공";
+
+            return new BasicResponse<>(result);
+        } catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
     /**
      *  8.12 커리큘럼 리뷰 작성 API
@@ -440,6 +442,25 @@ public class CurriController {
 
             return new BasicResponse<>(curriReviewList);
         } catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/scrap/topList")
+    public BasicResponse<List<GetScrapTopListRes>> getScrapTopList(){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            List<GetScrapTopListRes> getScrapTopListRes = curriService.getScrapTopList();
+
+            return new BasicResponse<>(getScrapTopListRes);
+
+        } catch (BasicException exception) {
             return new BasicResponse<>((exception.getStatus()));
         }
     }
