@@ -154,10 +154,10 @@ public class CurriService {
         }
     }
 
-    public void completeChapter(PatchChapterStatuReq patchChapterCompleteReq) throws BasicException {
+    public void completeChapter(PatchChapterStatuReq patchChapterCompleteReq, int userIdx) throws BasicException {
         try {
 
-            int result = curriDao.completeChapter(patchChapterCompleteReq);
+            int result = curriDao.completeChapter(patchChapterCompleteReq, userIdx);
             if (result == 0){
                 throw new BasicException(DB_ERROR);
             }
@@ -195,14 +195,14 @@ public class CurriService {
         }
     }
 
-//    public boolean curriReset(int curriIdx, int userIdx)throws BasicException{
-//        try{
-//            return curriDao.curriReset(curriIdx, userIdx);
-//        } catch (Exception exception){
-//            System.out.println(exception.getMessage());
-//            throw new BasicException(DB_ERROR);
-//        }
-//    }
+    public boolean curriReset(int curriIdx, int userIdx)throws BasicException{
+        try{
+            return curriDao.curriReset(curriIdx, userIdx);
+        } catch (Exception exception){
+            System.out.println(exception.getMessage());
+            throw new BasicException(DB_ERROR);
+        }
+    }
 
     public CurriReviewRes createCurriReview(PostCurriReviewReq postCurriReviewReq, int authorIdx) throws BasicException{
         try{
