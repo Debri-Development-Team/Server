@@ -246,11 +246,12 @@ public class CurriDao {
 
         String getChIdxQurey = "SELECT MIN(ch.chIdx)\n" +
                 "FROM Chapter as ch\n" +
+                "JOIN Ch_Lecture_Curri as chlc\n" +
                 "WHERE NOT EXISTS(\n" +
-                "    SELECT chIdx\n" +
+                "    SELECT chlc.chIdx\n" +
                 "    FROM Ch_Lecture_Curri as chlc\n" +
-                "    WHERE curriIdx = ? and chlc.lectureIdx = ? and chlc.chIdx = ch.chIdx\n" +
-                "    );";
+                "    WHERE chlc.curriIdx = ? and chlc.lectureIdx = ? and chlc.chIdx = ch.chIdx\n" +
+                "    ) AND ch.lectureIdx = ? AND ch.lectureIdx = chlc.lectureIdx;";
 
         String getChNumQurey = "SELECT l.chNumber\n" +
                 "FROM Lecture as l\n" +
@@ -265,28 +266,31 @@ public class CurriDao {
         int lastProgressOrder = this.jdbcTemplate.queryForObject(getLastProgressOrder, int.class, getLastOrderParams);
         int chNum = this.jdbcTemplate.queryForObject(getChNumQurey, int.class, postInsertLectureReq.getLectureIdx());
 
-        System.out.println(lastLectureOrder);
-        System.out.println(lastProgressOrder);
-        System.out.println(chNum);
+//        System.out.println(lastLectureOrder);
+//        System.out.println(lastProgressOrder);
+//        System.out.println(chNum);
 
         for (int i = 1; i <= chNum; i++){
 
             Object[] getChIdxParams = new Object[]{
                     postInsertLectureReq.getCurriIdx(),
+                    postInsertLectureReq.getLectureIdx(),
                     postInsertLectureReq.getLectureIdx()
             };
 
             int chIdx = this.jdbcTemplate.queryForObject(getChIdxQurey, int.class, getChIdxParams);
+
+//            System.out.println(chIdx);
 
             Object[] insertLectureParams = new Object[] {
                     chIdx,
                     postInsertLectureReq.getLectureIdx(),
                     postInsertLectureReq.getCurriIdx(),
                     lastLectureOrder + 1,
-                    lastProgressOrder + 1
+                    lastProgressOrder + i
             };
 
-            System.out.println(Arrays.toString(insertLectureParams));
+//            System.out.println(Arrays.toString(insertLectureParams));
 
             this.jdbcTemplate.update(insertLectureQuery, insertLectureParams);
         }
@@ -314,7 +318,7 @@ public class CurriDao {
             }
         }
 
-        System.out.println(Dday);
+//        System.out.println(Dday);
 
         int curriIdx = postInsertLectureReq.getCurriIdx();
 
@@ -343,7 +347,7 @@ public class CurriDao {
                 userIdx
         };
 
-        System.out.println(Arrays.toString(insertDdayParams));
+//        System.out.println(Arrays.toString(insertDdayParams));
 
         int result = this.jdbcTemplate.update(insertDdayQuery, insertDdayParams);
 
