@@ -721,11 +721,23 @@ public class CurriDao {
         return getChapterListResList;
     }
 
-    public GetThisCurriRes getThisCurri(int curriIdx, int userIdx) {
+    public GetThisCurriRes getThisCurri(int curriIdx) {
+
+        String getCurriOwnerAuthorQuery = "SELECT curriAuthor\n" +
+                "FROM Curriculum\n" +
+                "WHERE curriIdx = ?;";
+
+        String curriAuthor = this.jdbcTemplate.queryForObject(getCurriOwnerAuthorQuery, String.class, curriIdx);
+
+        String getCurriOwnerIdxQuery = "SELECT ownerIdx\n" +
+                "FROM Curriculum\n" +
+                "WHERE curriIdx = ?;";
+
+        int userIdx = this.jdbcTemplate.queryForObject(getCurriOwnerIdxQuery, int.class, curriIdx);
 
         String getThisCurriQurey = "SELECT distinct curriIdx, curriName, visibleStatus, langTag, progressRate, status, completeAt, curriAuthor, curriDesc\n" +
                 "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
+                "WHERE curriIdx = ? and curriAuthor = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
 
         String getCreatedAtQuery = "SELECT distinct c.createdAt\n" +
                 "FROM Curriculum as c\n" +
@@ -734,21 +746,21 @@ public class CurriDao {
 
         String getStatusQurey = "SELECT IFNULL(status, '0') AS RESULT\n" +
                 "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and ownerIdx = ? and status != 'DELETE';";
+                "WHERE curriIdx = ? and curriAuthor = ? and status != 'DELETE';";
 
         String getDdayNowQurey = "SELECT (TIMESTAMPDIFF(DAY , now(), dDayAt) + 1) AS RESULT\n" +
                 "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
+                "WHERE curriIdx = ? and curriAuthor= ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
 
         String getChangCreatedQurey = "SELECT IFNULL((TIMESTAMPDIFF(DAY , createdAt, statusChangedAt) + 1), 0) AS RESULT\n" +
                 "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
+                "WHERE curriIdx = ? and curriAuthor = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
 
         String getDdayAtQuery = "SELECT IF(dDayAt = '0000-00-00 00:00:00', 0, 1)\n" +
                 "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and ownerIdx = ?;";
+                "WHERE curriIdx = ? and curriAuthor = ?;";
 
-        String updateProgressRateQuery = "UPDATE Curriculum SET progressRate = ? WHERE curriIdx = ? and ownerIdx = ?;";
+        String updateProgressRateQuery = "UPDATE Curriculum SET progressRate = ? WHERE curriIdx = ? and curriAuthor = ?;";
 
         String getCompleteQuery = "SELECT COUNT(chlc.chIdx)\n" +
                 "FROM Ch_Lecture_Curri as chlc\n" +
@@ -767,7 +779,7 @@ public class CurriDao {
             Object[] updateProgressRatePramas = new Object[]{
                     progressRate,
                     curriIdx,
-                    userIdx
+                    curriAuthor
             };
 
             this.jdbcTemplate.update(updateProgressRateQuery, updateProgressRatePramas);
@@ -775,7 +787,7 @@ public class CurriDao {
 
         Object[] getThisCurriParams = new Object[]{
                 curriIdx,
-                userIdx
+                curriAuthor
         };
 
         String Status = this.jdbcTemplate.queryForObject(getStatusQurey, String.class, getThisCurriParams);
@@ -795,7 +807,7 @@ public class CurriDao {
 
         String getTotalDdayQurey = "SELECT dDay\n" +
                 "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and ownerIdx = ?;";
+                "WHERE curriIdx = ? and curriAuthor = ?;";
 
         int totalDday = this.jdbcTemplate.queryForObject(getTotalDdayQurey, int.class,getThisCurriParams);
         int a = totalDday / 7;
