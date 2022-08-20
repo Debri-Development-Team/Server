@@ -15,5 +15,6 @@ public class PostCurriCreateReq {
     private String curriAuthor;
     private String visibleStatus;
     private String langTag;
+    private String curriDesc;
 
 }
