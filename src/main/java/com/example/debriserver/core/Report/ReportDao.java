@@ -45,16 +45,16 @@ public class ReportDao {
         this.jdbcTemplate.update(insertPostReportQuery, insertPostReportParams);
     }
 
-    /**
-     * 신고된 게시물 삭제
-     */
-    public void deleteReportedPost(int postIdx) {
-        String deleteReportedPostQuery = "UPDATE Post SET status = 'DELETE' WHERE postIdx = ?";
-        int deleteReportedPostParams = postIdx;
-
-        this.jdbcTemplate.update(deleteReportedPostQuery,
-                deleteReportedPostParams);
-    }
+//    /**
+//     * 신고된 게시물 삭제
+//     */
+//    public void deleteReportedPost(int postIdx) {
+//        String deleteReportedPostQuery = "UPDATE Post SET status = 'DELETE' WHERE postIdx = ?";
+//        int deleteReportedPostParams = postIdx;
+//
+//        this.jdbcTemplate.update(deleteReportedPostQuery,
+//                deleteReportedPostParams);
+//    }
 
     /**
      * 신고 당한 댓글 작성자 찾기
@@ -81,16 +81,16 @@ public class ReportDao {
         this.jdbcTemplate.update(insertCommentReportQuery, insertCommentReportParams);
     }
 
-    /**
-     * 신고된 댓글 삭제
-     */
-    public void deleteReportedComment(int commentIdx) {
-        String deleteReportedCommentQuery = "UPDATE Comment SET status = 'DELETE' WHERE commentIdx = ?";
-        int deleteReportedCommentParams = commentIdx;
-
-        this.jdbcTemplate.update(deleteReportedCommentQuery,
-                deleteReportedCommentParams);
-    }
+//    /**
+//     * 신고된 댓글 삭제
+//     */
+//    public void deleteReportedComment(int commentIdx) {
+//        String deleteReportedCommentQuery = "UPDATE Comment SET status = 'DELETE' WHERE commentIdx = ?";
+//        int deleteReportedCommentParams = commentIdx;
+//
+//        this.jdbcTemplate.update(deleteReportedCommentQuery,
+//                deleteReportedCommentParams);
+//    }
 
     public int reportUser(int reportUserIdx, int postIdx, String reason)
     {
