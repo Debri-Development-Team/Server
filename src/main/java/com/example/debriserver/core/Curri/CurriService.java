@@ -177,9 +177,9 @@ public class CurriService {
         }
     }
 
-    public GetThisCurriRes getThisCurri(int curriIdx, int userIdx) throws BasicException{
+    public GetThisCurriRes getThisCurri(int curriIdx) throws BasicException{
         try{
-            return curriDao.getThisCurri(curriIdx, userIdx);
+            return curriDao.getThisCurri(curriIdx);
         } catch (Exception exception){
             System.out.println(exception.getMessage());
             throw new BasicException(DB_ERROR);

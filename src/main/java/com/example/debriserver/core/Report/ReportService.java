@@ -43,8 +43,6 @@ public class ReportService {
         try {
             int reportedUserIdx = reportProvider.findReportedPostUser(postPostReportReq.getPostIdx());
             reportDao.insertPostReport(userIdx, reportedUserIdx, postPostReportReq);
-            reportDao.deleteReportedPost(postPostReportReq.getPostIdx());
-            
         } catch (Exception exception) {
             throw new BasicException(DB_ERROR);
         }
@@ -63,7 +61,6 @@ public class ReportService {
         try {
             int reportedUserIdx = reportProvider.findReportedCommentUser(postCommentReportReq.getCommentIdx());
             reportDao.insertCommentReport(userIdx, reportedUserIdx, postCommentReportReq);
-            reportDao.deleteReportedComment(postCommentReportReq.getCommentIdx());
         } catch (Exception exception) {
             throw new BasicException(DB_ERROR);
         }
@@ -76,25 +73,24 @@ public class ReportService {
      * */
     public void reportUser(int reportUserIdx, int postIdx, String reason) throws BasicException
     {
+        // reportUserIdx가 User table에 존재하는지 확인
+        if(reportProvider.checkUserExist(reportUserIdx) == 0)
+        {
+            throw new BasicException(USERS_EMPTY_USER_ID);
+        }
+
+        // postIdx가 Post table에 존재하는지 확인
+        if(reportProvider.checkPostExist(postIdx) == 0)
+        {
+            throw new BasicException(INVALID_POST_ID);
+        }
+
         try{
-            // reportUserIdx가 User table에 존재하는지 확인
-            if(reportProvider.checkUserExist(reportUserIdx) == 0)
-            {
-                throw new BasicException(USERS_EMPTY_USER_ID);
-            }
-
-            // postIdx가 Post table에 존재하는지 확인
-            if(reportProvider.checkPostExist(postIdx) == 0)
-            {
-                throw new BasicException(POSTS_EMPTY_POST_ID);
-            }
-
             int result = reportDao.reportUser(reportUserIdx, postIdx, reason);
             if(result == 0)
             {
                 throw new BasicException(DB_ERROR);
             }
-
         } catch (Exception exception) {
             throw new BasicException(DB_ERROR);
         }
