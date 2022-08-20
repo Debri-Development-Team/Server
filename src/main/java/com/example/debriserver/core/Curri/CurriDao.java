@@ -248,11 +248,12 @@ public class CurriDao {
         String getChIdxQurey = "SELECT MIN(ch.chIdx)\n" +
                 "FROM Chapter as ch\n" +
                 "JOIN Ch_Lecture_Curri as chlc\n" +
+                "JOIN Lecture as l\n" +
                 "WHERE NOT EXISTS(\n" +
                 "    SELECT chlc.chIdx\n" +
                 "    FROM Ch_Lecture_Curri as chlc\n" +
                 "    WHERE chlc.curriIdx = ? and chlc.lectureIdx = ? and chlc.chIdx = ch.chIdx\n" +
-                "    ) AND ch.lectureIdx = ? AND ch.lectureIdx = chlc.lectureIdx;";
+                "    ) AND ch.lectureIdx = ? AND ch.lectureIdx = l.lectureIdx;\n";
 
         String getChNumQurey = "SELECT l.chNumber\n" +
                 "FROM Lecture as l\n" +
@@ -319,7 +320,7 @@ public class CurriDao {
             }
         }
 
-//        System.out.println(Dday);
+        System.out.println(Dday);
 
         int curriIdx = postInsertLectureReq.getCurriIdx();
 
@@ -348,7 +349,7 @@ public class CurriDao {
                 userIdx
         };
 
-//        System.out.println(Arrays.toString(insertDdayParams));
+        System.out.println(Arrays.toString(insertDdayParams));
 
         int result = this.jdbcTemplate.update(insertDdayQuery, insertDdayParams);
 
