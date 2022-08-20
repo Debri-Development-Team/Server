@@ -438,6 +438,8 @@ public class CurriDao {
 
         int result = this.jdbcTemplate.update(deleteCurriQuery, deleteCurriParams);
 
+        System.out.println(result);
+
         return result;
     }
 
