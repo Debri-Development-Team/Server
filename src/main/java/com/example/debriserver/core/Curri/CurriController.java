@@ -101,9 +101,7 @@ public class CurriController {
 
             if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            int userIdx = jwt.getUserIdx(jwtToken);
-
-            GetThisCurriRes getThisCurriRes = curriService.getThisCurri(curriIdx, userIdx);
+            GetThisCurriRes getThisCurriRes = curriService.getThisCurri(curriIdx);
 
             return new BasicResponse<>(getThisCurriRes);
         } catch (BasicException exception) {
