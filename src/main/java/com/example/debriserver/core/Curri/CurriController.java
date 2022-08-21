@@ -376,7 +376,24 @@ public class CurriController {
      *  8.10.1 커리큘럼 좋아요(추천) top 10 리스트 조회 API
      *  [GET]: localhost:8521/api/curri/scrap/topList
      */
+    @ResponseBody
+    @GetMapping("/scrap/topList")
+    public BasicResponse<List<GetScrapTopListRes>> getScrapTopList(){
+        try{
+            String jwtToken = jwt.getJwt();
 
+            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            List<GetScrapTopListRes> getScrapTopListRes = curriService.getScrapTopList();
+
+            return new BasicResponse<>(getScrapTopListRes);
+
+        } catch (BasicException exception) {
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 
     /**
      *  8.11 커리큘럼 리셋 API
@@ -444,21 +461,46 @@ public class CurriController {
         }
     }
 
+    /**
+     *  8.13 커리큘럼 복붙 API
+     *  [POST]: localhost:8521/api/curri/copy
+     */
     @ResponseBody
-    @GetMapping("/scrap/topList")
-    public BasicResponse<List<GetScrapTopListRes>> getScrapTopList(){
+    @PostMapping("/copy")
+    public BasicResponse<String> curriCopy(@RequestBody PostCurriCopyReq postCurriCopyReq){
         try{
             String jwtToken = jwt.getJwt();
 
-            if (jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            List<GetScrapTopListRes> getScrapTopListRes = curriService.getScrapTopList();
+            if(curriService.curriCopy(postCurriCopyReq, userIdx)) throw new BasicException(CURRI_COPY_FAIL);
 
-            return new BasicResponse<>(getScrapTopListRes);
+            String result = "커리큘럼이 성공적으로 추가 되었습니다";
 
-        } catch (BasicException exception) {
+            return new BasicResponse<>(result);
+        } catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     *  8.14 최신 커리큘럼 리스트 조회 API
+     *  [GET]: localhost:8521/api/curri/getTopList
+     */
+    @ResponseBody
+    @GetMapping("getTopList")
+    public BasicResponse<List<GetLatestListRes>> getLatestList(){
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            List<GetLatestListRes> getLatestListResList = curriService.getLatestList();
+
+            return new BasicResponse<>(getLatestListResList);
+        } catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
         }
     }

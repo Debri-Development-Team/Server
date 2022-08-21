@@ -692,9 +692,14 @@ public class CurriDao {
                 userIdx
         };
 
+        System.out.println(c);
+
         if (count > 0) {
             int a = 3;
-            if ((c+2) - count > 0) a = (c+2) - count;
+            if (count < 3) a = count;
+            else if ((c+2) - count > 0) {
+                a = (c+2) - count;
+            }
             for (int i = 0; i < a; i++) {
                 Object[] getChapterParams = new Object[]{
                         curriIdx,
@@ -905,7 +910,7 @@ public class CurriDao {
      * 스크랩 Top10 리스트 추출
      * @return
      */
-    public List<GetScrapTopListRes> getScrapTopList() {
+    public List<GetScrapTopListRes> getScrapTopList(){
 
         String getCreatedAtQuery = "SELECT distinct UNIX_TIMESTAMP(c.createdAt)\n" +
                 "FROM Curriculum as c\n" +
@@ -913,7 +918,7 @@ public class CurriDao {
                 "WHERE c.curriIdx = ? AND c.status NOT IN ('DELETE');";
 
 
-        String get = "SELECT a.curriIdx,COUNT(*) as count, row_number() over (order by Count(*) DESC)ranking, b.curriName, b.curriAuthor ,b.visibleStatus , b.langTag, b.progressRate ,b.status FROM CurriScrap as a LEFT JOIN Curriculum as b on a.curriIdx = b.curriIdx  WHERE a.status ='ACTIVE' group by curriIdx order by COUNT(*) DESC limit 10 ";
+        String get = "SELECT a.curriIdx,COUNT(*) as count, row_number() over (order by Count(*) DESC)ranking, b.curriName, b.curriAuthor ,b.visibleStatus , b.langTag, b.progressRate ,b.status FROM CurriScrap as a LEFT JOIN Curriculum as b on a.curriIdx = b.curriIdx  WHERE a.status ='ACTIVE' group by curriIdx order by COUNT(*) DESC limit 10;";
 
 
         return this.jdbcTemplate.query(get,
@@ -931,4 +936,60 @@ public class CurriDao {
 
                 ));
     }
+
+    public List<GetLatestListRes> getLatestList(){
+        String getLatestListQuery = "SELECT curriIdx, curriName, curriAuthor, curriDesc, visibleStatus, langTag, progressRate, status, createdAt\n" +
+                "FROM Curriculum\n" +
+                "WHERE visibleStatus = 'ACTIVE'\n" +
+                "GROUP BY curriIdx\n" +
+                "ORDER BY createdAt DESC limit 5;";
+
+        return this.jdbcTemplate.query(getLatestListQuery,
+                (rs, rowNum) -> new GetLatestListRes(
+                        rs.getInt("curriIdx"),
+                        rs.getString("curriName"),
+                        rs.getString("curriAuthor"),
+                        rs.getString("curriDesc"),
+                        rs.getString("visibleStattus"),
+                        rs.getString("langTag"),
+                        rs.getFloat("progressRate"),
+                        rs.getString("status"),
+                        rs.getTimestamp("createdAt")
+                ));
+    }
+
+    public boolean curriCopy(PostCurriCopyReq postCurriCopyReq, int userIdx){
+
+        // 커리 복사해오기
+        String copyCurriQuery = "INSERT INTO Curriculum(curriAuthor, ownerIdx, curriName, visibleStatus, langTag, curriDesc, dDay, dDayAt)\n" +
+                "SELECT ?, ?, curriName, visibleStatus, langTag, curriDesc, dDay, dDayAt = DATE_ADD(NOW(), INTERVAL dDay DAY)\n" +
+                "FROM Curriculum WHERE curriIdx = ?;";
+
+        Object[] copyCurriParams = new Object[]{
+                postCurriCopyReq.getNickName(),
+                userIdx,
+                postCurriCopyReq.getCurriIdx()
+        };
+
+        int result = this.jdbcTemplate.update(copyCurriQuery, copyCurriParams);
+
+        String getCurriIdxQurey = "SELECT MAX(curriIdx) FROM Curriculum where ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
+
+        int curriIdx = this.jdbcTemplate.queryForObject(getCurriIdxQurey, int.class, userIdx);
+
+
+        // 챕터 복사해오기
+        String copyChapterQuery = "INSERT INTO Ch_Lecture_Curri(chIdx, lectureIdx, curriIdx, chComplete, lectureOrder, progressOrder)\n" +
+                "SELECT chIdx, lectureIdx, ?, 'FALSE', lectureOrder, progressOrder\n" +
+                "FROM Ch_Lecture_Curri WHERE curriIdx = ?";
+
+        Object[] copyChapterParams = new Object[]{
+                curriIdx,
+                postCurriCopyReq.getCurriIdx()
+        };
+
+        this.jdbcTemplate.update(copyChapterQuery, copyChapterParams);
+
+    }
+
 }
