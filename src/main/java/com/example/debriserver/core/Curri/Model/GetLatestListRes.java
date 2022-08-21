@@ -21,5 +21,5 @@ public class GetLatestListRes {
     private String langTag;
     private Float progressRate;
     private String status;
-    private Timestamp createdAt;
+    private int createdAt;
 }

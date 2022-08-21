@@ -283,7 +283,7 @@ public class CurriService {
         }
     }
 
-    public boolean curriCopy(PostCurriCopyReq postCurriCopyReq, int userIdx) throws BasicException{
+    public int curriCopy(PostCurriCopyReq postCurriCopyReq, int userIdx) throws BasicException{
         try{
             return curriDao.curriCopy(postCurriCopyReq, userIdx);
         } catch (Exception exception) {

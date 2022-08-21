@@ -467,7 +467,7 @@ public class CurriController {
      */
     @ResponseBody
     @PostMapping("/copy")
-    public BasicResponse<String> curriCopy(@RequestBody PostCurriCopyReq postCurriCopyReq){
+    public BasicResponse<PostCurriCopyRes> curriCopy(@RequestBody PostCurriCopyReq postCurriCopyReq){
         try{
             String jwtToken = jwt.getJwt();
 
@@ -475,9 +475,11 @@ public class CurriController {
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            if(curriService.curriCopy(postCurriCopyReq, userIdx)) throw new BasicException(CURRI_COPY_FAIL);
+            int copiedCurriIdx = curriService.curriCopy(postCurriCopyReq, userIdx);
 
-            String result = "커리큘럼이 성공적으로 추가 되었습니다";
+            if( copiedCurriIdx == -1) throw new BasicException(CURRI_COPY_FAIL);
+
+            PostCurriCopyRes result = new PostCurriCopyRes(true, copiedCurriIdx);
 
             return new BasicResponse<>(result);
         } catch (BasicException exception){
@@ -487,10 +489,10 @@ public class CurriController {
 
     /**
      *  8.14 최신 커리큘럼 리스트 조회 API
-     *  [GET]: localhost:8521/api/curri/getTopList
+     *  [GET]: localhost:8521/api/curri/getNewList
      */
     @ResponseBody
-    @GetMapping("getTopList")
+    @GetMapping("/getNewList")
     public BasicResponse<List<GetLatestListRes>> getLatestList(){
         try{
             String jwtToken = jwt.getJwt();

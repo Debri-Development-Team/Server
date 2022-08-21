@@ -357,7 +357,7 @@ public class CurriDao {
     }
 
     public List<GetCurriListRes> getList(int userIdx) {
-        String getCurriListQuery = "SELECT distinct c.curriIdx, c.curriName, c.curriAuthor, c.visibleStatus, c.langTag, c.progressRate, c.status\n" +
+        String getCurriListQuery = "SELECT distinct c.curriIdx, c.curriName, c.curriAuthor, c.visibleStatus, c.langTag, c.progressRate, c.status, c.curriDesc\n" +
                 "FROM Curriculum as c\n" +
                 "JOIN User as u\n" +
                 "WHERE u.userIdx = ? AND u.userIdx = c.ownerIdx AND c.status NOT IN ('DELETE');";
@@ -372,6 +372,7 @@ public class CurriDao {
                         rs.getInt("curriIdx"),
                         rs.getString("curriName"),
                         rs.getString("curriAuthor"),
+                        rs.getString("curriDesc"),
                         rs.getString("visibleStatus"),
                         rs.getString("langTag"),
                         rs.getFloat("progressRate"),
@@ -938,10 +939,9 @@ public class CurriDao {
     }
 
     public List<GetLatestListRes> getLatestList(){
-        String getLatestListQuery = "SELECT curriIdx, curriName, curriAuthor, curriDesc, visibleStatus, langTag, progressRate, status, createdAt\n" +
-                "FROM Curriculum\n" +
-                "WHERE visibleStatus = 'ACTIVE'\n" +
-                "GROUP BY curriIdx\n" +
+        String getLatestListQuery =
+                "SELECT curriIdx, curriName, curriAuthor, curriDesc, visibleStatus, langTag, progressRate, status, UNIX_TIMESTAMP(createdAt) \n" +
+                "FROM Curriculum WHERE visibleStatus = 'ACTIVE'\n" +
                 "ORDER BY createdAt DESC limit 5;";
 
         return this.jdbcTemplate.query(getLatestListQuery,
@@ -950,28 +950,42 @@ public class CurriDao {
                         rs.getString("curriName"),
                         rs.getString("curriAuthor"),
                         rs.getString("curriDesc"),
-                        rs.getString("visibleStattus"),
+                        rs.getString("visibleStatus"),
                         rs.getString("langTag"),
                         rs.getFloat("progressRate"),
                         rs.getString("status"),
-                        rs.getTimestamp("createdAt")
+                        rs.getInt("UNIX_TIMESTAMP(createdAt)")
                 ));
     }
 
-    public boolean curriCopy(PostCurriCopyReq postCurriCopyReq, int userIdx){
+    public int curriCopy(PostCurriCopyReq postCurriCopyReq, int userIdx){
 
         // 커리 복사해오기
-        String copyCurriQuery = "INSERT INTO Curriculum(curriAuthor, ownerIdx, curriName, visibleStatus, langTag, curriDesc, dDay, dDayAt)\n" +
-                "SELECT ?, ?, curriName, visibleStatus, langTag, curriDesc, dDay, dDayAt = DATE_ADD(NOW(), INTERVAL dDay DAY)\n" +
-                "FROM Curriculum WHERE curriIdx = ?;";
+        String copyCurriQuery =
+                "INSERT INTO Curriculum(curriAuthor, ownerIdx, curriName, visibleStatus, langTag, curriDesc, dDay, dDayAt)\n" +
+                "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+
+        String getTargetCurriInfo = "SELECT ? as curriAuthor, ? as ownerIdx, curriName, visibleStatus, langTag, curriDesc, dDay, DATE_ADD(NOW(), INTERVAL dDay DAY) as dDayAt FROM Curriculum WHERE curriIdx = ?;";
 
         Object[] copyCurriParams = new Object[]{
-                postCurriCopyReq.getNickName(),
+                postCurriCopyReq.getTargetOwnerNickName(),
                 userIdx,
-                postCurriCopyReq.getCurriIdx()
+                postCurriCopyReq.getTargetCurriIdx()
         };
 
-        int result = this.jdbcTemplate.update(copyCurriQuery, copyCurriParams);
+        Object[] targetCurriInfo = this.jdbcTemplate.queryForObject(getTargetCurriInfo,
+                (rs, rowNum) -> new Object[]{
+                        rs.getString("curriAuthor"),
+                        rs.getInt("ownerIdx"),
+                        rs.getString("curriName"),
+                        rs.getString("visibleStatus"),
+                        rs.getString("langTag"),
+                        rs.getString("curriDesc"),
+                        rs.getInt("dDay"),
+                        rs.getString("dDayAt")
+                }, copyCurriParams);
+
+        int result = this.jdbcTemplate.update(copyCurriQuery, targetCurriInfo);
 
         String getCurriIdxQurey = "SELECT MAX(curriIdx) FROM Curriculum where ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
 
@@ -980,16 +994,18 @@ public class CurriDao {
 
         // 챕터 복사해오기
         String copyChapterQuery = "INSERT INTO Ch_Lecture_Curri(chIdx, lectureIdx, curriIdx, chComplete, lectureOrder, progressOrder)\n" +
-                "SELECT chIdx, lectureIdx, ?, 'FALSE', lectureOrder, progressOrder\n" +
-                "FROM Ch_Lecture_Curri WHERE curriIdx = ?";
+                "SELECT chIdx, lectureIdx, ? as curriIdx , 'FALSE' as chComplete, lectureOrder, progressOrder FROM Ch_Lecture_Curri WHERE curriIdx = ?;";
 
         Object[] copyChapterParams = new Object[]{
                 curriIdx,
-                postCurriCopyReq.getCurriIdx()
+                postCurriCopyReq.getTargetCurriIdx()
         };
 
-        this.jdbcTemplate.update(copyChapterQuery, copyChapterParams);
+        int result2 = this.jdbcTemplate.update(copyChapterQuery, copyChapterParams);
 
+        if(result == 0 || result2 == 0) curriIdx = -1;
+
+        return curriIdx;
     }
 
 }

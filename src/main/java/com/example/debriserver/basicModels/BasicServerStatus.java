@@ -123,7 +123,7 @@ public enum BasicServerStatus {
     CURRI_MODIFY_FAIL(false, 7613, "커리큘럼 수정에 실패하였습니다"),
     CURRI_INSERT_FATL(false, 7614,"강의자료 추가에 실패하였습니다"),
     CURRI_RESET_FAIL(false, 7615, "커리큘럼 리셋에 실패하였습니다"),
-    CURRI_COPY_FAIL(false, 7616, "커리큘럼 복붙에 성공하였습니다");
+    CURRI_COPY_FAIL(false, 7616, "커리큘럼 복붙에 실패하였습니다");
 
     private final boolean isSuccess;
     private final int returnCode;

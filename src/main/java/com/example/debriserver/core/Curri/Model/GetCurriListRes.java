@@ -13,6 +13,7 @@ public class GetCurriListRes {
     private int curriIdx;
     private String curriName;
     private String curriAuthor;
+    private String curriDesc;
     private String visibleStatus;
     private String langTag;
     private Float progressRate;
