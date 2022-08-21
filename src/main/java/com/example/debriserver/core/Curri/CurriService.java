@@ -263,17 +263,33 @@ public class CurriService {
     }
 
     public List<GetScrapTopListRes> getScrapTopList() throws BasicException {
-
         try {
-
             List<GetScrapTopListRes> getScrapTopListRes = curriDao.getScrapTopList();
-
             return getScrapTopListRes;
-
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
 
     }
+
+    public List<GetLatestListRes> getLatestList() throws BasicException {
+        try{
+            List<GetLatestListRes> getLatestListResList = curriDao.getLatestList();
+            return getLatestListResList;
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public boolean curriCopy(PostCurriCopyReq postCurriCopyReq, int userIdx) throws BasicException{
+        try{
+            return curriDao.curriCopy(postCurriCopyReq, userIdx);
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
 }
