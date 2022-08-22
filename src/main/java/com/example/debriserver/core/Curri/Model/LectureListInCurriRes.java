@@ -24,4 +24,6 @@ public class LectureListInCurriRes {
 
     private String scrapStatus;
     private String likeStatus;
+
+    private int lectureLikeCount;
 }
