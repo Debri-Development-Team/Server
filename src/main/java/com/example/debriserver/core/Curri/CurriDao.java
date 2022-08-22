@@ -612,6 +612,10 @@ public class CurriDao {
                 "FROM Ch_Lecture_Curri\n" +
                 "WHERE lectureIdx = ?;";
 
+        String getLecturLikeCountQuery = "SELECT IFNULL(COUNT(status), 0)\n" +
+                "FROM lectureLike\n" +
+                "WHERE lectureIdx = ?;";
+
         int count = this.jdbcTemplate.queryForObject(getLectureCountQuery, int.class, curriIdx);
 
         List<LectureIdxList> lectureIdxLists = this.jdbcTemplate.query(getLectureIdxQuery,
@@ -651,7 +655,9 @@ public class CurriDao {
 
                         this.jdbcTemplate.queryForObject(getLectureScrapStatusQuery, String.class, getStatusParams),
 
-                        this.jdbcTemplate.queryForObject(getLectureLikeStatusQuery, String.class, getStatusParams)
+                        this.jdbcTemplate.queryForObject(getLectureLikeStatusQuery, String.class, getStatusParams),
+
+                        this.jdbcTemplate.queryForObject(getLecturLikeCountQuery, int.class, lectureIdx)
 
                 )), getLectureParams);
 
@@ -721,6 +727,9 @@ public class CurriDao {
                                 rs.getInt("progressOrder"),
                                 this.jdbcTemplate.queryForObject(getCompleteChNumQurey, int.class, getThisCurriParams)
                         ), getChapterParams);
+
+                System.out.println(chapterListInCurriRes);
+
                 getChapterListResList.add(i, chapterListInCurriRes);
 
                 c++;
@@ -741,6 +750,19 @@ public class CurriDao {
         String getCurriOwnerIdxQuery = "SELECT ownerIdx\n" +
                 "FROM Curriculum\n" +
                 "WHERE curriIdx = ?;";
+
+        String getCurriScrapCountQuery = "SELECT IFNULL(COUNT(scrapIdx), 0)\n" +
+                "FROM CurriScrap\n" +
+                "WHERE curriIdx = ?;";
+
+        String getCurriScrapStatusQuery = "SELECT\n" +
+                "    CASE\n" +
+                "        WHEN COUNT(status) = 0 THEN 'INACTIVE'\n" +
+                "        WHEN status = 'ACTIVE' THEN 'ACTIVE'\n" +
+                "        ELSE 'INACTIVE'\n" +
+                "    END\n" +
+                "FROM CurriScrap\n" +
+                "WHERE curriIdx = ? AND scrapUserIdx = ?;";
 
         int userIdx = this.jdbcTemplate.queryForObject(getCurriOwnerIdxQuery, int.class, curriIdx);
 
@@ -799,6 +821,11 @@ public class CurriDao {
                 curriAuthor
         };
 
+        Object[] getCurriScrapStatusParams = new Object[]{
+                curriIdx,
+                userIdx
+        };
+
         String Status = this.jdbcTemplate.queryForObject(getStatusQurey, String.class, getThisCurriParams);
 
         int dDayAt = this.jdbcTemplate.queryForObject(getDdayAtQuery, int.class, getThisCurriParams);
@@ -833,6 +860,10 @@ public class CurriDao {
             c = 0;
         }
 
+        System.out.println(totalDday);
+        System.out.println(dDay);
+        System.out.println(c);
+
         return this.jdbcTemplate.queryForObject(getThisCurriQurey, (rs, rowNum)
                 -> new GetThisCurriRes (
                 rs.getInt("curriIdx"),
@@ -846,7 +877,10 @@ public class CurriDao {
                 rs.getString("curriDesc"),
 
                 dDay,
-                this.jdbcTemplate.queryForObject(getCreatedAtQuery, Timestamp.class, rs.getInt("curriIdx")),
+                this.jdbcTemplate.queryForObject(getCreatedAtQuery, Timestamp.class, curriIdx),
+
+                this.jdbcTemplate.queryForObject(getCurriScrapCountQuery, int.class, curriIdx),
+                this.jdbcTemplate.queryForObject(getCurriScrapStatusQuery, String.class, getCurriScrapStatusParams),
 
                 lectureList(curriIdx, userIdx),
 
