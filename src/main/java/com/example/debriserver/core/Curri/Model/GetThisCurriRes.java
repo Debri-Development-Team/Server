@@ -27,7 +27,7 @@ public class GetThisCurriRes {
     private Timestamp createdAt;
 
     private int curriLikeCount;
-    private String curriListStatus;
+    private String curriLikeStatus;
 
     List<LectureListInCurriRes> lectureListResList;
 
