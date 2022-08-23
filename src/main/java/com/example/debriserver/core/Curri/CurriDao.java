@@ -584,7 +584,7 @@ public class CurriDao {
         return result;
     }
 
-    public List<LectureListInCurriRes> lectureList(int curriIdx, int userIdx){
+    public List<LectureListInCurriRes> lectureList(int curriIdx, int userIdx, int ownerIdx){
         LectureListInCurriRes listInCurriRes = null;
 
         String getLectureCountQuery = "SELECT COUNT(distinct lectureIdx)\n" +
@@ -600,11 +600,21 @@ public class CurriDao {
                 "LEFT JOIN Ch_Lecture_Curri as chlc on l.lectureIdx = chlc.lectureIdx\n" +
                 "WHERE chlc.curriIdx = ? and chlc.lectureIdx = ?;";
 
-        String getLectureScrapStatusQuery = "SELECT IFNULL(status, 'FALSE')\n" +
+        String getLectureScrapStatusQuery = "SELECT\n" +
+                "    CASE\n" +
+                "        WHEN COUNT(status) = 0 THEN 'INACTIVE'\n" +
+                "        WHEN status = 'ACTIVE' THEN 'ACTIVE'\n" +
+                "        ELSE 'INACTIVE'\n" +
+                "    END\n" +
                 "FROM LectureScrap\n" +
                 "WHERE userIdx = ? and lectureIdx = ?;";
 
-        String getLectureLikeStatusQuery = "SELECT IFNULL(status, 'FALSE')\n" +
+        String getLectureLikeStatusQuery = "SELECT\n" +
+                "    CASE\n" +
+                "        WHEN COUNT(status) = 0 THEN 'INACTIVE'\n" +
+                "        WHEN status = 'ACTIVE' THEN 'ACTIVE'\n" +
+                "        ELSE 'INACTIVE'\n" +
+                "    END\n" +
                 "FROM lectureLike\n" +
                 "WHERE userIdx = ? and lectureIdx = ?;";
 
@@ -670,7 +680,7 @@ public class CurriDao {
         return getLectureListResList;
     }
 
-    public List<ChapterListInCurriRes> chapterList(int curriIdx, int c, int userIdx){
+    public List<ChapterListInCurriRes> chapterList(int curriIdx, int c, int ownerIdx){
         List<ChapterListInCurriRes> getChapterListResList = new ArrayList<>();
         ChapterListInCurriRes chapterListInCurriRes;
 
@@ -696,7 +706,7 @@ public class CurriDao {
 
         Object[] getThisCurriParams = new Object[]{
                 curriIdx,
-                userIdx
+                ownerIdx
         };
 
         System.out.println(c);
@@ -711,7 +721,7 @@ public class CurriDao {
                 Object[] getChapterParams = new Object[]{
                         curriIdx,
                         c,
-                        userIdx
+                        ownerIdx
                 };
 
                 chapterListInCurriRes = this.jdbcTemplate.queryForObject(getChapterListQurey, (rs, rowNum)
@@ -739,7 +749,7 @@ public class CurriDao {
         return getChapterListResList;
     }
 
-    public GetThisCurriRes getThisCurri(int curriIdx) {
+    public GetThisCurriRes getThisCurri(int curriIdx, int userIdx) {
 
         String getCurriOwnerAuthorQuery = "SELECT curriAuthor\n" +
                 "FROM Curriculum\n" +
@@ -764,7 +774,7 @@ public class CurriDao {
                 "FROM CurriScrap\n" +
                 "WHERE curriIdx = ? AND scrapUserIdx = ?;";
 
-        int userIdx = this.jdbcTemplate.queryForObject(getCurriOwnerIdxQuery, int.class, curriIdx);
+        int ownerIdx = this.jdbcTemplate.queryForObject(getCurriOwnerIdxQuery, int.class, curriIdx);
 
         String getThisCurriQurey = "SELECT distinct curriIdx, curriName, visibleStatus, langTag, progressRate, status, completeAt, curriAuthor, curriDesc\n" +
                 "FROM Curriculum\n" +
@@ -877,14 +887,15 @@ public class CurriDao {
                 rs.getString("curriDesc"),
 
                 dDay,
+                totalDday,
                 this.jdbcTemplate.queryForObject(getCreatedAtQuery, Timestamp.class, curriIdx),
 
                 this.jdbcTemplate.queryForObject(getCurriScrapCountQuery, int.class, curriIdx),
                 this.jdbcTemplate.queryForObject(getCurriScrapStatusQuery, String.class, getCurriScrapStatusParams),
 
-                lectureList(curriIdx, userIdx),
+                lectureList(curriIdx, userIdx, ownerIdx),
 
-                chapterList(curriIdx, c, userIdx)
+                chapterList(curriIdx, c, ownerIdx)
         ), getThisCurriParams);
     }
 

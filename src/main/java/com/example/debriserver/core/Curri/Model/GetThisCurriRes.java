@@ -24,6 +24,7 @@ public class GetThisCurriRes {
     private String curriDesc;
 
     private int dDay;
+    private int totalDday;
     private Timestamp createdAt;
 
     private int curriLikeCount;
