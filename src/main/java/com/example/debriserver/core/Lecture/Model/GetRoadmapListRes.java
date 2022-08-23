@@ -15,4 +15,5 @@ public class GetRoadmapListRes {
     private String roadmapName;
     private String roadmapExplain;
     private String roadmapAuthor;
+    private String mod;
 }

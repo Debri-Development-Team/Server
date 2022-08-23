@@ -306,14 +306,17 @@ public class LectureDao {
      * 로드맵 리스트 조회
      * */
     public List<GetRoadmapListRes> getRoadmapList() {
-        String getListQuery = "SELECT roadMapIdx, roadMapName, roadMapExp, authorName FROM Roadmap;";
+        String getListQuery = "SELECT roadMapIdx,roadMapName, roadMapExp, authorName, requireDay,\n" +
+                "       IF(roadCategory = 'Back', 'server', 'front')\n" +
+                "FROM Roadmap;";
 
         return this.jdbcTemplate.query(getListQuery,
                 (rs, rowNum) -> new GetRoadmapListRes(
                         rs.getInt("roadMapIdx"),
                         rs.getString("roadMapName"),
                         rs.getString("roadMapExp"),
-                        rs.getString("authorName")
+                        rs.getString("authorName"),
+                        rs.getString("IF(roadCategory = 'Back', 'server', 'front')")
                 ));
     }
 
