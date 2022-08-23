@@ -739,7 +739,7 @@ public class CurriDao {
         return getChapterListResList;
     }
 
-    public GetThisCurriRes getThisCurri(int curriIdx) {
+    public GetThisCurriRes getThisCurri(int curriIdx, int userIdx) {
 
         String getCurriOwnerAuthorQuery = "SELECT curriAuthor\n" +
                 "FROM Curriculum\n" +
@@ -764,7 +764,7 @@ public class CurriDao {
                 "FROM CurriScrap\n" +
                 "WHERE curriIdx = ? AND scrapUserIdx = ?;";
 
-        int userIdx = this.jdbcTemplate.queryForObject(getCurriOwnerIdxQuery, int.class, curriIdx);
+        int ownerIdx = this.jdbcTemplate.queryForObject(getCurriOwnerIdxQuery, int.class, curriIdx);
 
         String getThisCurriQurey = "SELECT distinct curriIdx, curriName, visibleStatus, langTag, progressRate, status, completeAt, curriAuthor, curriDesc\n" +
                 "FROM Curriculum\n" +
@@ -877,6 +877,7 @@ public class CurriDao {
                 rs.getString("curriDesc"),
 
                 dDay,
+                totalDday,
                 this.jdbcTemplate.queryForObject(getCreatedAtQuery, Timestamp.class, curriIdx),
 
                 this.jdbcTemplate.queryForObject(getCurriScrapCountQuery, int.class, curriIdx),
