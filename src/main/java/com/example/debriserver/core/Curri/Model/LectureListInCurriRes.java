@@ -14,5 +14,16 @@ public class LectureListInCurriRes {
     private String lectureName;
     private String langTag;
     private int chNumber;
+
+    private String pricing;
+    private String type;
+
     private Float progressRate;
+
+    private int usedCount;
+
+    private String scrapStatus;
+    private String likeStatus;
+
+    private int lectureLikeCount;
 }
