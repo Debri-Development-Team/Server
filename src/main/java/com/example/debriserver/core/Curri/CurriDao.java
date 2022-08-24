@@ -223,15 +223,6 @@ public class CurriDao {
                 "INTO Ch_Lecture_Curri(chIdx, lectureIdx, curriIdx, lectureOrder, progressOrder)\n" +
                 "VALUES (?, ?, ?, ?, ?);";
 
-        String insertLectureRateQuery = "INSERT INTO Lecture_Rate(lectureIdx, userIdx) VALUES (?, ?);";
-
-        Object[] insertLectureRateParams = new Object[]{
-                postInsertLectureReq.getLectureIdx(),
-                userIdx
-        };
-
-        this.jdbcTemplate.update(insertLectureRateQuery, insertLectureRateParams);
-
         // 현재 해당 커리큘럼의 max progressOrder 및 lectureOrder 가져오기
         String getLastProgressOrder = "SELECT IFNULL(MAX(progressOrder),0)\n" +
                 "FROM Ch_Lecture_Curri as chlc\n" +
