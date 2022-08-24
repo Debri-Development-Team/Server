@@ -778,7 +778,7 @@ public class CurriDao {
 
         String getCurriScrapCountQuery = "SELECT IFNULL(COUNT(scrapIdx), 0)\n" +
                 "FROM CurriScrap\n" +
-                "WHERE curriIdx = ?;";
+                "WHERE curriIdx = ? and status = 'ACTIVE';";
 
         String getCurriScrapStatusQuery = "SELECT\n" +
                 "    CASE\n" +
