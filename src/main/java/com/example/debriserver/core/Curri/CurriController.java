@@ -337,6 +337,7 @@ public class CurriController {
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
+            if(curriService.checkScrapIdxExist(scrapIdx)== false) throw new BasicException(BasicServerStatus.UNSCRAP_Curri_fail);
             if(curriService.checkUnScrapedCurriExist(scrapIdx)== true) throw new BasicException(BasicServerStatus.UNSCRAP_Curri_EXIST);
 
             curriService.scrapCancel(scrapIdx);

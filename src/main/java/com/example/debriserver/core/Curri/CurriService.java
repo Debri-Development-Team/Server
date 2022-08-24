@@ -222,6 +222,16 @@ public class CurriService {
         }
     }
 
+    public boolean checkScrapIdxExist(int scrapIdx) throws BasicException {
+        try {
+            boolean result = curriDao.checkScrapIdxExist(scrapIdx);
+            return result;
+        } catch (Exception exception) {
+            System.out.println(exception.getMessage());
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
     public boolean checkUnScrapedCurriExist(int scrapIdx) throws BasicException {
         try {
             boolean result = curriDao.checkUnScrapedCurriExist(scrapIdx);
