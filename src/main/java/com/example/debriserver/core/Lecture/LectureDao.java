@@ -108,20 +108,12 @@ public class LectureDao {
      * 강의 상세 내용 조회
      * */
     public GetLectureRes getLecture(int lectureIdx, int userIdx) {
-        String updateQuery = "UPDATE Lecture SET chNumber = (SELECT COUNT(*) FROM (SELECT chIdx FROM Ch_Lecture WHERE lectureIdx = ?) as sub) WHERE lectureIdx = ?;";
         String getQuery = "SELECT lectureIdx, lectureName, lectureDesc, langTag, pricing, srcLink, type, chNumber, publisher FROM Lecture WHERE lectureIdx = ? and status = 'ACTIVE';";
         String getListQuery = "SELECT chIdx, lectureIdx, chName, chOrder FROM Chapter WHERE lectureIdx = ? and status = 'ACTIVE';";
         String usedCountQuery = "SELECT COUNT(*) FROM Ch_Lecture_Curri WHERE lectureIdx = ?;";
         String likeCountQuery = "SELECT COUNT(*) FROM lectureLike WHERE lectureIdx = ? and status = 'ACTIVE';";
         String checkLikeQuery = "SELECT EXISTS(SELECT * FROM lectureLike WHERE lectureIdx = ? and userIdx = ? and status = 'ACTIVE');";
         String scrapStatusQuery = "SELECT COUNT(status) FROM LectureScrap WHERE userIdx = ? and lectureIdx = ? and status = 'ACTIVE';";
-
-        Object[] updateParameter = new Object[]{
-                lectureIdx,
-                lectureIdx
-        };
-
-        this.jdbcTemplate.update(updateQuery, updateParameter);
 
         return this.jdbcTemplate.queryForObject(getQuery, (rs, rowNum)
                 -> new GetLectureRes(
