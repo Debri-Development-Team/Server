@@ -393,6 +393,21 @@ public class CurriDao {
                 deleteUserParams);
     }
 
+
+    /**
+     * scrapIdx 여부
+     * @param scrapIdx
+     * @return
+     */
+    public boolean checkScrapIdxExist(int scrapIdx) {
+        String checkQuery = "SELECT COUNT(*) FROM CurriScrap WHERE scrapIdx= ? and status ='ACTIVE'";
+
+        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, scrapIdx);
+
+        if(result == 0) return false;
+        else return true;
+    }
+
     /**
      * 스크랩한 커리큘럼 존재 유무
      * @param userIdx
@@ -874,6 +889,8 @@ public class CurriDao {
         System.out.println(dDay);
         System.out.println(c);
 
+        String getScrapIdx = "SELECT CASE WHEN COUNT(scrapIdx) = 0 THEN 0 ELSE scrapIdx END FROM CurriScrap WHERE curriIdx = ? AND scrapUserIdx = ?";
+
         return this.jdbcTemplate.queryForObject(getThisCurriQurey, (rs, rowNum)
                 -> new GetThisCurriRes (
                 rs.getInt("curriIdx"),
@@ -895,7 +912,10 @@ public class CurriDao {
 
                 lectureList(curriIdx, userIdx, ownerIdx),
 
-                chapterList(curriIdx, c, ownerIdx)
+                chapterList(curriIdx, c, ownerIdx),
+
+                this.jdbcTemplate.queryForObject(getScrapIdx, int.class,curriIdx,userIdx)
+
         ), getThisCurriParams);
     }
 
