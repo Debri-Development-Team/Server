@@ -33,4 +33,6 @@ public class GetThisCurriRes {
     List<LectureListInCurriRes> lectureListResList;
 
     List<ChapterListInCurriRes> chapterListResList;
+
+    private int scrapIdx;
 }
