@@ -268,9 +268,9 @@ public class CurriDao {
         int lastProgressOrder = this.jdbcTemplate.queryForObject(getLastProgressOrder, int.class, getLastOrderParams);
         int chNum = this.jdbcTemplate.queryForObject(getChNumQurey, int.class, postInsertLectureReq.getLectureIdx());
 
-//        System.out.println(lastLectureOrder);
-//        System.out.println(lastProgressOrder);
-//        System.out.println(chNum);
+        System.out.println(lastLectureOrder);
+        System.out.println(lastProgressOrder);
+        System.out.println(chNum);
 
         for (int i = 1; i <= chNum; i++){
 
@@ -282,7 +282,7 @@ public class CurriDao {
 
             int chIdx = this.jdbcTemplate.queryForObject(getChIdxQurey, int.class, getChIdxParams);
 
-//            System.out.println(chIdx);
+            System.out.println(chIdx);
 
             Object[] insertLectureParams = new Object[] {
                     chIdx,
@@ -292,7 +292,7 @@ public class CurriDao {
                     lastProgressOrder + i
             };
 
-//            System.out.println(Arrays.toString(insertLectureParams));
+            System.out.println(Arrays.toString(insertLectureParams));
 
             this.jdbcTemplate.update(insertLectureQuery, insertLectureParams);
         }
@@ -391,6 +391,21 @@ public class CurriDao {
         int deleteUserParams = scrapIdx;
         return this.jdbcTemplate.update(deleteUserQuery,
                 deleteUserParams);
+    }
+
+
+    /**
+     * scrapIdx 여부
+     * @param scrapIdx
+     * @return
+     */
+    public boolean checkScrapIdxExist(int scrapIdx) {
+        String checkQuery = "SELECT COUNT(*) FROM CurriScrap WHERE scrapIdx= ? and status ='ACTIVE'";
+
+        int result = this.jdbcTemplate.queryForObject(checkQuery, int.class, scrapIdx);
+
+        if(result == 0) return false;
+        else return true;
     }
 
     /**
@@ -874,6 +889,8 @@ public class CurriDao {
         System.out.println(dDay);
         System.out.println(c);
 
+        String getScrapIdx = "SELECT CASE WHEN COUNT(scrapIdx) = 0 THEN 0 ELSE scrapIdx END FROM CurriScrap WHERE curriIdx = ? AND scrapUserIdx = ?";
+
         return this.jdbcTemplate.queryForObject(getThisCurriQurey, (rs, rowNum)
                 -> new GetThisCurriRes (
                 rs.getInt("curriIdx"),
@@ -895,7 +912,10 @@ public class CurriDao {
 
                 lectureList(curriIdx, userIdx, ownerIdx),
 
-                chapterList(curriIdx, c, ownerIdx)
+                chapterList(curriIdx, c, ownerIdx),
+
+                this.jdbcTemplate.queryForObject(getScrapIdx, int.class,curriIdx,userIdx)
+
         ), getThisCurriParams);
     }
 
