@@ -268,9 +268,9 @@ public class CurriDao {
         int lastProgressOrder = this.jdbcTemplate.queryForObject(getLastProgressOrder, int.class, getLastOrderParams);
         int chNum = this.jdbcTemplate.queryForObject(getChNumQurey, int.class, postInsertLectureReq.getLectureIdx());
 
-//        System.out.println(lastLectureOrder);
-//        System.out.println(lastProgressOrder);
-//        System.out.println(chNum);
+        System.out.println(lastLectureOrder);
+        System.out.println(lastProgressOrder);
+        System.out.println(chNum);
 
         for (int i = 1; i <= chNum; i++){
 
@@ -282,7 +282,7 @@ public class CurriDao {
 
             int chIdx = this.jdbcTemplate.queryForObject(getChIdxQurey, int.class, getChIdxParams);
 
-//            System.out.println(chIdx);
+            System.out.println(chIdx);
 
             Object[] insertLectureParams = new Object[] {
                     chIdx,
@@ -292,7 +292,7 @@ public class CurriDao {
                     lastProgressOrder + i
             };
 
-//            System.out.println(Arrays.toString(insertLectureParams));
+            System.out.println(Arrays.toString(insertLectureParams));
 
             this.jdbcTemplate.update(insertLectureQuery, insertLectureParams);
         }
