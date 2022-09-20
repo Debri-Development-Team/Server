@@ -32,10 +32,6 @@ public class BoardService {
             throw new BasicException(BOARD_NOT_EXIST);
         }
 
-        if (boardProvider.checkUserExist(userIdx) == 0) {
-            throw new BasicException(USERS_EMPTY_USER_ID);
-        }
-
         try {
             if (boardProvider.checkBoardSubsExist(boardIdx, userIdx) == 0) {
 
