@@ -32,37 +32,27 @@ public class BoardService {
             throw new BasicException(BOARD_NOT_EXIST);
         }
 
-        if (boardProvider.checkUserExist(userIdx) == 0) {
-            throw new BasicException(USERS_EMPTY_USER_ID);
+        if (boardProvider.checkBoardSubsExist(boardIdx, userIdx) == 0) {
+
+            int result = boardDao.insertBoardSubs(boardIdx, userIdx);
+            if (result == 0) {
+                throw new BasicException(BOARD_INSERT_FAIL);
+            }
+        }
+        else if(!boardProvider.checkUnscrapExist(boardIdx, userIdx)){
+
+            int result2 = boardDao.scrapBoard(boardIdx, userIdx);
+            if (result2 == 0) {
+                throw new BasicException(BOARD_SCRAP_FAIL);
+            }
+        }
+        else {
+            throw new BasicException(SCRAP_BOARD_EXIST);
         }
 
         try {
-            if (boardProvider.checkBoardSubsExist(boardIdx, userIdx) == 0) {
 
-                int result = boardDao.insertBoardSubs(boardIdx, userIdx);
-                if (result == 0) {
-                    throw new BasicException(BOARD_INSERT_FAIL);
-                }
-
-                int result2 = boardDao.scrapBoard(boardIdx, userIdx);
-                if (result2 == 0) {
-                    throw new BasicException(BOARD_SCRAP_FAIL);
-                }
-            }
-            else if(!boardProvider.checkUnscrapExist(boardIdx, userIdx)){
-
-                int result2 = boardDao.scrapBoard(boardIdx, userIdx);
-                if (result2 == 0) {
-                    throw new BasicException(BOARD_SCRAP_FAIL);
-                }
-            }
-            else {
-                throw new BasicException(SCRAP_BOARD_EXIST);
-            }
-        } catch (BasicException e) {
-            System.out.println(e.getStatus());
-            throw new BasicException(e.getStatus());
-        }catch (Exception e){
+        } catch (Exception e){
             throw new BasicException(DB_ERROR);
         }
     }
