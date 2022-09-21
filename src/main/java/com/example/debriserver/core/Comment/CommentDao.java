@@ -219,7 +219,7 @@ public class CommentDao {
                                         rs.getString("authorName"),
                                         this.jdbcTemplate.queryForObject(checkLikeStatusQuery, int.class, userIdx, rs.getInt("commentIdx")) == 1,
                                         this.jdbcTemplate.queryForObject(likeNumberCountQuery, int.class, rs.getInt("commentIdx"))
-                                ), postIdx
+                                ), postIdx, userIdx
                 );
     }
 

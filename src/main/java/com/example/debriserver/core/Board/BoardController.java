@@ -109,11 +109,6 @@ public class BoardController {
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            if(boardProvider.checkUserExist(userIdx) == 0)
-            {
-                throw new BasicException(USERS_EMPTY_USER_ID);
-            }
-
             List<GetUnscrapBoardListRes> getUnscrapBoardListResList = boardProvider.getList(userIdx);
 
             return new BasicResponse<>(getUnscrapBoardListResList);
