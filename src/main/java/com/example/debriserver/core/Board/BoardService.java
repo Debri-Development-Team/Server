@@ -85,16 +85,15 @@ public class BoardService {
 
     public List<GetScrapBoardListRes> getScrapBoardList(int userIdx) throws BasicException {
 
-        if(boardDao.countScrapBoardList(userIdx) > 0) {
-            if (boardProvider.checkUserExist(userIdx) == 0) {
-                throw new BasicException(USERS_EMPTY_USER_ID);
+        try {
+            if (boardDao.countScrapBoardList(userIdx) > 0) {
+                List<GetScrapBoardListRes> getScrapBoardListRes = boardDao.getScrapBoardList(userIdx);
+                return getScrapBoardListRes;
+            } else {
+                throw new BasicException(BOARD_GET_SCRAP_LIST_FAIL);
             }
-
-            List<GetScrapBoardListRes> getScrapBoardListRes = boardDao.getScrapBoardList(userIdx);
-            return getScrapBoardListRes;
-        }
-        else {
-            throw new BasicException(BOARD_GET_SCRAP_LIST_FAIL);
+        } catch (Exception exception) {
+            throw new BasicException(DB_ERROR);
         }
     }
 
