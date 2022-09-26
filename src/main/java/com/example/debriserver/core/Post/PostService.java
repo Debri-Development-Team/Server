@@ -34,10 +34,6 @@ public class PostService {
 
             int postIdx = postDao.insertPosts(postPostsReq);
 
-           /* for (int i = 0; i < postPostsReq.getPostImgUrls().size(); i++) {
-                postDao.insertPostsImgs(postIdx, postPostsReq.getPostImgUrls().get(i));
-            }*/
-
             return new PostPostsRes(postIdx);
         }
         catch (Exception exception) {
@@ -69,11 +65,11 @@ public class PostService {
 
     public void deletePost(int postIdx) throws BasicException {
 
+        if (postProvider.checkPostExist(postIdx) == 0) {
+            throw new BasicException(POSTS_EMPTY_POST_ID);
+        }
+        
         try{
-
-            if (postProvider.checkPostExist(postIdx) == 0) {
-                throw new BasicException(POSTS_EMPTY_POST_ID);
-            }
 
             int result = postDao.deletePost(postIdx);
             if (result == 0) {
@@ -135,12 +131,6 @@ public class PostService {
             throw new BasicException(POSTS_EMPTY_POST_ID);
         }
 
-        // userIdx가 User table에 존재하는지 확인
-        if(postProvider.checkUserExist(userIdx) == 0)
-        {
-            throw new BasicException(USERS_EMPTY_USER_ID);
-        }
-
         // 데이터가 PostMarked table에 존재하지 않는 경우
         if(postProvider.checkPostMarkedExist(postIdx, userIdx) == 0)
         {
@@ -162,15 +152,8 @@ public class PostService {
     public void unScrapPost(int postIdx, int userIdx) throws BasicException
     {
         // postIdx가 Post table에 존재하는지 확인
-        if(postProvider.checkPostExist(postIdx) == 0)
-        {
+        if(postProvider.checkPostExist(postIdx) == 0) {
             throw new BasicException(POSTS_EMPTY_POST_ID);
-        }
-
-        // userIdx가 User table에 존재하는지 확인
-        if(postProvider.checkUserExist(userIdx) == 0)
-        {
-            throw new BasicException(USERS_EMPTY_USER_ID);
         }
 
         // 데이터가 PostMarked table에 존재하지 않는 경우
@@ -191,11 +174,6 @@ public class PostService {
 
     public List<GetScrapRes> getScrapPosts(int userIdx) throws BasicException
     {
-        // userIdx가 User table에 존재하는지 확인
-        if(postProvider.checkUserExist(userIdx) == 0)
-        {
-            throw new BasicException(USERS_EMPTY_USER_ID);
-        }
 
         List<GetScrapRes> getPosts = postDao.getScrapPosts(userIdx);
         return getPosts;
