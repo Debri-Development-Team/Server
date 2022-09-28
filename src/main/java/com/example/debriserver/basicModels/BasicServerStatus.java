@@ -52,6 +52,7 @@ public enum BasicServerStatus {
     POST_USERS_EMPTY_EMAIL(false, 3020, "이메일을 입력해주세요."),
     POST_USERS_EMPTY_PASSWORD(false, 3021, "비밀번호를 입력해주세요."),
     POST_USERS_INVALID_EMAIL(false, 3022, "이메일 형식을 확인해주세요."),
+    POST_SCRAP_INVALID_POSTIDX(false, 3023, "해당 postIdx가 PostMarked 테이블에 존재하지 않습니다."),
 
     // [USER]
     POST_USERS_INCORRECT_PASSWORD(false,3023,"비밀번호가 일치하지 않습니다."),
