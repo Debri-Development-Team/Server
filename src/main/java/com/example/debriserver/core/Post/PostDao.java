@@ -217,9 +217,9 @@ public class PostDao {
                 "                (SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = p.postIdx and status = 'ACTIVE') as commentCont\n" +
                 "FROM Post as p\n" +
                 "         LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
-                "         LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = ? AND ru.status = 'BLOCK'\n" +
-                "         LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = ?\n" +
-                "         LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = ?\n" +
+                "         LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
+                "         LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
+                "         LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "         LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
                 "WHERE p.status = 'ACTIVE' AND b.boardIdx = ? AND reportedUserIdx is null";
 
@@ -248,7 +248,7 @@ public class PostDao {
                 "                (SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = p.postIdx and status = 'ACTIVE') as commentCont\n" +
                 "FROM Post as p\n" +
                 "    LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
-                "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = ? AND ru.status = 'BLOCK'\n" +
+                "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
                 "    LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
@@ -334,7 +334,7 @@ public class PostDao {
                 "                (SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = p.postIdx and status = 'ACTIVE') as commentCont\n" +
                 "FROM Post as p\n" +
                 "    LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
-                "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = ? AND ru.status = 'BLOCK'\n" +
+                "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
                 "    LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
