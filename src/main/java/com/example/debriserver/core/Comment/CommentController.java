@@ -184,7 +184,7 @@ public class CommentController {
 
             int userIdx = jwt.getUserIdx(jwtToken);
             //댓글이 존재하는지
-            if(commentProvider.commentExist(commentIdx, userIdx)) throw new BasicException(BasicServerStatus.COMMENT_NOT_EXIST_ERROR);
+            if(commentProvider.commentExist(commentIdx)) throw new BasicException(BasicServerStatus.COMMENT_NOT_EXIST_ERROR);
             //이미 좋아요를 눌렀는지
             //if(commentService.commentLikeExist(commentIdx, userIdx)) throw new BasicException(BasicServerStatus.ALREADY_COMMENT_LIKE);
             //본인이 작성한 댓글인지
@@ -212,7 +212,7 @@ public class CommentController {
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            if(commentProvider.commentExist(commentIdx, userIdx)) throw new BasicException(BasicServerStatus.COMMENT_NOT_EXIST_ERROR);
+            if(commentProvider.commentExist(commentIdx)) throw new BasicException(BasicServerStatus.COMMENT_NOT_EXIST_ERROR);
 
             return new BasicResponse<>(commentService.deleteCommentLike(userIdx, commentIdx));
         }catch (BasicException exception){

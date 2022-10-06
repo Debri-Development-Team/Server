@@ -40,9 +40,9 @@ public class CommentProvider {
         }
     }
 
-    public boolean commentExist(int commentIdx, int userIdx) throws BasicException{
+    public boolean commentExist(int commentIdx) throws BasicException{
         try{
-            return commentDao.commentExist(commentIdx, userIdx);
+            return commentDao.commentExist(commentIdx);
         }catch (Exception exception){
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
