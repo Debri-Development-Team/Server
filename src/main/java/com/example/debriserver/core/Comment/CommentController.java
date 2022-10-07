@@ -46,14 +46,14 @@ public class CommentController {
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
+            if(postReplyOnPostReq.getContent().length() > 5000){
+                throw new BasicException(BasicServerStatus.COMMENT_TOO_LONG_ERROR);
+            }
+
             if(commentProvider.checkPostDeleted(postReplyOnPostReq.getPostIdx())){
                 throw new BasicException(BasicServerStatus.COMMENT_POST_DELETED_ERROR);
             }
             PostReplyOnPostRes postReplyOnPostRes = commentService.createReplyOnPost(postReplyOnPostReq);
-
-            if(postReplyOnPostReq.getContent().length() > 5000){
-                throw new BasicException(BasicServerStatus.COMMENT_TOO_LONG_ERROR);
-            }
 
             return new BasicResponse<>(postReplyOnPostRes);
         }catch (BasicException exception){
@@ -73,15 +73,15 @@ public class CommentController {
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
+            if(postReplyOnReplyReq.getContent().length() > 5000){
+                throw new BasicException(BasicServerStatus.COMMENT_TOO_LONG_ERROR);
+            }
+
             if(commentProvider.checkCommentDeleted(postReplyOnReplyReq.getRootCommentIdx())){
                 throw new BasicException(BasicServerStatus.ROOT_COMMENT_DELETED_ERROR);
             }
 
             PostReplyOnReplyRes postReplyOnReplyRes = commentService.createReplyOnReply(postReplyOnReplyReq);
-
-            if(postReplyOnReplyReq.getContent().length() > 5000){
-                throw new BasicException(BasicServerStatus.COMMENT_TOO_LONG_ERROR);
-            }
 
             return new BasicResponse<>(postReplyOnReplyRes);
         }catch (BasicException exception){
