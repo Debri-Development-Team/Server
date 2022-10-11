@@ -195,13 +195,18 @@ public class CommentDao {
 
     public List<GetCommentRes> getComment(int postIdx, int userIdx){
         String getListQuery =
-                "SELECT Comment.commentIdx, userIdx, postIdx, authorName, class, commentOrder, groupNum, commentContent\n" +
+                "SELECT Comment.commentIdx, userIdx, postIdx, authorName, class, commentOrder, groupNum, commentContent,\n" +
+                        "    (SELECT TIMESTAMPDIFF(minute, Comment.commentIdx, CURRENT_TIMESTAMP)) as timeAfterCreated,\n" +
+                        "    (SELECT exists(SELECT * FROM CommentLike WHERE userIdx = ? and Comment.commentIdx and status = 'ACTIVE')) as likeStatus,\n" +
+                        "    (SELECT COUNT(*) FROM CommentLike WHERE Comment.commentIdx and status = 'ACTIVE') as likeCount\n" +
                         "FROM Comment LEFT JOIN ReportedComment RC on Comment.commentIdx = RC.commentIdx\n" +
                         "WHERE postIdx = ? and Comment.status = 'ACTIVE' and (reportUserIdx != ? or reportUserIdx is null);";
 
-        String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Comment WHERE commentIdx = ?), CURRENT_TIMESTAMP);";
-        String checkLikeStatusQuery = "SELECT exists(SELECT * FROM CommentLike WHERE userIdx = ? and commentIdx = ? and status = 'ACTIVE');";
-        String likeNumberCountQuery = "SELECT COUNT(*) FROM CommentLike WHERE commentIdx = ? and status = 'ACTIVE';";
+        Object[] getListParam = new Object[]{
+                userIdx,
+                postIdx,
+                userIdx
+        };
 
         return this.jdbcTemplate.query
                 (
@@ -214,12 +219,12 @@ public class CommentDao {
                                         rs.getInt("class"),
                                         rs.getInt("commentOrder"),
                                         rs.getInt("groupNum"),
-                                        this.jdbcTemplate.queryForObject(getTimeQuery, int.class, rs.getInt("commentIdx")),
+                                        rs.getInt("timeAfterCreated"),
                                         rs.getString("commentContent"),
                                         rs.getString("authorName"),
-                                        this.jdbcTemplate.queryForObject(checkLikeStatusQuery, int.class, userIdx, rs.getInt("commentIdx")) == 1,
-                                        this.jdbcTemplate.queryForObject(likeNumberCountQuery, int.class, rs.getInt("commentIdx"))
-                                ), postIdx, userIdx
+                                        rs.getInt("likeStatus") == 1,
+                                        rs.getInt("likeCount")
+                                ), getListParam
                 );
     }
 
