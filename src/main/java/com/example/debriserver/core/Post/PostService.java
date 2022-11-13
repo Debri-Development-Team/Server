@@ -34,10 +34,6 @@ public class PostService {
 
             int postIdx = postDao.insertPosts(postPostsReq);
 
-           /* for (int i = 0; i < postPostsReq.getPostImgUrls().size(); i++) {
-                postDao.insertPostsImgs(postIdx, postPostsReq.getPostImgUrls().get(i));
-            }*/
-
             return new PostPostsRes(postIdx);
         }
         catch (Exception exception) {
@@ -69,11 +65,11 @@ public class PostService {
 
     public void deletePost(int postIdx) throws BasicException {
 
+        if (postProvider.checkPostExist(postIdx) == 0) {
+            throw new BasicException(POSTS_EMPTY_POST_ID);
+        }
+        
         try{
-
-            if (postProvider.checkPostExist(postIdx) == 0) {
-                throw new BasicException(POSTS_EMPTY_POST_ID);
-            }
 
             int result = postDao.deletePost(postIdx);
             if (result == 0) {
@@ -135,23 +131,35 @@ public class PostService {
             throw new BasicException(POSTS_EMPTY_POST_ID);
         }
 
-        // userIdx가 User table에 존재하는지 확인
-        if(postProvider.checkUserExist(userIdx) == 0)
-        {
-            throw new BasicException(USERS_EMPTY_USER_ID);
-        }
-
         // 데이터가 PostMarked table에 존재하지 않는 경우
         if(postProvider.checkPostMarkedExist(postIdx, userIdx) == 0)
         {
-            // PostMarked에 데이터를 추가하는 함수
-            int result = postDao.insertPostMarked(postIdx, userIdx);
+            try{
+                // PostMarked에 데이터를 추가하는 함수
+                int result = postDao.insertPostMarked(postIdx, userIdx);
+                if (result == 0)
+                {
+                    throw new BasicException(DB_ERROR);
+                }
+            } catch (Exception e)
+            {
+                throw new BasicException(DB_ERROR);
+            }
         }
         // 데이터가 PostMarked table에 이미 존재하는 경우
         else
         {
-            // status를 ACTIVE로 바꾸는 함수
-            int result = postDao.scrapPost(postIdx, userIdx);
+            try{
+                // status를 ACTIVE로 바꾸는 함수
+                int result = postDao.scrapPost(postIdx, userIdx);
+                if (result == 0)
+                {
+                    throw new BasicException(DB_ERROR);
+                }
+            } catch (Exception e)
+            {
+                throw new BasicException(DB_ERROR);
+            }
         }
     }
 
@@ -166,36 +174,32 @@ public class PostService {
         {
             throw new BasicException(POSTS_EMPTY_POST_ID);
         }
-
-        // userIdx가 User table에 존재하는지 확인
-        if(postProvider.checkUserExist(userIdx) == 0)
-        {
-            throw new BasicException(USERS_EMPTY_USER_ID);
-        }
-
-        // 데이터가 PostMarked table에 존재하지 않는 경우
+        
+        // 데이터가 PostMarked table에 존재하지 않는 경우 해당 postIdx가 PostMarked 테이블에 존재하지 않음을 전달
         if(postProvider.checkPostMarkedExist(postIdx, userIdx) == 0)
         {
-            // PostMarked에 데이터를 추가 -> status를 INACTIVE로 변경
-            int result = postDao.insertPostMarked(postIdx, userIdx);
-            int result2 = postDao.unScrapPost(postIdx, userIdx);
+            throw new BasicException(POST_SCRAP_INVALID_POSTIDX);
         }
         // 데이터가 PostMarked table에 이미 존재하는 경우
         else
         {
-            // status를 INACTIVE로 바꾸는 함수
-            int result = postDao.unScrapPost(postIdx, userIdx);
+            try{
+                // status를 INACTIVE로 바꾸는 함수
+                int result = postDao.unScrapPost(postIdx, userIdx);
+                if (result == 0)
+                {
+                    throw new BasicException(DB_ERROR);
+                }
+            } catch (Exception e)
+            {
+                throw new BasicException(DB_ERROR);
+            }
         }
     }
 
 
     public List<GetScrapRes> getScrapPosts(int userIdx) throws BasicException
     {
-        // userIdx가 User table에 존재하는지 확인
-        if(postProvider.checkUserExist(userIdx) == 0)
-        {
-            throw new BasicException(USERS_EMPTY_USER_ID);
-        }
 
         List<GetScrapRes> getPosts = postDao.getScrapPosts(userIdx);
         return getPosts;

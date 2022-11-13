@@ -46,10 +46,6 @@ public class PostController {
                 return new BasicResponse<>(BasicServerStatus.POST_TOO_LONG_CONTENTS);
             }
 
-            /*if (postPostsReq.getPostImgUrls().size() < 1) {
-                return new BasicResponse<>(BasicServerStatus.POST_EMPTY_IMG_URL);
-            }*/
-
             PostPostsRes postPostsRes = postService.createPosts(postPostsReq);
             return new BasicResponse<>(postPostsRes);
         } catch(BasicException exception){
