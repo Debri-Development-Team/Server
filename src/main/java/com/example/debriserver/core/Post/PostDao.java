@@ -147,17 +147,17 @@ public class PostDao {
      **/
     public List<GetScrapRes> getScrapPosts(int userIdx)
     {
-        String getScrapPostsQuery = "SELECT p.postIdx, p.boardIdx, u.nickname, p.postName, pl.likeStatus, pm.status as scrapStatus,\n" +
+        String getScrapPostsQuery = "(SELECT p.postIdx, p.boardIdx, u.nickname, p.postName, pl.likeStatus, pm.status as scrapStatus,\n" +
                 "       (SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = p.postIdx and likeStatus = 'LIKE') as cntPost,\n" +
                 "       TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = p.postIdx), CURRENT_TIMESTAMP) as postCreatedAt,\n" +
                 "       (SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = p.postIdx and status = 'ACTIVE') as cntComment,\n" +
-                "       (SELECT boardName FROM Board WHERE boardIdx = p.boardIdx) as boardName\n" +
+                "       (SELECT boardName FROM Board WHERE boardIdx = p.boardIdx) as boardName) order by p.postIdx LIMIT 12 * (pageNum - 1) 12\n" +
                 "FROM Post as p\n" +
                 "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
                 "    LEFT JOIN PostLike as pl on p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN User as u on p.userIdx = u.userIdx\n" +
-                "WHERE p.status = 'ACTIVE' AND pm.status = 'ACTIVE' AND reportedUserIdx is null;";
+                "WHERE p.status = 'ACTIVE' AND pm.status = 'ACTIVE' AND reportedUserIdx is null";
 
         return this.jdbcTemplate.query(getScrapPostsQuery,
                 (rs, rowNum) -> new GetScrapRes(
