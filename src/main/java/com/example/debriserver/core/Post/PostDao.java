@@ -145,33 +145,38 @@ public class PostDao {
     /**
      * 유저가 스크랩한 글
      **/
-    public List<GetScrapRes> getScrapPosts(int userIdx)
+    public List<GetScrapRes> getScrapPosts(int userIdx, int pageNum)
     {
-        String getScrapPostsQuery = "(SELECT p.postIdx, p.boardIdx, u.nickname, p.postName, pl.likeStatus, pm.status as scrapStatus,\n" +
+        int idx = 12 * (pageNum - 1);
+
+        String getScrapPostsQuery = "SELECT p.postIdx, p.boardIdx, u.nickname, p.postName, pl.likeStatus, pm.status as scrapStatus,\n" +
                 "       (SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = p.postIdx and likeStatus = 'LIKE') as cntPost,\n" +
                 "       TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = p.postIdx), CURRENT_TIMESTAMP) as postCreatedAt,\n" +
                 "       (SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = p.postIdx and status = 'ACTIVE') as cntComment,\n" +
-                "       (SELECT boardName FROM Board WHERE boardIdx = p.boardIdx) as boardName) order by p.postIdx LIMIT 12 * (pageNum - 1) 12\n" +
+                "       (SELECT boardName FROM Board WHERE boardIdx = p.boardIdx) as boardName\n" +
                 "FROM Post as p\n" +
                 "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
                 "    LEFT JOIN PostLike as pl on p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN User as u on p.userIdx = u.userIdx\n" +
-                "WHERE p.status = 'ACTIVE' AND pm.status = 'ACTIVE' AND reportedUserIdx is null";
+                "WHERE p.status = 'ACTIVE' AND pm.status = 'ACTIVE' AND reportedUserIdx is null\n" +
+                "order by p.postIdx LIMIT ?, 12";
 
         return this.jdbcTemplate.query(getScrapPostsQuery,
-                (rs, rowNum) -> new GetScrapRes(
-                        rs.getInt("postIdx"),
-                        rs.getInt("boardIdx"),
-                        rs.getString("nickName"),
-                        rs.getString("postName"),
-                        rs.getString("likeStatus"),
-                        rs.getString("scrapStatus"),
-                        rs.getInt("cntPost"),
-                        rs.getInt("postCreatedAt"),
-                        rs.getInt("cntComment"),
-                        rs.getString("boardName")
-                ));
+                (rs, rowNum) -> new GetScrapRes
+                        (
+                            rs.getInt("postIdx"),
+                            rs.getInt("boardIdx"),
+                            rs.getString("nickName"),
+                            rs.getString("postName"),
+                            rs.getString("likeStatus"),
+                            rs.getString("scrapStatus"),
+                            rs.getInt("cntPost"),
+                            rs.getInt("postCreatedAt"),
+                            rs.getInt("cntComment"),
+                            rs.getString("boardName")
+                        ),
+                idx);
     }
 
     public int insertPostLike(PostPostLikeReq postPostLikeReq) {
@@ -208,7 +213,8 @@ public class PostDao {
         return this.jdbcTemplate.update(insertPostLikeQuery, insertPostLikeParams);
     }
     
-    public List<GetPostListRes> getPostList(int userIdx, int boardIdx){
+    public List<GetPostListRes> getPostList(int userIdx, int boardIdx, int pageNum){
+        int idx = 12 * (pageNum - 1);
 
         String getListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus,\n" +
                 "                pm.status as scrapStatus, b.boardName,\n" +
@@ -221,7 +227,8 @@ public class PostDao {
                 "         LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
                 "         LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "         LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
-                "WHERE p.status = 'ACTIVE' AND b.boardIdx = ? AND reportedUserIdx is null";
+                "WHERE p.status = 'ACTIVE' AND b.boardIdx = ? AND reportedUserIdx is null\n" +
+                "order by p.postIdx LIMIT ?, 12";
 
         return this.jdbcTemplate.query(getListQuery,
                 (rs, rowNum) -> new GetPostListRes
@@ -237,10 +244,12 @@ public class PostDao {
                                 rs.getInt("commentCont"),
                                 rs.getString("boardName")
                         ),
-                boardIdx);
+                boardIdx, idx);
     }
 
-    public List<GetPostSearchListRes> getPostSearchList(int userIdx, String keyword){
+    public List<GetPostSearchListRes> getPostSearchList(int userIdx, String keyword, int pageNum){
+        int idx = 12 * (pageNum - 1);
+
         String getPostSearchListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus,\n" +
                 "                pm.status as scrapStatus, b.boardName,\n" +
                 "                (SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = p.postIdx and likeStatus = 'LIKE') as contPostLike,\n" +
@@ -252,7 +261,8 @@ public class PostDao {
                 "    LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
-                "WHERE p.status = 'ACTIVE' AND p.postName like '" + keyword + "%' AND reportedUserIdx is null";
+                "WHERE p.status = 'ACTIVE' AND p.postName like '" + keyword + "%' AND reportedUserIdx is null\n" +
+                "order by p.postIdx LIMIT ?, 12";
 
         return this.jdbcTemplate.query(getPostSearchListQuery,
                 (rs, rowNum) -> new GetPostSearchListRes
@@ -267,7 +277,8 @@ public class PostDao {
                                 rs.getInt("postCreatedAt"),
                                 rs.getInt("commentCont"),
                                 rs.getString("boardName")
-                        ));
+                        )
+                , idx);
     }
 
     public GetPostRes getPost(int postIdx, int userIdx){
@@ -312,7 +323,9 @@ public class PostDao {
                 getPostParameters);
     }
 
-    public List<GetPostListRes> getBoardPostList(String key, int boardIdx, int userIdx) {
+    public List<GetPostListRes> getBoardPostList(String key, int boardIdx, int userIdx, int pageNum) {
+        int idx = 12 * (pageNum - 1);
+
         String getPostSearchListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus,\n" +
                 "                pm.status as scrapStatus, b.boardName,\n" +
                 "                (SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = p.postIdx and likeStatus = 'LIKE') as contPostLike,\n" +
@@ -324,7 +337,8 @@ public class PostDao {
                 "    LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
-                "WHERE p.status = 'ACTIVE' AND p.postName like '" + key + "%' AND b.boardIdx = ? AND reportedUserIdx is null;";
+                "WHERE p.status = 'ACTIVE' AND p.postName like '" + key + "%' AND b.boardIdx = ? AND reportedUserIdx is null\n" +
+                "order by p.postIdx LIMIT ?, 12";
 
         return this.jdbcTemplate.query(getPostSearchListQuery,
                 (rs, rowNum) -> new GetPostListRes
@@ -339,6 +353,6 @@ public class PostDao {
                                 rs.getInt("postCreatedAt"),
                                 rs.getInt("commentCont"),
                                 rs.getString("boardName")
-                        ), boardIdx);
+                        ), boardIdx, idx);
     }
 }

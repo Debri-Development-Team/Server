@@ -12,5 +12,6 @@ import lombok.Setter;
 public class GetPostSearchListReq {
 
     private String keyword;
+    int pageNum;
 
 }
