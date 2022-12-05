@@ -54,19 +54,19 @@ public class PostProvider {
         }
     }
 
-    public List<GetPostListRes> getPostList(int userIdx, int boardIdx) throws BasicException{
+    public List<GetPostListRes> getPostList(int userIdx, int boardIdx, int pageNum) throws BasicException{
         try{
-            return postDao.getPostList(userIdx, boardIdx);
+            return postDao.getPostList(userIdx, boardIdx, pageNum);
         }catch (Exception exception){
             System.out.println(exception.getMessage());
             throw new BasicException(DB_ERROR);
         }
     }
 
-    public List<GetPostSearchListRes> getPostSearchList(int userIdx, String keyword) throws BasicException{
+    public List<GetPostSearchListRes> getPostSearchList(int userIdx, String keyword, int pageNum) throws BasicException{
         try{
 
-            return postDao.getPostSearchList(userIdx, keyword);
+            return postDao.getPostSearchList(userIdx, keyword, pageNum);
 
         }catch (Exception exception){
             System.out.println(exception.getMessage());

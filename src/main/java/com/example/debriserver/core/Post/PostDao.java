@@ -145,8 +145,10 @@ public class PostDao {
     /**
      * 유저가 스크랩한 글
      **/
-    public List<GetScrapRes> getScrapPosts(int userIdx)
+    public List<GetScrapRes> getScrapPosts(int userIdx, int pageNum)
     {
+        int idx = 12 * (pageNum - 1);
+
         String getScrapPostsQuery = "SELECT p.postIdx, p.boardIdx, u.nickname, p.postName, pl.likeStatus, pm.status as scrapStatus,\n" +
                 "       (SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = p.postIdx and likeStatus = 'LIKE') as cntPost,\n" +
                 "       TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = p.postIdx), CURRENT_TIMESTAMP) as postCreatedAt,\n" +
@@ -157,21 +159,24 @@ public class PostDao {
                 "    LEFT JOIN PostLike as pl on p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN User as u on p.userIdx = u.userIdx\n" +
-                "WHERE p.status = 'ACTIVE' AND pm.status = 'ACTIVE' AND reportedUserIdx is null;";
+                "WHERE p.status = 'ACTIVE' AND pm.status = 'ACTIVE' AND reportedUserIdx is null\n" +
+                "order by p.postIdx LIMIT ?, 12";
 
         return this.jdbcTemplate.query(getScrapPostsQuery,
-                (rs, rowNum) -> new GetScrapRes(
-                        rs.getInt("postIdx"),
-                        rs.getInt("boardIdx"),
-                        rs.getString("nickName"),
-                        rs.getString("postName"),
-                        rs.getString("likeStatus"),
-                        rs.getString("scrapStatus"),
-                        rs.getInt("cntPost"),
-                        rs.getInt("postCreatedAt"),
-                        rs.getInt("cntComment"),
-                        rs.getString("boardName")
-                ));
+                (rs, rowNum) -> new GetScrapRes
+                        (
+                            rs.getInt("postIdx"),
+                            rs.getInt("boardIdx"),
+                            rs.getString("nickName"),
+                            rs.getString("postName"),
+                            rs.getString("likeStatus"),
+                            rs.getString("scrapStatus"),
+                            rs.getInt("cntPost"),
+                            rs.getInt("postCreatedAt"),
+                            rs.getInt("cntComment"),
+                            rs.getString("boardName")
+                        ),
+                idx);
     }
 
     public int insertPostLike(PostPostLikeReq postPostLikeReq) {
@@ -208,7 +213,8 @@ public class PostDao {
         return this.jdbcTemplate.update(insertPostLikeQuery, insertPostLikeParams);
     }
     
-    public List<GetPostListRes> getPostList(int userIdx, int boardIdx){
+    public List<GetPostListRes> getPostList(int userIdx, int boardIdx, int pageNum){
+        int idx = 12 * (pageNum - 1);
 
         String getListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus,\n" +
                 "                pm.status as scrapStatus, b.boardName,\n" +
@@ -221,7 +227,8 @@ public class PostDao {
                 "         LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
                 "         LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "         LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
-                "WHERE p.status = 'ACTIVE' AND b.boardIdx = ? AND reportedUserIdx is null";
+                "WHERE p.status = 'ACTIVE' AND b.boardIdx = ? AND reportedUserIdx is null\n" +
+                "order by p.postIdx LIMIT ?, 12";
 
         return this.jdbcTemplate.query(getListQuery,
                 (rs, rowNum) -> new GetPostListRes
@@ -237,10 +244,12 @@ public class PostDao {
                                 rs.getInt("commentCont"),
                                 rs.getString("boardName")
                         ),
-                boardIdx);
+                boardIdx, idx);
     }
 
-    public List<GetPostSearchListRes> getPostSearchList(int userIdx, String keyword){
+    public List<GetPostSearchListRes> getPostSearchList(int userIdx, String keyword, int pageNum){
+        int idx = 12 * (pageNum - 1);
+
         String getPostSearchListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus,\n" +
                 "                pm.status as scrapStatus, b.boardName,\n" +
                 "                (SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = p.postIdx and likeStatus = 'LIKE') as contPostLike,\n" +
@@ -252,7 +261,8 @@ public class PostDao {
                 "    LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
-                "WHERE p.status = 'ACTIVE' AND p.postName like '" + keyword + "%' AND reportedUserIdx is null";
+                "WHERE p.status = 'ACTIVE' AND p.postName like '" + keyword + "%' AND reportedUserIdx is null\n" +
+                "order by p.postIdx LIMIT ?, 12";
 
         return this.jdbcTemplate.query(getPostSearchListQuery,
                 (rs, rowNum) -> new GetPostSearchListRes
@@ -267,66 +277,55 @@ public class PostDao {
                                 rs.getInt("postCreatedAt"),
                                 rs.getInt("commentCont"),
                                 rs.getString("boardName")
-                        ));
+                        )
+                , idx);
     }
 
     public GetPostRes getPost(int postIdx, int userIdx){
-        boolean userLikeStatus;
-        boolean userScrapStatus;
+        String getPostQuery =
+                "SELECT Post.boardIdx, B.boardName, Post.postIdx, Post.postName, Post.postContent, Post.userIdx as authorIdx, U.nickname,\n" +
+                        "(SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE') as likeNum,\n" +
+                        "(SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE') as commentNum,\n" +
+                        "(SELECT IFNULL(max(likeStatus), 'NULL') as likeStatus FROM PostLike WHERE postIdx = ? and userIdx = ?) as likeStatus,\n" +
+                        "(SELECT IFNULL(max(status), 'INACTIVE') as scrapStatus FROM PostMarked WHERE postIdx = ? and userIdx = ?) as scrapStatus,\n" +
+                        "TIMESTAMPDIFF(minute, Post.createdAt, CURRENT_TIMESTAMP) as createdDate\n" +
+                        "FROM\n" +
+                        "Post left join User U on Post.userIdx = U.userIdx\n" +
+                        "left join Board B on Post.boardIdx = B.boardIdx\n" +
+                        "WHERE Post.postIdx = ? and Post.status = 'ACTIVE';";
 
-        String getPostQuery = "SELECT distinct p.boardIdx, p.postIdx, p.postName, u.nickname, p.postContent, p.userIdx\n" +
-                "FROM Post as p LEFT JOIN User as u ON p.userIdx = u.userIdx WHERE postIdx = ? and p.status = 'ACTIVE';";
-
-        String getLikeQuery = "SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = ? and likeStatus = 'LIKE';";
-        String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Post WHERE postIdx = ?), CURRENT_TIMESTAMP);";
-        String getCommentNumberQuery = "SELECT COUNT(commentIdx) FROM Comment WHERE postIdx = ? and status = 'ACTIVE';";
-        String checkUserLikeStatusQuery = "SELECT COUNT(*) FROM PostLike WHERE postIdx = ? and userIdx = ?;";
-        String checkUserScrapStatusQuery = "SELECT COUNT(*) FROM PostMarked WHERE postIdx = ? and userIdx = ?;";
-        String getUserLikeStatusQuery = "SELECT IF(likeStatus = 'LIKE', true, false) FROM PostLike WHERE postIdx = ? and userIdx = ?;";
-        String getUserScrapStatusQuery = "SELECT IF(status = 'ACTIVE', true, false) FROM PostMarked WHERE postIdx = ? and userIdx = ?;";
-        String getBoardNameQuery = "SELECT boardName FROM Board WHERE boardIdx = ?;";
-
-        Object[] userStatusParameters = new Object[]{
+        Object[] getPostParameters = new Object[]{
                 postIdx,
-                userIdx
+                postIdx,
+                postIdx,
+                userIdx,
+                postIdx,
+                userIdx,
+                postIdx,
         };
-
-        if(this.jdbcTemplate.queryForObject(checkUserLikeStatusQuery, int.class, userStatusParameters) <= 0){
-            userLikeStatus = false;
-        }
-        else{
-            if(this.jdbcTemplate.queryForObject(getUserLikeStatusQuery, int.class, userStatusParameters) == 1) userLikeStatus = true;
-            else userLikeStatus = false;
-        }
-
-        if(this.jdbcTemplate.queryForObject(checkUserScrapStatusQuery, int.class, userStatusParameters) <= 0){
-            userScrapStatus = false;
-        }
-        else{
-            if(this.jdbcTemplate.queryForObject(getUserScrapStatusQuery, int.class, userStatusParameters) == 1) userScrapStatus = true;
-            else userScrapStatus = false;
-        }
         
         return this.jdbcTemplate.queryForObject(getPostQuery,
                 (rs, rowNum) -> new GetPostRes
                         (
                                 rs.getInt("boardIdx"),
                                 rs.getInt("postIdx"),
-                                rs.getInt("userIdx"),
+                                rs.getInt("authorIdx"),
                                 rs.getString("postName"),
-                                rs.getString("nickName"),
+                                rs.getString("nickname"),
                                 rs.getString("postContent"),
-                                this.jdbcTemplate.queryForObject(getLikeQuery, int.class, postIdx),
-                                this.jdbcTemplate.queryForObject(getTimeQuery, int.class, postIdx),
-                                this.jdbcTemplate.queryForObject(getCommentNumberQuery, int.class, postIdx),
-                                userScrapStatus,
-                                userLikeStatus,
-                                this.jdbcTemplate.queryForObject(getBoardNameQuery, String.class, rs.getInt("boardIdx"))
+                                rs.getInt("likeNum"),
+                                rs.getInt("createdDate"),
+                                rs.getInt("commentNum"),
+                                rs.getString("scrapStatus").equalsIgnoreCase("ACTIVE"),
+                                rs.getString("likeStatus").equalsIgnoreCase("LIKE"),
+                                rs.getString("boardName")
                         ),
-                postIdx);
+                getPostParameters);
     }
 
-    public List<GetPostListRes> getBoardPostList(String key, int boardIdx, int userIdx) {
+    public List<GetPostListRes> getBoardPostList(String key, int boardIdx, int userIdx, int pageNum) {
+        int idx = 12 * (pageNum - 1);
+
         String getPostSearchListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus,\n" +
                 "                pm.status as scrapStatus, b.boardName,\n" +
                 "                (SELECT COUNT(postIdx) FROM PostLike WHERE postIdx = p.postIdx and likeStatus = 'LIKE') as contPostLike,\n" +
@@ -338,7 +337,8 @@ public class PostDao {
                 "    LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
-                "WHERE p.status = 'ACTIVE' AND p.postName like '" + key + "%' AND b.boardIdx = ? AND reportedUserIdx is null;";
+                "WHERE p.status = 'ACTIVE' AND p.postName like '" + key + "%' AND b.boardIdx = ? AND reportedUserIdx is null\n" +
+                "order by p.postIdx LIMIT ?, 12";
 
         return this.jdbcTemplate.query(getPostSearchListQuery,
                 (rs, rowNum) -> new GetPostListRes
@@ -353,6 +353,6 @@ public class PostDao {
                                 rs.getInt("postCreatedAt"),
                                 rs.getInt("commentCont"),
                                 rs.getString("boardName")
-                        ), boardIdx);
+                        ), boardIdx, idx);
     }
 }

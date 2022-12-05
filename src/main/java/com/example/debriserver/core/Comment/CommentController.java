@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.Basic;
 import java.util.List;
 
 /**
@@ -25,13 +24,13 @@ public class CommentController {
     final jwtUtility jwt = new jwtUtility();
 
     @Autowired
-    private final CommentService commentService;
+    private final CommentProvider commentProvider;
     @Autowired
-    private final CommentDao commentDao;
+    private final CommentService commentService;
 
-    public CommentController(CommentService commentService, CommentDao commentDao){
+    public CommentController(CommentProvider commentProvider, CommentService commentService){
+        this.commentProvider = commentProvider;
         this.commentService = commentService;
-        this.commentDao = commentDao;
     }
 
     /**
@@ -47,14 +46,14 @@ public class CommentController {
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            if(commentService.checkPostDeleted(postReplyOnPostReq.getPostIdx())){
-                throw new BasicException(BasicServerStatus.COMMENT_POST_DELETED_ERROR);
-            }
-            PostReplyOnPostRes postReplyOnPostRes = commentService.createReplyOnPost(postReplyOnPostReq);
-
             if(postReplyOnPostReq.getContent().length() > 5000){
                 throw new BasicException(BasicServerStatus.COMMENT_TOO_LONG_ERROR);
             }
+
+            if(commentProvider.checkPostDeleted(postReplyOnPostReq.getPostIdx())){
+                throw new BasicException(BasicServerStatus.COMMENT_POST_DELETED_ERROR);
+            }
+            PostReplyOnPostRes postReplyOnPostRes = commentService.createReplyOnPost(postReplyOnPostReq);
 
             return new BasicResponse<>(postReplyOnPostRes);
         }catch (BasicException exception){
@@ -74,15 +73,15 @@ public class CommentController {
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            if(commentService.checkCommentDeleted(postReplyOnReplyReq.getRootCommentIdx())){
+            if(postReplyOnReplyReq.getContent().length() > 5000){
+                throw new BasicException(BasicServerStatus.COMMENT_TOO_LONG_ERROR);
+            }
+
+            if(commentProvider.checkCommentDeleted(postReplyOnReplyReq.getRootCommentIdx())){
                 throw new BasicException(BasicServerStatus.ROOT_COMMENT_DELETED_ERROR);
             }
 
             PostReplyOnReplyRes postReplyOnReplyRes = commentService.createReplyOnReply(postReplyOnReplyReq);
-
-            if(postReplyOnReplyReq.getContent().length() > 5000){
-                throw new BasicException(BasicServerStatus.COMMENT_TOO_LONG_ERROR);
-            }
 
             return new BasicResponse<>(postReplyOnReplyRes);
         }catch (BasicException exception){
@@ -104,10 +103,10 @@ public class CommentController {
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            if(!commentService.checkCommentExist(postIdx)){
+            if(!commentProvider.checkCommentExistInPost(postIdx)){
                 throw new BasicException(BasicServerStatus.COMMENT_NOT_EXIST_ERROR);
             }
-            if(commentService.checkPostDeleted(postIdx)){
+            if(commentProvider.checkPostDeleted(postIdx)){
                 throw new BasicException(BasicServerStatus.COMMENT_ROOT_POST_NOT_EXIST);
             }
 
@@ -158,9 +157,9 @@ public class CommentController {
             //수정할 댓글의 길이가 5000자를 넘지는 않는지
             if(patchModReq.getModContent().length() > 5000) throw new BasicException(BasicServerStatus.COMMENT_TOO_LONG_ERROR);
             //일단 수정 시도하는 사람이 댓글 작성자인지
-            if(commentService.isAuthor(patchModReq.getUserIdx(), commentIdx)) throw new BasicException(BasicServerStatus.MODIFY_IT_IS_NOT_AUTHOR_ERROR);
+            if(commentProvider.isAuthor(patchModReq.getUserIdx(), commentIdx)) throw new BasicException(BasicServerStatus.MODIFY_IT_IS_NOT_AUTHOR_ERROR);
             //수정 시도하는 댓글이 삭제되어있지는 않은지
-            if(commentService.isDeleted(commentIdx)) throw  new BasicException(BasicServerStatus.MODIFY_ALREADY_DELETED_COMMENT);
+            if(commentProvider.isDeleted(commentIdx)) throw  new BasicException(BasicServerStatus.MODIFY_ALREADY_DELETED_COMMENT);
 
             PatchModRes patchModRes = commentService.modifyComment(commentIdx, patchModReq);
 
@@ -185,7 +184,7 @@ public class CommentController {
 
             int userIdx = jwt.getUserIdx(jwtToken);
             //댓글이 존재하는지
-            if(commentService.commentExist(commentIdx, userIdx)) throw new BasicException(BasicServerStatus.COMMENT_NOT_EXIST_ERROR);
+            if(commentProvider.commentExist(commentIdx)) throw new BasicException(BasicServerStatus.COMMENT_NOT_EXIST_ERROR);
             //이미 좋아요를 눌렀는지
             //if(commentService.commentLikeExist(commentIdx, userIdx)) throw new BasicException(BasicServerStatus.ALREADY_COMMENT_LIKE);
             //본인이 작성한 댓글인지
@@ -213,7 +212,7 @@ public class CommentController {
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            if(commentService.commentExist(commentIdx, userIdx)) throw new BasicException(BasicServerStatus.COMMENT_NOT_EXIST_ERROR);
+            if(commentProvider.commentExist(commentIdx)) throw new BasicException(BasicServerStatus.COMMENT_NOT_EXIST_ERROR);
 
             return new BasicResponse<>(commentService.deleteCommentLike(userIdx, commentIdx));
         }catch (BasicException exception){

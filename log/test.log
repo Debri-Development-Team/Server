@@ -1,116 +1,150 @@
-2022-09-30 20:18:28.215  INFO 3463 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Starting DebriServerApplication using Java 11.0.15.1 on Soo-namui-iMac.local with PID 3463 (/Users/soo-namchoi/Dropbox/내 Mac (Soo-nam의 iMac)/Desktop/최선규/gitProject/Debri_Server/build/classes/java/main started by soo-namchoi in /Users/soo-namchoi/Dropbox/내 Mac (Soo-nam의 iMac)/Desktop/최선규/gitProject/Debri_Server)
-2022-09-30 20:18:28.228  INFO 3463 --- [restartedMain] c.e.debriserver.DebriServerApplication   : No active profile set, falling back to 1 default profile: "default"
-2022-09-30 20:18:28.464  INFO 3463 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2022-09-30 20:18:28.464  INFO 3463 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2022-09-30 20:18:29.694  INFO 3463 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2022-09-30 20:18:29.720  INFO 3463 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 13 ms. Found 0 JPA repository interfaces.
-2022-09-30 20:18:30.939  INFO 3463 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8521 (http)
-2022-09-30 20:18:30.951  INFO 3463 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2022-09-30 20:18:30.952  INFO 3463 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
-2022-09-30 20:18:31.035  INFO 3463 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2022-09-30 20:18:31.035  INFO 3463 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2571 ms
-2022-09-30 20:18:31.294  INFO 3463 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2022-09-30 20:18:32.350  INFO 3463 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2022-09-30 20:18:32.602  INFO 3463 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2022-09-30 20:18:32.705  INFO 3463 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
-2022-09-30 20:18:34.219  INFO 3463 --- [restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
-2022-09-30 20:18:34.406  INFO 3463 --- [restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
-2022-09-30 20:18:34.690  INFO 3463 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
-2022-09-30 20:18:34.706  INFO 3463 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2022-09-30 20:18:34.926  WARN 3463 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2022-09-30 20:18:35.429  INFO 3463 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2022-09-30 20:18:35.529  INFO 3463 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8521 (http) with context path ''
-2022-09-30 20:18:35.578  INFO 3463 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Started DebriServerApplication in 8.442 seconds (JVM running for 9.896)
-2022-09-30 20:19:05.289  INFO 3463 --- [http-nio-8521-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2022-09-30 20:19:05.290  INFO 3463 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2022-09-30 20:19:05.291  INFO 3463 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
-2022-09-30 20:22:04.157  INFO 3463 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
-2022-09-30 20:22:04.179  INFO 3463 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-2022-09-30 20:22:04.252  INFO 3463 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-2022-09-30 20:22:08.210  INFO 4091 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Starting DebriServerApplication using Java 11.0.15.1 on Soo-namui-iMac.local with PID 4091 (/Users/soo-namchoi/Dropbox/내 Mac (Soo-nam의 iMac)/Desktop/최선규/gitProject/Debri_Server/build/classes/java/main started by soo-namchoi in /Users/soo-namchoi/Dropbox/내 Mac (Soo-nam의 iMac)/Desktop/최선규/gitProject/Debri_Server)
-2022-09-30 20:22:08.211  INFO 4091 --- [restartedMain] c.e.debriserver.DebriServerApplication   : No active profile set, falling back to 1 default profile: "default"
-2022-09-30 20:22:08.241  INFO 4091 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2022-09-30 20:22:08.241  INFO 4091 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2022-09-30 20:22:08.725  INFO 4091 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2022-09-30 20:22:08.742  INFO 4091 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 11 ms. Found 0 JPA repository interfaces.
-2022-09-30 20:22:09.128  INFO 4091 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8521 (http)
-2022-09-30 20:22:09.137  INFO 4091 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2022-09-30 20:22:09.138  INFO 4091 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
-2022-09-30 20:22:09.190  INFO 4091 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2022-09-30 20:22:09.190  INFO 4091 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 948 ms
-2022-09-30 20:22:09.291  INFO 4091 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2022-09-30 20:22:09.614  INFO 4091 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2022-09-30 20:22:09.649  INFO 4091 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2022-09-30 20:22:09.678  INFO 4091 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
-2022-09-30 20:22:09.783  INFO 4091 --- [restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
-2022-09-30 20:22:09.857  INFO 4091 --- [restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
-2022-09-30 20:22:09.950  INFO 4091 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
-2022-09-30 20:22:09.957  INFO 4091 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2022-09-30 20:22:10.083  WARN 4091 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2022-09-30 20:22:10.338  INFO 4091 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2022-09-30 20:22:10.366  INFO 4091 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8521 (http) with context path ''
-2022-09-30 20:22:10.375  INFO 4091 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Started DebriServerApplication in 2.486 seconds (JVM running for 3.497)
-2022-09-30 20:22:16.245  INFO 4091 --- [http-nio-8521-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2022-09-30 20:22:16.245  INFO 4091 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2022-09-30 20:22:16.246  INFO 4091 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
-2022-09-30 20:23:38.202  WARN 4091 --- [http-nio-8521-exec-5] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'GET' not supported]
-2022-09-30 20:24:11.153  INFO 4091 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
-2022-09-30 20:24:11.156  INFO 4091 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-2022-09-30 20:24:11.215  INFO 4091 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-2022-09-30 20:24:14.910  INFO 4363 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Starting DebriServerApplication using Java 11.0.15.1 on Soo-namui-iMac.local with PID 4363 (/Users/soo-namchoi/Dropbox/내 Mac (Soo-nam의 iMac)/Desktop/최선규/gitProject/Debri_Server/build/classes/java/main started by soo-namchoi in /Users/soo-namchoi/Dropbox/내 Mac (Soo-nam의 iMac)/Desktop/최선규/gitProject/Debri_Server)
-2022-09-30 20:24:14.911  INFO 4363 --- [restartedMain] c.e.debriserver.DebriServerApplication   : No active profile set, falling back to 1 default profile: "default"
-2022-09-30 20:24:14.954  INFO 4363 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2022-09-30 20:24:14.954  INFO 4363 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2022-09-30 20:24:15.495  INFO 4363 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2022-09-30 20:24:15.512  INFO 4363 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 11 ms. Found 0 JPA repository interfaces.
-2022-09-30 20:24:15.890  INFO 4363 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8521 (http)
-2022-09-30 20:24:15.896  INFO 4363 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2022-09-30 20:24:15.897  INFO 4363 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
-2022-09-30 20:24:15.947  INFO 4363 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2022-09-30 20:24:15.947  INFO 4363 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 992 ms
-2022-09-30 20:24:16.046  INFO 4363 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2022-09-30 20:24:16.362  INFO 4363 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2022-09-30 20:24:16.400  INFO 4363 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2022-09-30 20:24:16.430  INFO 4363 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
-2022-09-30 20:24:16.529  INFO 4363 --- [restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
-2022-09-30 20:24:16.609  INFO 4363 --- [restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
-2022-09-30 20:24:16.712  INFO 4363 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
-2022-09-30 20:24:16.719  INFO 4363 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2022-09-30 20:24:16.859  WARN 4363 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2022-09-30 20:24:17.108  INFO 4363 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2022-09-30 20:24:17.136  INFO 4363 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8521 (http) with context path ''
-2022-09-30 20:24:17.145  INFO 4363 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Started DebriServerApplication in 2.651 seconds (JVM running for 3.201)
-2022-09-30 20:24:20.117  INFO 4363 --- [http-nio-8521-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2022-09-30 20:24:20.118  INFO 4363 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2022-09-30 20:24:20.119  INFO 4363 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
-2022-09-30 20:25:16.128  WARN 4363 --- [http-nio-8521-exec-3] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MissingServletRequestParameterException: Required request parameter 'key' for method parameter type String is not present]
-2022-09-30 20:28:08.902  WARN 4363 --- [http-nio-8521-exec-1] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MissingServletRequestParameterException: Required request parameter 'key' for method parameter type String is not present]
-2022-09-30 20:34:35.102  INFO 4363 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
-2022-09-30 20:34:35.107  INFO 4363 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-2022-09-30 20:34:35.161  INFO 4363 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-2022-09-30 20:34:38.700  INFO 5735 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Starting DebriServerApplication using Java 11.0.15.1 on Soo-namui-iMac.local with PID 5735 (/Users/soo-namchoi/Dropbox/내 Mac (Soo-nam의 iMac)/Desktop/최선규/gitProject/Debri_Server/build/classes/java/main started by soo-namchoi in /Users/soo-namchoi/Dropbox/내 Mac (Soo-nam의 iMac)/Desktop/최선규/gitProject/Debri_Server)
-2022-09-30 20:34:38.701  INFO 5735 --- [restartedMain] c.e.debriserver.DebriServerApplication   : No active profile set, falling back to 1 default profile: "default"
-2022-09-30 20:34:38.733  INFO 5735 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2022-09-30 20:34:38.733  INFO 5735 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2022-09-30 20:34:39.254  INFO 5735 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2022-09-30 20:34:39.273  INFO 5735 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 12 ms. Found 0 JPA repository interfaces.
-2022-09-30 20:34:39.663  INFO 5735 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8521 (http)
-2022-09-30 20:34:39.671  INFO 5735 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2022-09-30 20:34:39.672  INFO 5735 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
-2022-09-30 20:34:39.736  INFO 5735 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2022-09-30 20:34:39.736  INFO 5735 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1002 ms
-2022-09-30 20:34:39.829  INFO 5735 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2022-09-30 20:34:40.140  INFO 5735 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2022-09-30 20:34:40.178  INFO 5735 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2022-09-30 20:34:40.209  INFO 5735 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
-2022-09-30 20:34:40.307  INFO 5735 --- [restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
-2022-09-30 20:34:40.385  INFO 5735 --- [restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
-2022-09-30 20:34:40.491  INFO 5735 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
-2022-09-30 20:34:40.498  INFO 5735 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2022-09-30 20:34:40.632  WARN 5735 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2022-09-30 20:34:40.883  INFO 5735 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
-2022-09-30 20:34:40.907  INFO 5735 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8521 (http) with context path ''
-2022-09-30 20:34:40.916  INFO 5735 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Started DebriServerApplication in 2.531 seconds (JVM running for 3.124)
-2022-09-30 20:34:43.248  INFO 5735 --- [http-nio-8521-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2022-09-30 20:34:43.249  INFO 5735 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2022-09-30 20:34:43.250  INFO 5735 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2022-11-30 09:08:46.375  INFO 70738 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Starting DebriServerApplication using Java 11.0.15.1 on gimjeong-yeon-ui-MacBookPro.local with PID 70738 (/Users/kim_jeongyeon/Documents/Debri/Server/build/classes/java/main started by kim_jeongyeon in /Users/kim_jeongyeon/Documents/Debri/Server)
+2022-11-30 09:08:46.379  INFO 70738 --- [restartedMain] c.e.debriserver.DebriServerApplication   : No active profile set, falling back to 1 default profile: "default"
+2022-11-30 09:08:46.428  INFO 70738 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2022-11-30 09:08:46.429  INFO 70738 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2022-11-30 09:08:47.161  INFO 70738 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2022-11-30 09:08:47.186  INFO 70738 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 13 ms. Found 0 JPA repository interfaces.
+2022-11-30 09:08:47.824  INFO 70738 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8521 (http)
+2022-11-30 09:08:47.834  INFO 70738 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-11-30 09:08:47.834  INFO 70738 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
+2022-11-30 09:08:47.900  INFO 70738 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-11-30 09:08:47.901  INFO 70738 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1471 ms
+2022-11-30 09:08:48.059  INFO 70738 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-11-30 09:08:48.765  INFO 70738 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-11-30 09:08:48.861  INFO 70738 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-11-30 09:08:48.941  INFO 70738 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-11-30 09:08:49.138  INFO 70738 --- [restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-11-30 09:08:49.266  INFO 70738 --- [restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2022-11-30 09:08:49.444  INFO 70738 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-11-30 09:08:49.456  INFO 70738 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2022-11-30 09:08:49.646  WARN 70738 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2022-11-30 09:08:50.070  INFO 70738 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2022-11-30 09:08:50.167  INFO 70738 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8521 (http) with context path ''
+2022-11-30 09:08:50.185  INFO 70738 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Started DebriServerApplication in 4.401 seconds (JVM running for 5.451)
+2022-11-30 09:10:16.581  INFO 70738 --- [http-nio-8521-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-11-30 09:10:16.581  INFO 70738 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-11-30 09:10:16.583  INFO 70738 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2022-11-30 09:10:16.716  WARN 70738 --- [http-nio-8521-exec-2] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.http.converter.HttpMessageNotReadableException: Required request body is missing: public com.example.debriserver.basicModels.BasicResponse<java.util.List<com.example.debriserver.core.Post.model.GetPostSearchListRes>> com.example.debriserver.core.Post.PostController.getPostSearchList(com.example.debriserver.core.Post.model.GetPostSearchListReq,int)]
+2022-11-30 09:15:02.488  INFO 70738 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2022-11-30 09:15:02.494  INFO 70738 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-11-30 09:15:02.806  INFO 70738 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2022-11-30 09:15:05.730  INFO 71264 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Starting DebriServerApplication using Java 11.0.15.1 on gimjeong-yeon-ui-MacBookPro.local with PID 71264 (/Users/kim_jeongyeon/Documents/Debri/Server/build/classes/java/main started by kim_jeongyeon in /Users/kim_jeongyeon/Documents/Debri/Server)
+2022-11-30 09:15:05.731  INFO 71264 --- [restartedMain] c.e.debriserver.DebriServerApplication   : No active profile set, falling back to 1 default profile: "default"
+2022-11-30 09:15:05.778  INFO 71264 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2022-11-30 09:15:05.778  INFO 71264 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2022-11-30 09:15:06.485  INFO 71264 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2022-11-30 09:15:06.508  INFO 71264 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 12 ms. Found 0 JPA repository interfaces.
+2022-11-30 09:15:07.109  INFO 71264 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8521 (http)
+2022-11-30 09:15:07.121  INFO 71264 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-11-30 09:15:07.121  INFO 71264 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
+2022-11-30 09:15:07.199  INFO 71264 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-11-30 09:15:07.200  INFO 71264 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1421 ms
+2022-11-30 09:15:07.354  INFO 71264 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-11-30 09:15:07.989  INFO 71264 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-11-30 09:15:08.046  INFO 71264 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-11-30 09:15:08.110  INFO 71264 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-11-30 09:15:08.316  INFO 71264 --- [restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-11-30 09:15:08.423  INFO 71264 --- [restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2022-11-30 09:15:08.579  INFO 71264 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-11-30 09:15:08.590  INFO 71264 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2022-11-30 09:15:08.764  WARN 71264 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2022-11-30 09:15:09.132  INFO 71264 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2022-11-30 09:15:09.172  INFO 71264 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8521 (http) with context path ''
+2022-11-30 09:15:09.186  INFO 71264 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Started DebriServerApplication in 3.919 seconds (JVM running for 4.611)
+2022-11-30 09:15:09.286  INFO 71264 --- [http-nio-8521-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-11-30 09:15:09.287  INFO 71264 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-11-30 09:15:09.288  INFO 71264 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2022-11-30 09:15:15.766  WARN 71264 --- [http-nio-8521-exec-3] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'POST' not supported]
+2022-11-30 09:15:18.056  WARN 71264 --- [http-nio-8521-exec-4] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.http.converter.HttpMessageNotReadableException: Required request body is missing: public com.example.debriserver.basicModels.BasicResponse<java.util.List<com.example.debriserver.core.Post.model.GetPostSearchListRes>> com.example.debriserver.core.Post.PostController.getPostSearchList(com.example.debriserver.core.Post.model.GetPostSearchListReq)]
+2022-11-30 09:19:40.751  INFO 71264 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2022-11-30 09:19:40.757  INFO 71264 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-11-30 09:19:40.824  INFO 71264 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2022-11-30 09:19:43.921  INFO 71939 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Starting DebriServerApplication using Java 11.0.15.1 on gimjeong-yeon-ui-MacBookPro.local with PID 71939 (/Users/kim_jeongyeon/Documents/Debri/Server/build/classes/java/main started by kim_jeongyeon in /Users/kim_jeongyeon/Documents/Debri/Server)
+2022-11-30 09:19:43.923  INFO 71939 --- [restartedMain] c.e.debriserver.DebriServerApplication   : No active profile set, falling back to 1 default profile: "default"
+2022-11-30 09:19:43.971  INFO 71939 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2022-11-30 09:19:43.971  INFO 71939 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2022-11-30 09:19:44.675  INFO 71939 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2022-11-30 09:19:44.698  INFO 71939 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 11 ms. Found 0 JPA repository interfaces.
+2022-11-30 09:19:45.279  INFO 71939 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8521 (http)
+2022-11-30 09:19:45.289  INFO 71939 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-11-30 09:19:45.290  INFO 71939 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
+2022-11-30 09:19:45.354  INFO 71939 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-11-30 09:19:45.355  INFO 71939 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1383 ms
+2022-11-30 09:19:45.498  INFO 71939 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-11-30 09:19:46.284  INFO 71939 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-11-30 09:19:46.341  INFO 71939 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-11-30 09:19:46.403  INFO 71939 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-11-30 09:19:46.583  INFO 71939 --- [restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-11-30 09:19:46.692  INFO 71939 --- [restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2022-11-30 09:19:46.844  INFO 71939 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-11-30 09:19:46.855  INFO 71939 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2022-11-30 09:19:47.031  WARN 71939 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2022-11-30 09:19:47.384  INFO 71939 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2022-11-30 09:19:47.422  INFO 71939 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8521 (http) with context path ''
+2022-11-30 09:19:47.437  INFO 71939 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Started DebriServerApplication in 4.019 seconds (JVM running for 4.719)
+2022-11-30 09:20:26.983  INFO 71939 --- [http-nio-8521-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-11-30 09:20:26.984  INFO 71939 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-11-30 09:20:26.985  INFO 71939 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2022-11-30 09:29:48.194  INFO 71939 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2022-11-30 09:29:48.199  INFO 71939 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-11-30 09:29:48.296  INFO 71939 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2022-11-30 09:29:51.687  INFO 72798 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Starting DebriServerApplication using Java 11.0.15.1 on gimjeong-yeon-ui-MacBookPro.local with PID 72798 (/Users/kim_jeongyeon/Documents/Debri/Server/build/classes/java/main started by kim_jeongyeon in /Users/kim_jeongyeon/Documents/Debri/Server)
+2022-11-30 09:29:51.688  INFO 72798 --- [restartedMain] c.e.debriserver.DebriServerApplication   : No active profile set, falling back to 1 default profile: "default"
+2022-11-30 09:29:51.734  INFO 72798 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2022-11-30 09:29:51.734  INFO 72798 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2022-11-30 09:29:52.433  INFO 72798 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2022-11-30 09:29:52.456  INFO 72798 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 12 ms. Found 0 JPA repository interfaces.
+2022-11-30 09:29:53.031  INFO 72798 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8521 (http)
+2022-11-30 09:29:53.041  INFO 72798 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-11-30 09:29:53.041  INFO 72798 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
+2022-11-30 09:29:53.105  INFO 72798 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-11-30 09:29:53.105  INFO 72798 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1371 ms
+2022-11-30 09:29:53.252  INFO 72798 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-11-30 09:29:53.719  INFO 72798 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-11-30 09:29:53.777  INFO 72798 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-11-30 09:29:53.841  INFO 72798 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-11-30 09:29:54.022  INFO 72798 --- [restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-11-30 09:29:54.131  INFO 72798 --- [restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2022-11-30 09:29:54.281  INFO 72798 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-11-30 09:29:54.292  INFO 72798 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2022-11-30 09:29:54.467  WARN 72798 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2022-11-30 09:29:54.816  INFO 72798 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2022-11-30 09:29:54.854  INFO 72798 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8521 (http) with context path ''
+2022-11-30 09:29:54.868  INFO 72798 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Started DebriServerApplication in 3.762 seconds (JVM running for 4.566)
+2022-11-30 09:30:14.123  INFO 72798 --- [http-nio-8521-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-11-30 09:30:14.124  INFO 72798 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-11-30 09:30:14.126  INFO 72798 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2022-11-30 09:30:14.232  WARN 72798 --- [http-nio-8521-exec-2] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MissingServletRequestParameterException: Required request parameter 'key' for method parameter type String is not present]
+2022-11-30 09:37:01.141  INFO 72798 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2022-11-30 09:37:01.146  INFO 72798 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-11-30 09:37:01.227  INFO 72798 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2022-11-30 09:37:03.896  INFO 73402 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Starting DebriServerApplication using Java 11.0.15.1 on gimjeong-yeon-ui-MacBookPro.local with PID 73402 (/Users/kim_jeongyeon/Documents/Debri/Server/build/classes/java/main started by kim_jeongyeon in /Users/kim_jeongyeon/Documents/Debri/Server)
+2022-11-30 09:37:03.897  INFO 73402 --- [restartedMain] c.e.debriserver.DebriServerApplication   : No active profile set, falling back to 1 default profile: "default"
+2022-11-30 09:37:03.944  INFO 73402 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2022-11-30 09:37:03.945  INFO 73402 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2022-11-30 09:37:04.659  INFO 73402 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2022-11-30 09:37:04.683  INFO 73402 --- [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 12 ms. Found 0 JPA repository interfaces.
+2022-11-30 09:37:05.299  INFO 73402 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8521 (http)
+2022-11-30 09:37:05.309  INFO 73402 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-11-30 09:37:05.310  INFO 73402 --- [restartedMain] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.64]
+2022-11-30 09:37:05.376  INFO 73402 --- [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-11-30 09:37:05.377  INFO 73402 --- [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1432 ms
+2022-11-30 09:37:05.521  INFO 73402 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-11-30 09:37:06.120  INFO 73402 --- [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-11-30 09:37:06.175  INFO 73402 --- [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-11-30 09:37:06.233  INFO 73402 --- [restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-11-30 09:37:06.407  INFO 73402 --- [restartedMain] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-11-30 09:37:06.516  INFO 73402 --- [restartedMain] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+2022-11-30 09:37:06.677  INFO 73402 --- [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-11-30 09:37:06.688  INFO 73402 --- [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2022-11-30 09:37:06.880  WARN 73402 --- [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2022-11-30 09:37:07.253  INFO 73402 --- [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2022-11-30 09:37:07.303  INFO 73402 --- [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8521 (http) with context path ''
+2022-11-30 09:37:07.318  INFO 73402 --- [restartedMain] c.e.debriserver.DebriServerApplication   : Started DebriServerApplication in 3.88 seconds (JVM running for 4.82)
+2022-11-30 09:38:12.521  INFO 73402 --- [http-nio-8521-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-11-30 09:38:12.522  INFO 73402 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-11-30 09:38:12.523  INFO 73402 --- [http-nio-8521-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2022-11-30 09:38:12.627  WARN 73402 --- [http-nio-8521-exec-2] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MissingServletRequestParameterException: Required request parameter 'key' for method parameter type String is not present]
+2022-11-30 09:43:07.243  INFO 73402 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2022-11-30 09:43:07.248  INFO 73402 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-11-30 09:43:07.343  INFO 73402 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

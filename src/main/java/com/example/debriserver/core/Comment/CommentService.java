@@ -17,9 +17,15 @@ public class CommentService {
     @Autowired
     private final CommentDao commentDao;
 
-    public CommentService(CommentDao commentDao){
+    @Autowired
+    private final CommentProvider commentProvider;
+
+    public CommentService(CommentProvider commentProvider, CommentDao commentDao)
+    {
+        this.commentProvider = commentProvider;
         this.commentDao = commentDao;
     }
+
 
     public PostReplyOnPostRes createReplyOnPost(PostReplyOnPostReq postReplyOnPostReq) throws BasicException{
         try{
@@ -76,46 +82,7 @@ public class CommentService {
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }
-    public boolean checkCommentExist(int postIdx) throws BasicException{
-        try{
-            return commentDao.checkCommentExist(postIdx);
-        }catch (Exception exception){
-            throw new BasicException(BasicServerStatus.DB_ERROR);
-        }
-    }
 
-    public boolean checkPostDeleted(int postIdx) throws BasicException {
-        try{
-            return commentDao.checkPostDeleted(postIdx);
-        }catch (Exception exception){
-            throw new BasicException(BasicServerStatus.DB_ERROR);
-        }
-    }
-
-    public boolean checkCommentDeleted(int commentIdx) throws BasicException {
-        try{
-            return commentDao.checkCommentDeleted(commentIdx);
-        }catch (Exception exception) {
-            throw new BasicException(BasicServerStatus.DB_ERROR);
-        }
-    }
-
-    public boolean isAuthor(int userIdx, int commentIdx) throws BasicException{
-
-        try{
-            return commentDao.isAuthor(userIdx, commentIdx);
-        }catch (Exception exception){
-            throw new BasicException(BasicServerStatus.DB_ERROR);
-        }
-    }
-
-    public boolean isDeleted(int commentIdx) throws BasicException{
-        try{
-            return commentDao.isDeleted(commentIdx);
-        }catch (Exception exception){
-            throw new BasicException(BasicServerStatus.DB_ERROR);
-        }
-    }
 
     public PostCommentLikeRes createCommentLike(int userIdx, int commentIdx) throws BasicException{
         try{
@@ -134,12 +101,4 @@ public class CommentService {
         }
     }
 
-    public boolean commentExist(int commentIdx, int userIdx) throws BasicException{
-        try{
-            return commentDao.commentExist(commentIdx, userIdx);
-        }catch (Exception exception){
-            throw new BasicException(BasicServerStatus.DB_ERROR);
-        }
-
-    }
 }

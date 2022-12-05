@@ -46,10 +46,6 @@ public class PostController {
                 return new BasicResponse<>(BasicServerStatus.POST_TOO_LONG_CONTENTS);
             }
 
-            /*if (postPostsReq.getPostImgUrls().size() < 1) {
-                return new BasicResponse<>(BasicServerStatus.POST_EMPTY_IMG_URL);
-            }*/
-
             PostPostsRes postPostsRes = postService.createPosts(postPostsReq);
             return new BasicResponse<>(postPostsRes);
         } catch(BasicException exception){
@@ -197,8 +193,9 @@ public class PostController {
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
             String keyword = getPostSearchListReq.getKeyword();
+            int pageNum = getPostSearchListReq.getPageNum();
             int userIdx = jwt.getUserIdx(jwtToken);
-            List<GetPostSearchListRes> getPostSearchListRes = postProvider.getPostSearchList(userIdx, keyword);
+            List<GetPostSearchListRes> getPostSearchListRes = postProvider.getPostSearchList(userIdx, keyword, pageNum);
 
             return  new BasicResponse<>(getPostSearchListRes);
 
@@ -210,10 +207,10 @@ public class PostController {
 
      /**
       * 특정 게시판의 게시글 리스트를 조회하는 api
-      * [GET]localhost / api / post / getList / {boardIdx}
+      * [GET]localhost / api / post / getList / {boardIdx} / {pageNum}
       */
-     @GetMapping("/getList/{boardIdx}")
-     public BasicResponse<List<GetPostListRes>> getPostList ( @PathVariable int boardIdx){
+     @GetMapping("/getList/{boardIdx}/{pageNum}")
+     public BasicResponse<List<GetPostListRes>> getPostList ( @PathVariable int boardIdx, @PathVariable int pageNum){
 
          try {
              String jwtToken = jwt.getJwt();
@@ -224,7 +221,7 @@ public class PostController {
                  return new BasicResponse<>(BasicServerStatus.BOARD_NOT_EXIST);
 
              int userIdx = jwt.getUserIdx(jwtToken);
-             List<GetPostListRes> getPostListRes = postProvider.getPostList(userIdx, boardIdx);
+             List<GetPostListRes> getPostListRes = postProvider.getPostList(userIdx, boardIdx, pageNum);
 
              return new BasicResponse<>(getPostListRes);
          } catch (BasicException exception) {
@@ -236,8 +233,8 @@ public class PostController {
       * 유저가 스크랩한 Posts
       * */
      @ResponseBody
-     @GetMapping("/getMyScrap")
-     public BasicResponse<List<GetScrapRes>> getScrapPosts ()
+     @GetMapping("/getMyScrap/{pageNum}")
+     public BasicResponse<List<GetScrapRes>> getScrapPosts (@PathVariable int pageNum)
      {
          try {
              String jwtToken = jwt.getJwt();
@@ -245,7 +242,7 @@ public class PostController {
 
              int userIdx = jwt.getUserIdx(jwtToken);
 
-             List<GetScrapRes> getPosts = postService.getScrapPosts(userIdx);
+             List<GetScrapRes> getPosts = postService.getScrapPosts(userIdx, pageNum);
              return new BasicResponse<>(getPosts);
 
          } catch (BasicException exception) {
@@ -282,8 +279,8 @@ public class PostController {
      /**
       * 3.7.2 특정 게시판 키워드 조회
       * */
-     @GetMapping("/boardPostList/{boardIdx}")
-    public BasicResponse<List<GetPostListRes>> getBoardPostList(@RequestParam String key, @PathVariable int boardIdx){
+     @GetMapping("/boardPostList/{boardIdx}/{pageNum}")
+    public BasicResponse<List<GetPostListRes>> getBoardPostList(@RequestParam String key, @PathVariable int boardIdx, @PathVariable int pageNum){
 
          try{
              String jwtToken = jwt.getJwt();
@@ -295,7 +292,7 @@ public class PostController {
              if (!postProvider.checkBoardExist(boardIdx))
                  return new BasicResponse<>(BasicServerStatus.BOARD_NOT_EXIST);
 
-             return new BasicResponse<>(postService.getBoardPostList(key, boardIdx, userIdx));
+             return new BasicResponse<>(postService.getBoardPostList(key, boardIdx, userIdx, pageNum));
 
          }catch (BasicException exception){
              return new BasicResponse<>((exception.getStatus()));

@@ -20,8 +20,8 @@ public class CommentDao {
     public PostReplyOnPostRes createReplyOnPost(PostReplyOnPostReq postReplyOnPostReq){
         //먼저 유저 인덱스, 내용, 게시글 번호를 저장
         String insertQuery = "INSERT\n" +
-                "INTO Comment(userIdx, postIdx, commentContent, authorName)\n" +
-                "VALUES (?, ?, ?, ?);";
+                "INTO Comment(userIdx, postIdx, commentContent, authorName, class, commentOrder)\n" +
+                "VALUES (?, ?, ?, ?, ?, ?);";
 
         //방금 삽입한 인덱스를 가져온다
         String preInsertedIdxQuery= "SELECT MAX(commentIdx) FROM Comment;";
@@ -29,7 +29,7 @@ public class CommentDao {
         //그 인덱스를 그룹번호로 클래스 번호로 0을, 순서로 0을 삽입
         String insertPostProcessQuery =
                 "UPDATE Comment\n" +
-                "SET groupNum = ?, class = ?, commentOrder = ?\n" +
+                "SET groupNum = ?\n" +
                 "WHERE commentIdx = ?;";
 
         //댓글 정보를 가져온다
@@ -43,7 +43,9 @@ public class CommentDao {
                         postReplyOnPostReq.getUserIdx(),
                         postReplyOnPostReq.getPostIdx(),
                         postReplyOnPostReq.getContent(),
-                        postReplyOnPostReq.getAuthorName()
+                        postReplyOnPostReq.getAuthorName(),
+                        0,
+                        0
                 };
 
         this.jdbcTemplate.update(insertQuery, insertCommentParameters);
@@ -55,8 +57,6 @@ public class CommentDao {
         Object[] insertPostProcessParameters = new Object[]
                 {
                         insertedCommentIdx,
-                        0,
-                        0,
                         insertedCommentIdx
                 };
 
@@ -318,7 +318,7 @@ public class CommentDao {
         return new PatchCommentLikeRes(true);
     }
 
-    public boolean commentExist(int commentIdx, int userIdx) {
+    public boolean commentExist(int commentIdx) {
         String checkQuery = "SELECT exists(SELECT * FROM Comment WHERE commentIdx = ? and status = 'ACTIVE');";
 
         return this.jdbcTemplate.queryForObject(checkQuery, int.class, commentIdx) == 0;
