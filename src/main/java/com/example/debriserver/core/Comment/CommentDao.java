@@ -193,11 +193,12 @@ public class CommentDao {
 
     }
 
-    public List<GetCommentRes> getComment(int postIdx, int userIdx){
+    public List<GetCommentRes> getComment(int postIdx, int userIdx, int pageNum){
         String getListQuery =
                 "SELECT Comment.commentIdx, userIdx, postIdx, authorName, class, commentOrder, groupNum, commentContent\n" +
                         "FROM Comment LEFT JOIN ReportedComment RC on Comment.commentIdx = RC.commentIdx\n" +
-                        "WHERE postIdx = ? and Comment.status = 'ACTIVE' and (reportUserIdx != ? or reportUserIdx is null);";
+                        "WHERE postIdx = ? and Comment.status = 'ACTIVE' and (reportUserIdx != ? or reportUserIdx is null)\n" +
+                        "order by commentIdx DESC LIMIT ?, 12;";
 
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Comment WHERE commentIdx = ?), CURRENT_TIMESTAMP);";
         String checkLikeStatusQuery = "SELECT exists(SELECT * FROM CommentLike WHERE userIdx = ? and commentIdx = ? and status = 'ACTIVE');";

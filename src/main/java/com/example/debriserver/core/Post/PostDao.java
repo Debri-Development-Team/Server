@@ -160,7 +160,7 @@ public class PostDao {
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN User as u on p.userIdx = u.userIdx\n" +
                 "WHERE p.status = 'ACTIVE' AND pm.status = 'ACTIVE' AND reportedUserIdx is null\n" +
-                "order by p.postIdx LIMIT ?, 12";
+                "order by p.postIdx DESC LIMIT ?, 12";
 
         return this.jdbcTemplate.query(getScrapPostsQuery,
                 (rs, rowNum) -> new GetScrapRes
@@ -228,7 +228,7 @@ public class PostDao {
                 "         LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "         LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
                 "WHERE p.status = 'ACTIVE' AND b.boardIdx = ? AND reportedUserIdx is null\n" +
-                "order by p.postIdx LIMIT ?, 12";
+                "order by p.postIdx DESC LIMIT ?, 12";
 
         return this.jdbcTemplate.query(getListQuery,
                 (rs, rowNum) -> new GetPostListRes
@@ -262,7 +262,7 @@ public class PostDao {
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
                 "WHERE p.status = 'ACTIVE' AND p.postName like '" + keyword + "%' AND reportedUserIdx is null\n" +
-                "order by p.postIdx LIMIT ?, 12";
+                "order by p.postIdx DESC LIMIT ?, 12";
 
         return this.jdbcTemplate.query(getPostSearchListQuery,
                 (rs, rowNum) -> new GetPostSearchListRes
@@ -338,7 +338,7 @@ public class PostDao {
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
                 "WHERE p.status = 'ACTIVE' AND p.postName like '" + key + "%' AND b.boardIdx = ? AND reportedUserIdx is null\n" +
-                "order by p.postIdx LIMIT ?, 12";
+                "order by p.postIdx DESC LIMIT ?, 12";
 
         return this.jdbcTemplate.query(getPostSearchListQuery,
                 (rs, rowNum) -> new GetPostListRes
