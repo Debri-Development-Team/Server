@@ -101,4 +101,12 @@ public class CommentService {
         }
     }
 
+    public int getCommentNumber(int postIdx) throws BasicException{
+
+        try {
+            return commentDao.getCommentNumber(postIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
 }

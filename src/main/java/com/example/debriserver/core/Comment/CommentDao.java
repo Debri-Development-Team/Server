@@ -204,6 +204,8 @@ public class CommentDao {
         String checkLikeStatusQuery = "SELECT exists(SELECT * FROM CommentLike WHERE userIdx = ? and commentIdx = ? and status = 'ACTIVE');";
         String likeNumberCountQuery = "SELECT COUNT(*) FROM CommentLike WHERE commentIdx = ? and status = 'ACTIVE';";
 
+        pageNum = (pageNum - 1) * 12;
+
         return this.jdbcTemplate.query
                 (
                         getListQuery,
@@ -220,7 +222,7 @@ public class CommentDao {
                                         rs.getString("authorName"),
                                         this.jdbcTemplate.queryForObject(checkLikeStatusQuery, int.class, userIdx, rs.getInt("commentIdx")) == 1,
                                         this.jdbcTemplate.queryForObject(likeNumberCountQuery, int.class, rs.getInt("commentIdx"))
-                                ), postIdx, userIdx
+                                ), postIdx, userIdx, pageNum
                 );
     }
 
@@ -326,4 +328,9 @@ public class CommentDao {
     }
 
 
+    public int getCommentNumber(int postIdx) {
+        String queryString = "select count(commentIdx) from Comment where postIdx = ?;";
+
+        return this.jdbcTemplate.queryForObject(queryString, int.class, postIdx);
+    }
 }

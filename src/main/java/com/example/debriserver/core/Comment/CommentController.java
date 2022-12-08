@@ -94,7 +94,7 @@ public class CommentController {
      * [GET]: localhost:8521/api/comment/get/{postIdx}
      * */
     @GetMapping("/get/{postIdx}")
-    public BasicResponse<List<GetCommentRes>> getComment (@PathVariable int postIdx, @RequestParam int pageNum){
+    public BasicResponse<GetCommentCountRes> getComment (@PathVariable int postIdx, @RequestParam int pageNum){
 
         try{
             String jwtToken = jwt.getJwt();
@@ -110,9 +110,10 @@ public class CommentController {
                 throw new BasicException(BasicServerStatus.COMMENT_ROOT_POST_NOT_EXIST);
             }
 
-            List<GetCommentRes> getCommentRes= commentService.getComment(postIdx, userIdx, pageNum);
+            List<GetCommentRes> getCommentRes = commentService.getComment(postIdx, userIdx, pageNum);
+            int commentCount = commentService.getCommentNumber(postIdx);
 
-            return new BasicResponse<>(getCommentRes);
+            return new BasicResponse<>(new GetCommentCountRes(getCommentRes, commentCount));
         }catch(BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
         }

@@ -1,11 +1,8 @@
 package com.example.debriserver.core.Post;
 
 import com.example.debriserver.basicModels.BasicException;
-import com.example.debriserver.core.Post.model.GetPostSearchListRes;
-import com.example.debriserver.core.Post.model.GetScrapRes;
+import com.example.debriserver.core.Post.model.*;
 import com.example.debriserver.basicModels.BasicResponse;
-import com.example.debriserver.core.Post.model.GetPostListRes;
-import com.example.debriserver.core.Post.model.GetPostRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +51,7 @@ public class PostProvider {
         }
     }
 
-    public List<GetPostListRes> getPostList(int userIdx, int boardIdx, int pageNum) throws BasicException{
+    public GetPostListCountRes getPostList(int userIdx, int boardIdx, int pageNum) throws BasicException{
         try{
             return postDao.getPostList(userIdx, boardIdx, pageNum);
         }catch (Exception exception){
@@ -63,7 +60,7 @@ public class PostProvider {
         }
     }
 
-    public List<GetPostSearchListRes> getPostSearchList(int userIdx, String keyword, int pageNum) throws BasicException{
+    public GetPostSearchListCountRes getPostSearchList(int userIdx, String keyword, int pageNum) throws BasicException{
         try{
 
             return postDao.getPostSearchList(userIdx, keyword, pageNum);
