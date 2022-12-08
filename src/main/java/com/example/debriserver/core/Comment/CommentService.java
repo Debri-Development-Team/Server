@@ -51,9 +51,9 @@ public class CommentService {
         }
     }
 
-    public List<GetCommentRes> getComment(int postIdx, int userIdx) throws BasicException{
+    public List<GetCommentRes> getComment(int postIdx, int userIdx, int pageNum) throws BasicException{
         try{
-            List<GetCommentRes> getCommentRes = commentDao.getComment(postIdx, userIdx);
+            List<GetCommentRes> getCommentRes = commentDao.getComment(postIdx, userIdx, pageNum);
 
             return getCommentRes;
         }catch (Exception exception){
@@ -101,4 +101,12 @@ public class CommentService {
         }
     }
 
+    public int getCommentNumber(int postIdx) throws BasicException{
+
+        try {
+            return commentDao.getCommentNumber(postIdx);
+        }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
 }

@@ -186,7 +186,7 @@ public class PostController {
      * */
     @ResponseBody
     @PostMapping("/getSearchList")
-    public BasicResponse<List<GetPostSearchListRes>> getPostSearchList(@RequestBody GetPostSearchListReq getPostSearchListReq){
+    public BasicResponse<GetPostSearchListCountRes> getPostSearchList(@RequestBody GetPostSearchListReq getPostSearchListReq){
         try{
             String jwtToken = jwt.getJwt();
 
@@ -195,9 +195,8 @@ public class PostController {
             String keyword = getPostSearchListReq.getKeyword();
             int pageNum = getPostSearchListReq.getPageNum();
             int userIdx = jwt.getUserIdx(jwtToken);
-            List<GetPostSearchListRes> getPostSearchListRes = postProvider.getPostSearchList(userIdx, keyword, pageNum);
 
-            return  new BasicResponse<>(getPostSearchListRes);
+            return  new BasicResponse<>(postProvider.getPostSearchList(userIdx, keyword, pageNum));
 
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
@@ -210,7 +209,7 @@ public class PostController {
       * [GET]localhost / api / post / getList / {boardIdx} / {pageNum}
       */
      @GetMapping("/getList/{boardIdx}/{pageNum}")
-     public BasicResponse<List<GetPostListRes>> getPostList ( @PathVariable int boardIdx, @PathVariable int pageNum){
+     public BasicResponse<GetPostListCountRes> getPostList ( @PathVariable int boardIdx, @PathVariable int pageNum){
 
          try {
              String jwtToken = jwt.getJwt();
@@ -221,9 +220,8 @@ public class PostController {
                  return new BasicResponse<>(BasicServerStatus.BOARD_NOT_EXIST);
 
              int userIdx = jwt.getUserIdx(jwtToken);
-             List<GetPostListRes> getPostListRes = postProvider.getPostList(userIdx, boardIdx, pageNum);
 
-             return new BasicResponse<>(getPostListRes);
+             return new BasicResponse<>(postProvider.getPostList(userIdx, boardIdx, pageNum));
          } catch (BasicException exception) {
              return new BasicResponse<>((exception.getStatus()));
          }
@@ -234,7 +232,7 @@ public class PostController {
       * */
      @ResponseBody
      @GetMapping("/getMyScrap/{pageNum}")
-     public BasicResponse<List<GetScrapRes>> getScrapPosts (@PathVariable int pageNum)
+     public BasicResponse<GetScrapCountRes> getScrapPosts (@PathVariable int pageNum)
      {
          try {
              String jwtToken = jwt.getJwt();
@@ -242,8 +240,7 @@ public class PostController {
 
              int userIdx = jwt.getUserIdx(jwtToken);
 
-             List<GetScrapRes> getPosts = postService.getScrapPosts(userIdx, pageNum);
-             return new BasicResponse<>(getPosts);
+             return new BasicResponse<>(postService.getScrapPosts(userIdx, pageNum));
 
          } catch (BasicException exception) {
              return new BasicResponse<>((exception.getStatus()));
@@ -280,7 +277,7 @@ public class PostController {
       * 3.7.2 특정 게시판 키워드 조회
       * */
      @GetMapping("/boardPostList/{boardIdx}/{pageNum}")
-    public BasicResponse<List<GetPostListRes>> getBoardPostList(@RequestParam String key, @PathVariable int boardIdx, @PathVariable int pageNum){
+    public BasicResponse<GetPostListCountRes> getBoardPostList(@RequestParam String key, @PathVariable int boardIdx, @PathVariable int pageNum){
 
          try{
              String jwtToken = jwt.getJwt();

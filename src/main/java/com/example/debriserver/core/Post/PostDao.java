@@ -145,7 +145,7 @@ public class PostDao {
     /**
      * 유저가 스크랩한 글
      **/
-    public List<GetScrapRes> getScrapPosts(int userIdx, int pageNum)
+    public GetScrapCountRes getScrapPosts(int userIdx, int pageNum)
     {
         int idx = 12 * (pageNum - 1);
 
@@ -160,9 +160,16 @@ public class PostDao {
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN User as u on p.userIdx = u.userIdx\n" +
                 "WHERE p.status = 'ACTIVE' AND pm.status = 'ACTIVE' AND reportedUserIdx is null\n" +
-                "order by p.postIdx LIMIT ?, 12";
+                "order by p.postIdx DESC LIMIT ?, 12";
 
-        return this.jdbcTemplate.query(getScrapPostsQuery,
+        String countQuery = "SELECT count(p.postIdx)\n" +
+                "FROM Post as p\n" +
+                "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
+                "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
+                "    LEFT JOIN User as u on p.userIdx = u.userIdx\n" +
+                "WHERE p.status = 'ACTIVE' AND pm.status = 'ACTIVE' AND reportedUserIdx is null";
+
+        List<GetScrapRes> postList = this.jdbcTemplate.query(getScrapPostsQuery,
                 (rs, rowNum) -> new GetScrapRes
                         (
                             rs.getInt("postIdx"),
@@ -177,6 +184,10 @@ public class PostDao {
                             rs.getString("boardName")
                         ),
                 idx);
+
+        int count = this.jdbcTemplate.queryForObject(countQuery, int.class);
+
+        return new GetScrapCountRes(postList, count);
     }
 
     public int insertPostLike(PostPostLikeReq postPostLikeReq) {
@@ -213,7 +224,7 @@ public class PostDao {
         return this.jdbcTemplate.update(insertPostLikeQuery, insertPostLikeParams);
     }
     
-    public List<GetPostListRes> getPostList(int userIdx, int boardIdx, int pageNum){
+    public GetPostListCountRes getPostList(int userIdx, int boardIdx, int pageNum){
         int idx = 12 * (pageNum - 1);
 
         String getListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus,\n" +
@@ -228,9 +239,17 @@ public class PostDao {
                 "         LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "         LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
                 "WHERE p.status = 'ACTIVE' AND b.boardIdx = ? AND reportedUserIdx is null\n" +
-                "order by p.postIdx LIMIT ?, 12";
+                "order by p.postIdx DESC LIMIT ?, 12";
 
-        return this.jdbcTemplate.query(getListQuery,
+        String countQuery = "SELECT distinct count(p.postIdx)\n" +
+                "FROM Post as p\n" +
+                "         LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
+                "         LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
+                "         LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
+                "WHERE p.status = 'ACTIVE' AND b.boardIdx = ? AND reportedUserIdx is null;";
+
+
+        List<GetPostListRes> postList = this.jdbcTemplate.query(getListQuery,
                 (rs, rowNum) -> new GetPostListRes
                         (
                                 rs.getInt("boardIdx"),
@@ -245,9 +264,13 @@ public class PostDao {
                                 rs.getString("boardName")
                         ),
                 boardIdx, idx);
+
+        int count = this.jdbcTemplate.queryForObject(countQuery, int.class, boardIdx);
+
+        return new GetPostListCountRes(postList, count);
     }
 
-    public List<GetPostSearchListRes> getPostSearchList(int userIdx, String keyword, int pageNum){
+    public GetPostSearchListCountRes getPostSearchList(int userIdx, String keyword, int pageNum){
         int idx = 12 * (pageNum - 1);
 
         String getPostSearchListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus,\n" +
@@ -262,9 +285,18 @@ public class PostDao {
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
                 "WHERE p.status = 'ACTIVE' AND p.postName like '" + keyword + "%' AND reportedUserIdx is null\n" +
-                "order by p.postIdx LIMIT ?, 12";
+                "order by p.postIdx DESC LIMIT ?, 12";
 
-        return this.jdbcTemplate.query(getPostSearchListQuery,
+        String countQuery = "SELECT count(p.postIdx) as postCount \n" +
+                "FROM Post as p\n" +
+                "    LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
+                "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
+                "    LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
+                "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
+                "    LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
+                "WHERE p.status = 'ACTIVE' AND p.postName like '" + keyword + "%' AND reportedUserIdx is null;";
+
+        List<GetPostSearchListRes> postList =  this.jdbcTemplate.query(getPostSearchListQuery,
                 (rs, rowNum) -> new GetPostSearchListRes
                         (
                                 rs.getInt("boardIdx"),
@@ -279,6 +311,10 @@ public class PostDao {
                                 rs.getString("boardName")
                         )
                 , idx);
+
+        int count = this.jdbcTemplate.queryForObject(countQuery, int.class);
+
+        return new GetPostSearchListCountRes(postList, count);
     }
 
     public GetPostRes getPost(int postIdx, int userIdx){
@@ -323,7 +359,7 @@ public class PostDao {
                 getPostParameters);
     }
 
-    public List<GetPostListRes> getBoardPostList(String key, int boardIdx, int userIdx, int pageNum) {
+    public GetPostListCountRes getBoardPostList(String key, int boardIdx, int userIdx, int pageNum) {
         int idx = 12 * (pageNum - 1);
 
         String getPostSearchListQuery = "SELECT distinct p.boardIdx, p.postIdx, p.userIdx, u.nickname, p.postName, pl.likeStatus,\n" +
@@ -338,9 +374,18 @@ public class PostDao {
                 "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
                 "    LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
                 "WHERE p.status = 'ACTIVE' AND p.postName like '" + key + "%' AND b.boardIdx = ? AND reportedUserIdx is null\n" +
-                "order by p.postIdx LIMIT ?, 12";
+                "order by p.postIdx DESC LIMIT ?, 12";
 
-        return this.jdbcTemplate.query(getPostSearchListQuery,
+        String countQuery = "SELECT count(p.postIdx) as postCount \n" +
+                "FROM Post as p\n" +
+                "    LEFT JOIN User as u ON p.userIdx = u.userIdx\n" +
+                "    LEFT JOIN ReportedUser as ru ON ru.reportedUserIdx = p.userIdx AND ru.reportUserIdx = " + userIdx + " AND ru.status = 'BLOCK'\n" +
+                "    LEFT JOIN PostLike as pl ON p.postIdx = pl.postIdx AND pl.userIdx = " + userIdx + "\n" +
+                "    LEFT JOIN PostMarked pm On p.postIdx = pm.postIdx AND pm.userIdx = " + userIdx + "\n" +
+                "    LEFT JOIN Board as b on p.boardIdx = b.boardIdx\n" +
+                "WHERE p.status = 'ACTIVE' AND p.postName like '" + key + "%' AND b.boardIdx = ? AND reportedUserIdx is null;";
+
+        List<GetPostListRes> postList = this.jdbcTemplate.query(getPostSearchListQuery,
                 (rs, rowNum) -> new GetPostListRes
                         (
                                 rs.getInt("boardIdx"),
@@ -354,5 +399,8 @@ public class PostDao {
                                 rs.getInt("commentCont"),
                                 rs.getString("boardName")
                         ), boardIdx, idx);
+
+        int count = this.jdbcTemplate.queryForObject(countQuery, int.class, boardIdx);
+        return new GetPostListCountRes(postList, count);
     }
 }
