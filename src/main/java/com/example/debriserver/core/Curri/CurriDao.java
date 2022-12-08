@@ -521,9 +521,20 @@ public class CurriDao {
     }
 
     public GetThisCurriRes getThisCurri(int curriIdx, int userIdx) {
+
+        // D - day update
+        String upDateDayQuery = "UPDATE Curriculum as C, \n" +
+                "    ( SELECT DATEDIFF(dDayAt, NOW()) as newDay\n" +
+                "    FROM Curriculum\n" +
+                "    WHERE curriIdx = " + curriIdx + " ) as C2\n" +
+                "SET C.dDay = C2.newDay\n" +
+                "WHERE curriIdx = ?;";
+
+        this.jdbcTemplate.update(upDateDayQuery, curriIdx);
+
         String getCurriQuery = "SELECT\n" +
                 "    c.curriIdx, curriName, visibleStatus, langTag,\n" +
-                "    progressRate, c.status, completeAt, curriAuthor,\n" +
+                "    progressRate, c.status, UNIX_TIMESTAMP(completeAt) as completeAt, curriAuthor,\n" +
                 "    dDay, createdAt, curriDesc, cs.cntScrap, cs.scrapIdx,\n" +
                 "    cs.scrapStatus, chlc.cntCh\n" +
                 "FROM Curriculum as c\n" +
@@ -553,12 +564,15 @@ public class CurriDao {
         String getLectureQuery = "SELECT\n" +
                 "    l.lectureIdx, l.lectureName, l.langTag, l.chNumber, l.pricing,\n" +
                 "    l.type, COUNT(chlc2.curriIdx) as usedCnt, chlc.cpCnt,\n" +
-                "    chlc.scrapStatus, chlc.likeStatus\n" +
+                "    (cpCnt / l.chNumber) * 100 as progressRate,\n" +
+                "    chlc.scrapStatus, chlc.likeStatus,\n" +
+                "    IFNULL(llc, 0) as llc\n" +
                 "FROM Lecture as l\n" +
                 "JOIN (\n" +
                 "    SELECT chlc.lectureIdx, COUNT(chI.chIdx) as cpCnt,\n" +
                 "           IFNULL(lScrap.status, 'INACTIVE') as scrapStatus,\n" +
-                "           IFNULL(lLike.status, 'INACTIVE') as likeStatus\n" +
+                "           IFNULL(lLike.status, 'INACTIVE') as likeStatus,\n" +
+                "           llc\n" +
                 "    FROM Ch_Lecture_Curri as chlc\n" +
                 "    LEFT JOIN (\n" +
                 "        SELECT chI.lectureIdx, chI.chIdx\n" +
@@ -575,6 +589,12 @@ public class CurriDao {
                 "        FROM lectureLike\n" +
                 "        WHERE userIdx = " + userIdx + "\n" +
                 "    ) lLike on lLike.lectureIdx = chlc.lectureIdx\n" +
+                "    LEFT JOIN (\n" +
+                "        SELECT COUNT(status) as llc, lectureIdx\n" +
+                "        FROM lectureLike\n" +
+                "        WHERE status = 'ACTIVE'\n" +
+                "        GROUP BY lectureIdx\n" +
+                "    ) lcLike on lcLike.lectureIdx = chlc.lectureIdx\n" +
                 "    WHERE chlc.curriIdx = " + curriIdx + "\n" +
                 "    GROUP BY lectureIdx\n" +
                 ") chlc\n" +
@@ -585,6 +605,75 @@ public class CurriDao {
                 ") chlc2 on chlc2.lectureIdx = chlc.lectureIdx\n" +
                 "WHERE status = 'ACTIVE' AND l.lectureIdx = chlc.lectureIdx\n" +
                 "GROUP BY l.lectureIdx;";
+
+        String getChapterQuery = "SELECT\n" +
+                "    chlc.chIdx, chlc.lectureIdx, chlc.curriIdx, chlc.progressOrder, chlc.chComplete,\n" +
+                "    c.chName, l.chNumber, IFNULL(chlc2.chCnt, 0) as chCnt\n" +
+                "FROM Ch_Lecture_Curri as chlc\n" +
+                "LEFT JOIN (\n" +
+                "    SELECT chNumber, lectureIdx\n" +
+                "    FROM Lecture\n" +
+                ") l on chlc.lectureIdx = l.lectureIdx\n" +
+                "LEFT JOIN (\n" +
+                "    SELECT chIdx, chName\n" +
+                "    FROM Chapter\n" +
+                "    GROUP BY chIdx\n" +
+                ") c on chlc.chIdx = c.chIdx\n" +
+                "LEFT JOIN (\n" +
+                "    SELECT curriIdx, lectureIdx, COUNT(chComplete) as chCnt\n" +
+                "    FROM Ch_Lecture_Curri as  chlc2\n" +
+                "    WHERE chComplete = 'TRUE'\n" +
+                "    GROUP BY lectureIdx\n" +
+                ") chlc2 on chlc.lectureIdx = chlc2.lectureIdx AND chlc.lectureIdx = chlc2.lectureIdx\n" +
+                "WHERE chlc.curriIdx = " + curriIdx + "\n" +
+                "LIMIT ?, 3;";
+
+        return this.jdbcTemplate.queryForObject(getCurriQuery,
+                (rs, rowNum) -> new GetThisCurriRes(
+                        rs.getInt("curriIdx"),
+                        rs.getString("curriName"),
+                        rs.getString("visibleStatus"),
+                        rs.getString("langTag"),
+                        rs.getFloat("progressRate"),
+                        rs.getString("status"),
+                        rs.getInt("completeAt"),
+                        rs.getString("curriAuthor"),
+                        rs.getString("curriDesc"),
+                        rs.getInt("dDay"),
+                        rs.getInt("cntCh"),
+                        rs.getTimestamp("createdAt"),
+                        rs.getInt("cntScrap"),
+                        rs.getString("scrapStatus"),
+                        rs.getInt("scrapIdx"),
+
+                        this.jdbcTemplate.query(getLectureQuery,
+                                (rs2, rowNum2) -> new LectureListInCurriRes(
+                                        rs2.getInt("lectureIdx"),
+                                        rs2.getString("lectureName"),
+                                        rs2.getString("langTag"),
+                                        rs2.getInt("chNumber"),
+                                        rs2.getString("pricing"),
+                                        rs2.getString("type"),
+                                        rs2.getFloat("progressRate"),
+                                        rs2.getInt("usedCnt"),
+                                        rs2.getString("scrapStatus"),
+                                        rs2.getString("likeStatus"),
+                                        rs2.getInt("llc")
+                                )),
+
+                        this.jdbcTemplate.query(getChapterQuery,
+                                (rs3, rowNum3) -> new ChapterListInCurriRes(
+                                        rs3.getInt("chIdx"),
+                                        rs3.getInt("lectureIdx"),
+                                        rs3.getInt("curriIdx"),
+                                        rs3.getString("chName"),
+                                        rs3.getInt("chNumber"),
+                                        rs3.getString("langTag"),
+                                        rs3.getString("chComplete"),
+                                        rs3.getInt("progressOrder"),
+                                        rs3.getInt("chCnt")
+                                ), rs.getInt("cntCh") - rs.getInt("dDay"))
+                ), curriIdx);
     }
 
     public CurriReviewRes createCurriReview(PostCurriReviewReq postCurriReviewReq, int authorIdx){
