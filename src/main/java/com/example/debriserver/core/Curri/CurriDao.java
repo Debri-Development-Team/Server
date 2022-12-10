@@ -55,7 +55,6 @@ public class CurriDao {
 
     }
 
-    // 서브 쿼리로 합쳐야할 듯
     public float rate(int lectureIdx, int curriIdx){
         String getCompleteQuery = "SELECT COUNT(chlc.chIdx)\n" +
                 "FROM Ch_Lecture_Curri as chlc\n" +
@@ -214,7 +213,6 @@ public class CurriDao {
         return result > 0;
     }
 
-    // sub 쿼리 활용해서 적극적으로 줄여보기
     public boolean insertLecture(PostInsertLectureReq postInsertLectureReq, int userIdx){
         // 해당 강의 자료의 정보를 찾아 커리큘럼에 추가하는 쿼리
         String insertLectureQuery = "INSERT INTO Ch_Lecture_Curri(chIdx, lectureIdx, curriIdx, lectureOrder, progressOrder)\n" +
@@ -285,7 +283,7 @@ public class CurriDao {
     }
 
     public List<GetCurriListRes> getList(int userIdx) {
-        String getCurriListQuery = "SELECT distinct c.curriIdx, c.curriName, c.curriAuthor, c.visibleStatus, c.langTag, c.progressRate, c.status, c.curriDesc, UNIX_TIMESTAMP(c.createdAt) as created\n" +
+        String getCurriListQuery = "SELECT distinct c.curriIdx, c.curriName, c.curriAuthor, c.visibleStatus, c.langTag, c.progressRate, c.status, c.curriDesc, UNIX_TIMESTAMP(c.createdAt) as createAt\n" +
                 "FROM Curriculum as c\n" +
                 "JOIN User as u\n" +
                 "WHERE u.userIdx = ? AND u.userIdx = c.ownerIdx AND c.status NOT IN ('DELETE');";
@@ -300,7 +298,7 @@ public class CurriDao {
                         rs.getString("langTag"),
                         rs.getFloat("progressRate"),
                         rs.getString("status"),
-                        rs.getInt("created")
+                        rs.getInt("createAt")
                 ), userIdx);
     }
 

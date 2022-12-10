@@ -198,16 +198,18 @@ public class PostService {
     }
 
 
-    public List<GetScrapRes> getScrapPosts(int userIdx) throws BasicException
+    public GetScrapCountRes getScrapPosts(int userIdx, int pageNum) throws BasicException
     {
-
-        List<GetScrapRes> getPosts = postDao.getScrapPosts(userIdx);
-        return getPosts;
+        try{
+            return postDao.getScrapPosts(userIdx, pageNum);
+        }catch (Exception exception){
+            throw new BasicException(DB_ERROR);
+        }
     }
 
-    public List<GetPostListRes> getBoardPostList(String key, int boardIdx, int userIdx) throws BasicException{
+    public GetPostListCountRes getBoardPostList(String key, int boardIdx, int userIdx, int pageNum) throws BasicException{
         try{
-            return postDao.getBoardPostList(key, boardIdx, userIdx);
+            return postDao.getBoardPostList(key, boardIdx, userIdx, pageNum);
         }catch (Exception exception){
             throw new BasicException(DB_ERROR);
         }

@@ -5,13 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetPostSearchListReq {
-
-    private String keyword;
-    int pageNum;
-
+public class GetScrapCountRes {
+    private List<GetScrapRes> postList;
+    private int postCount;
 }

@@ -1,4 +1,4 @@
-package com.example.debriserver.core.Post.model;
+package com.example.debriserver.core.Auth.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,9 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetPostSearchListReq {
-
-    private String keyword;
-    int pageNum;
-
+public class PostAuthEmailReq {
+    private String email;
 }

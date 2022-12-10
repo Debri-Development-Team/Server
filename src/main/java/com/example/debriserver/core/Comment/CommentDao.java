@@ -20,8 +20,8 @@ public class CommentDao {
     public PostReplyOnPostRes createReplyOnPost(PostReplyOnPostReq postReplyOnPostReq){
         //먼저 유저 인덱스, 내용, 게시글 번호를 저장
         String insertQuery = "INSERT\n" +
-                "INTO Comment(userIdx, postIdx, commentContent, authorName)\n" +
-                "VALUES (?, ?, ?, ?);";
+                "INTO Comment(userIdx, postIdx, commentContent, authorName, class, commentOrder)\n" +
+                "VALUES (?, ?, ?, ?, ?, ?);";
 
         //방금 삽입한 인덱스를 가져온다
         String preInsertedIdxQuery= "SELECT MAX(commentIdx) FROM Comment;";
@@ -29,7 +29,7 @@ public class CommentDao {
         //그 인덱스를 그룹번호로 클래스 번호로 0을, 순서로 0을 삽입
         String insertPostProcessQuery =
                 "UPDATE Comment\n" +
-                "SET groupNum = ?, class = ?, commentOrder = ?\n" +
+                "SET groupNum = ?\n" +
                 "WHERE commentIdx = ?;";
 
         //댓글 정보를 가져온다
@@ -43,7 +43,9 @@ public class CommentDao {
                         postReplyOnPostReq.getUserIdx(),
                         postReplyOnPostReq.getPostIdx(),
                         postReplyOnPostReq.getContent(),
-                        postReplyOnPostReq.getAuthorName()
+                        postReplyOnPostReq.getAuthorName(),
+                        0,
+                        0
                 };
 
         this.jdbcTemplate.update(insertQuery, insertCommentParameters);
@@ -55,8 +57,6 @@ public class CommentDao {
         Object[] insertPostProcessParameters = new Object[]
                 {
                         insertedCommentIdx,
-                        0,
-                        0,
                         insertedCommentIdx
                 };
 
@@ -193,15 +193,18 @@ public class CommentDao {
 
     }
 
-    public List<GetCommentRes> getComment(int postIdx, int userIdx){
+    public List<GetCommentRes> getComment(int postIdx, int userIdx, int pageNum){
         String getListQuery =
                 "SELECT Comment.commentIdx, userIdx, postIdx, authorName, class, commentOrder, groupNum, commentContent\n" +
                         "FROM Comment LEFT JOIN ReportedComment RC on Comment.commentIdx = RC.commentIdx\n" +
-                        "WHERE postIdx = ? and Comment.status = 'ACTIVE' and (reportUserIdx != ? or reportUserIdx is null);";
+                        "WHERE postIdx = ? and Comment.status = 'ACTIVE' and (reportUserIdx != ? or reportUserIdx is null)\n" +
+                        "order by commentIdx DESC LIMIT ?, 12;";
 
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Comment WHERE commentIdx = ?), CURRENT_TIMESTAMP);";
         String checkLikeStatusQuery = "SELECT exists(SELECT * FROM CommentLike WHERE userIdx = ? and commentIdx = ? and status = 'ACTIVE');";
         String likeNumberCountQuery = "SELECT COUNT(*) FROM CommentLike WHERE commentIdx = ? and status = 'ACTIVE';";
+
+        pageNum = (pageNum - 1) * 12;
 
         return this.jdbcTemplate.query
                 (
@@ -219,7 +222,7 @@ public class CommentDao {
                                         rs.getString("authorName"),
                                         this.jdbcTemplate.queryForObject(checkLikeStatusQuery, int.class, userIdx, rs.getInt("commentIdx")) == 1,
                                         this.jdbcTemplate.queryForObject(likeNumberCountQuery, int.class, rs.getInt("commentIdx"))
-                                ), postIdx, userIdx
+                                ), postIdx, userIdx, pageNum
                 );
     }
 
@@ -318,11 +321,16 @@ public class CommentDao {
         return new PatchCommentLikeRes(true);
     }
 
-    public boolean commentExist(int commentIdx, int userIdx) {
+    public boolean commentExist(int commentIdx) {
         String checkQuery = "SELECT exists(SELECT * FROM Comment WHERE commentIdx = ? and status = 'ACTIVE');";
 
         return this.jdbcTemplate.queryForObject(checkQuery, int.class, commentIdx) == 0;
     }
 
 
+    public int getCommentNumber(int postIdx) {
+        String queryString = "select count(commentIdx) from Comment where postIdx = ?;";
+
+        return this.jdbcTemplate.queryForObject(queryString, int.class, postIdx);
+    }
 }
