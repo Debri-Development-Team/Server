@@ -521,16 +521,24 @@ public class CurriDao {
     }
 
     public GetThisCurriRes getThisCurri(int curriIdx, int userIdx) {
+        // check status
+        String checkStatusQuery = "SELECT COUNT(curriIdx)\n" +
+                "FROM Curriculum\n" +
+                "WHERE curriIdx = ? AND status = 'ACTIVE';";
+
+        int check = this.jdbcTemplate.queryForObject(checkStatusQuery, int.class, curriIdx);
 
         // D - day update
-        String upDateDayQuery = "UPDATE Curriculum as C, \n" +
-                "    ( SELECT DATEDIFF(dDayAt, NOW()) as newDay\n" +
-                "    FROM Curriculum\n" +
-                "    WHERE curriIdx = " + curriIdx + " ) as C2\n" +
-                "SET C.dDay = C2.newDay\n" +
-                "WHERE curriIdx = ?;";
+        if (check > 0) {
+            String upDateDayQuery = "UPDATE Curriculum as C, \n" +
+                    "    ( SELECT DATEDIFF(dDayAt, NOW()) as newDay\n" +
+                    "    FROM Curriculum\n" +
+                    "    WHERE curriIdx = " + curriIdx + " ) as C2\n" +
+                    "SET C.dDay = C2.newDay\n" +
+                    "WHERE curriIdx = ?;";
 
-        this.jdbcTemplate.update(upDateDayQuery, curriIdx);
+            this.jdbcTemplate.update(upDateDayQuery, curriIdx);
+        }
 
         String getCurriQuery = "SELECT\n" +
                 "    c.curriIdx, curriName, visibleStatus, langTag,\n" +
