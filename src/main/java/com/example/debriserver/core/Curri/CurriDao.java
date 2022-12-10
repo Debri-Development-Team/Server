@@ -218,34 +218,35 @@ public class CurriDao {
     public boolean insertLecture(PostInsertLectureReq postInsertLectureReq, int userIdx){
         // 해당 강의 자료의 정보를 찾아 커리큘럼에 추가하는 쿼리
         String insertLectureQuery = "INSERT INTO Ch_Lecture_Curri(chIdx, lectureIdx, curriIdx, lectureOrder, progressOrder)\n" +
-                "SELECT chIdx, chl.lectureIdx, " + postInsertLectureReq.getCurriIdx() + " as curriIdx,\n" +
-                "       mo.ml + 1 as ml,\n" +
-                "       ROW_NUMBER() over(order by chIdx) + mo.mp as num\n" +
+                "SELECT\n" +
+                "    chIdx, lectureIdx, c.curriIdx,\n" +
+                "    mo.ml + 1 as ml,\n" +
+                "    ROW_NUMBER() over(order by chIdx) + mo.mp as num\n" +
                 "FROM Chapter as chl\n" +
                 "JOIN (\n" +
                 "    SELECT IFNULL(MAX(progressOrder), 0) as mp,\n" +
-                "           IFNULL(MAX(lectureOrder),0) as ml,\n" +
-                "           lectureIdx\n" +
+                "           IFNULL(MAX(lectureOrder),0) as ml\n" +
                 "    FROM Ch_Lecture_Curri as chlc\n" +
-                "    LEFT JOIN Curriculum as c on c.curriIdx = chlc.curriIdx\n" +
-                "    WHERE chlc.curriIdx = ? and ownerIdx = ?\n" +
-                ") mo on mo.lectureIdx != chl.lectureIdx\n" +
-                "WHERE chl.lectureIdx = ?;";
+                "    WHERE chlc.curriIdx = ?\n" +
+                ") mo\n" +
+                "JOIN (\n" +
+                "    SELECT curriIdx\n" +
+                "    FROM Curriculum\n" +
+                "    WHERE curriIdx = ?\n" +
+                ") c\n" +
+                "WHERE chl.lectureIdx = ?;\n";
 
         Object[] insertLectureParameters = new Object[] {
                 postInsertLectureReq.getCurriIdx(),
-                userIdx,
+                postInsertLectureReq.getCurriIdx(),
                 postInsertLectureReq.getLectureIdx()
         };
 
         this.jdbcTemplate.update(insertLectureQuery, insertLectureParameters);
 
-        String getDdayQurey = "SELECT CASE\n" +
-                "    WHEN l.chNumber % 3 = 0\n" +
-                "    THEN c.dDay + (l.chNumber % 3) * 7\n" +
-                "    WHEN l.chNumber % 3 != 0\n" +
-                "    THEN c.dDay + (l.chNumber % 3 + 1) * 7\n" +
-                "    END as afDay\n" +
+        String getDdayQurey = "SELECT\n" +
+                "    IF(TRUNCATE(chNumber % 3, 0) = 0, TRUNCATE(chNumber / 3, 0) * 7,\n" +
+                "       (TRUNCATE(chNumber / 3, 0) + 1) * 7) as afDay\n" +
                 "FROM Curriculum as c\n" +
                 "LEFT JOIN(\n" +
                 "    SELECT distinct chNumber, l.lectureIdx, chlc.curriIdx\n" +
@@ -257,6 +258,7 @@ public class CurriDao {
 
         Object[] getDdayParams = new Object[]{
                 postInsertLectureReq.getLectureIdx(),
+                postInsertLectureReq.getCurriIdx(),
                 postInsertLectureReq.getCurriIdx(),
                 userIdx
         };
@@ -536,7 +538,9 @@ public class CurriDao {
                 "    c.curriIdx, curriName, visibleStatus, langTag,\n" +
                 "    progressRate, c.status, UNIX_TIMESTAMP(completeAt) as completeAt, curriAuthor,\n" +
                 "    dDay, createdAt, curriDesc, cs.cntScrap, cs.scrapIdx,\n" +
-                "    cs.scrapStatus, chlc.cntCh\n" +
+                "    cs.scrapStatus, chlc.cntCh,\n" +
+                "    IF(dDay < 1, (TRUNCATE(cntCh / 7, 0) - 1) * 3,\n" +
+                "        (TRUNCATE((cntCh - dDay) / 7, 0) - 1) * 3) as cusor\n" +
                 "FROM Curriculum as c\n" +
                 "JOIN (\n" +
                 "    SELECT\n" +
@@ -608,10 +612,10 @@ public class CurriDao {
 
         String getChapterQuery = "SELECT\n" +
                 "    chlc.chIdx, chlc.lectureIdx, chlc.curriIdx, chlc.progressOrder, chlc.chComplete,\n" +
-                "    c.chName, l.chNumber, IFNULL(chlc2.chCnt, 0) as chCnt\n" +
+                "    c.chName, l.chNumber, IFNULL(chlc2.chCnt, 0) as chCnt, l.langTag\n" +
                 "FROM Ch_Lecture_Curri as chlc\n" +
                 "LEFT JOIN (\n" +
-                "    SELECT chNumber, lectureIdx\n" +
+                "    SELECT chNumber, lectureIdx, langTag\n" +
                 "    FROM Lecture\n" +
                 ") l on chlc.lectureIdx = l.lectureIdx\n" +
                 "LEFT JOIN (\n" +
@@ -672,7 +676,7 @@ public class CurriDao {
                                         rs3.getString("chComplete"),
                                         rs3.getInt("progressOrder"),
                                         rs3.getInt("chCnt")
-                                ), rs.getInt("cntCh") - rs.getInt("dDay"))
+                                ), rs.getInt("cusor"))
                 ), curriIdx);
     }
 
