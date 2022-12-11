@@ -3,6 +3,8 @@ package com.example.debriserver.core.Auth;
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicResponse;
 import com.example.debriserver.basicModels.BasicServerStatus;
+import com.example.debriserver.core.Auth.model.PostAuthEmailReq;
+import com.example.debriserver.core.Auth.model.PostAuthEmailRes;
 import com.example.debriserver.core.Auth.model.PostLoginReq;
 import com.example.debriserver.core.Auth.model.PostLoginRes;
 import com.example.debriserver.utility.jwtUtility;
@@ -36,6 +38,9 @@ public class AuthController {
         this.JwtUtility = JwtUtility;
     }
 
+    /**
+     * 로그인
+     */
     @ResponseBody
     @PostMapping("/login")
     public BasicResponse<PostLoginRes> login(@RequestBody PostLoginReq postLoginReq)
@@ -65,6 +70,29 @@ public class AuthController {
         }catch (BasicException exception)
         {
             return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 이메일 인증
+     */
+    @ResponseBody
+    @PostMapping("/authEmail")
+    public BasicResponse<PostAuthEmailRes> authEmail(@RequestBody PostAuthEmailReq postAuthEmailReq)
+    {
+        try{
+            // 이메일 형식 확인
+            if(!isRegexEmail(postAuthEmailReq.getEmail()))
+            {
+                return new BasicResponse<>(BasicServerStatus.POST_USERS_INVALID_EMAIL);
+            }
+
+            PostAuthEmailRes postAuthEmailRes = authService.authEmail(postAuthEmailReq.getEmail());
+            return new BasicResponse<>(postAuthEmailRes);
+
+        }catch (BasicException exception)
+        {
+            return new BasicResponse<>(exception.getStatus());
         }
     }
 
