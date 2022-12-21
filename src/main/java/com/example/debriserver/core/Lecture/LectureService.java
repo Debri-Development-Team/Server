@@ -140,4 +140,14 @@ public class LectureService {
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }
+
+    public PostRoadmapCopyRes copyRoadmap(PostRoadmapCopyReq postRoadmapCopyReq, int userIdx) throws BasicException{
+
+        try{
+            return lectureDao.copyRoadmap(postRoadmapCopyReq, userIdx);
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
 }

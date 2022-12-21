@@ -1,13 +1,20 @@
 package com.example.debriserver.core.Lecture;
 
 import com.example.debriserver.basicModels.BasicResponse;
+import com.example.debriserver.core.Curri.Model.PostInsertLectureReq;
 import com.example.debriserver.core.Lecture.Model.*;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.Array;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -426,5 +433,112 @@ public class LectureDao {
         this.jdbcTemplate.update(updateQuery, lectureIdx, userIdx);
 
         return new LectureLikeRes(true);
+    }
+
+    public PostRoadmapCopyRes copyRoadmap(PostRoadmapCopyReq postRoadmapCopyReq, int userIdx) throws SQLException {
+        // Curri 테이블에 데이터 저장
+        String insertQuery = "INSERT\n" +
+                "INTO Curriculum(curriName, curriAuthor, visibleStatus, langTag, curriDesc, ownerIdx)\n" +
+                "VALUES (?, ?, ?, ?, ?, ?);";
+
+        String getCurriIdxQurey = "SELECT MAX(curriIdx) FROM Curriculum where ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
+
+        Object[] insertParams = new Object[] {
+                postRoadmapCopyReq.getRoadmapName(),
+                "Debri Team",
+                "INACTIVE",
+                postRoadmapCopyReq.getLangTag(),
+                postRoadmapCopyReq.getRoadmapExplain(),
+                userIdx
+        };
+
+        this.jdbcTemplate.update(insertQuery, insertParams);
+
+        int curriIdx = this.jdbcTemplate.queryForObject(getCurriIdxQurey, int.class, userIdx);
+
+        String getLectuerListQuery = "select lectureIdx from Roadmap_Child where roadmapIdx = ?;";
+
+        List<LectuerIndex> list = this.jdbcTemplate.query(getLectuerListQuery,
+                (rs, rowNum) -> new LectuerIndex(
+                        rs.getInt("lectureIdx")
+                ), postRoadmapCopyReq.getRoadmapIdx());
+
+        for(LectuerIndex lecture: list){
+            boolean result = insertLecture(curriIdx, userIdx, lecture.getLectuerIdx());
+            System.out.println(result);
+        }
+
+        return new PostRoadmapCopyRes(curriIdx);
+    }
+
+    public boolean insertLecture(int curriIdx, int userIdx, int lectureIdx){
+        long retryDate = System.currentTimeMillis();
+
+        // 해당 강의 자료의 정보를 찾아 커리큘럼에 추가하는 쿼리
+        String insertLectureQuery = "INSERT INTO Ch_Lecture_Curri(chIdx, lectureIdx, curriIdx, lectureOrder, progressOrder)\n" +
+                "SELECT\n" +
+                "    chIdx, lectureIdx, c.curriIdx,\n" +
+                "    mo.ml + 1 as ml,\n" +
+                "    ROW_NUMBER() over(order by chIdx) + mo.mp as num\n" +
+                "FROM Chapter as chl\n" +
+                "JOIN (\n" +
+                "    SELECT IFNULL(MAX(progressOrder), 0) as mp,\n" +
+                "           IFNULL(MAX(lectureOrder),0) as ml\n" +
+                "    FROM Ch_Lecture_Curri as chlc\n" +
+                "    WHERE chlc.curriIdx = ?\n" +
+                ") mo\n" +
+                "JOIN (\n" +
+                "    SELECT curriIdx\n" +
+                "    FROM Curriculum\n" +
+                "    WHERE curriIdx = ?\n" +
+                ") c\n" +
+                "WHERE chl.lectureIdx = ?;\n";
+
+        Object[] insertLectureParameters = new Object[] {
+                curriIdx,
+                curriIdx,
+                lectureIdx
+        };
+
+        this.jdbcTemplate.update(insertLectureQuery, insertLectureParameters);
+
+        String getDdayQurey = "SELECT\n" +
+                "    IF(TRUNCATE(chNumber % 3, 0) = 0, TRUNCATE(chNumber / 3, 0) * 7,\n" +
+                "       (TRUNCATE(chNumber / 3, 0) + 1) * 7) as afDay\n" +
+                "FROM Curriculum as c\n" +
+                "LEFT JOIN(\n" +
+                "    SELECT distinct chNumber, l.lectureIdx, chlc.curriIdx\n" +
+                "    FROM Lecture as l\n" +
+                "    LEFT JOIN Ch_Lecture_Curri as chlc on l.lectureIdx = chlc.lectureIdx\n" +
+                "    WHERE l.lectureIdx = ? AND chlc.curriIdx = ?\n" +
+                ") l on l.curriIdx = c.curriIdx\n" +
+                "WHERE c.curriIdx = ? AND ownerIdx = ?;";
+
+        Object[] getDdayParams = new Object[]{
+                lectureIdx,
+                curriIdx,
+                curriIdx,
+                userIdx
+        };
+
+        int afterDday = this.jdbcTemplate.queryForObject(getDdayQurey, int.class, getDdayParams);
+
+        Timestamp origianl = new Timestamp(retryDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(origianl.getTime());
+        cal.add(Calendar.DAY_OF_MONTH, afterDday);
+        Timestamp later = new Timestamp(cal.getTime().getTime());
+
+        Object[] insertDdayParams = new Object[]{
+                afterDday,
+                later,
+                curriIdx,
+                userIdx
+        };
+
+        String insertDdayQuery = "UPDATE Curriculum SET dDay = ?, dDayAt = ? WHERE curriIdx = ? and ownerIdx = ?;";
+        int result = this.jdbcTemplate.update(insertDdayQuery, insertDdayParams);
+
+        return result != 0;
     }
 }
