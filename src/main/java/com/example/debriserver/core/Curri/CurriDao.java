@@ -150,8 +150,6 @@ public class CurriDao {
 
         int result = this.jdbcTemplate.update(curriNameModifyQuery, curriNameModifyParams);
 
-//        System.out.println("nameModify : " + result);
-
         return result != 0;
     }
 
@@ -166,8 +164,6 @@ public class CurriDao {
         };
 
         int result = this.jdbcTemplate.update(curriVisibleStatusModifyQuery, curriVisibleStatusModifyParams);
-
-//        System.out.println(result);
 
         return result != 0;
     }
@@ -218,114 +214,54 @@ public class CurriDao {
     }
 
     public boolean insertLecture(PostInsertLectureReq postInsertLectureReq, int userIdx){
-        // ch-l-c에 강의 연결
-        String insertLectureQuery = "INSERT\n" +
-                "INTO Ch_Lecture_Curri(chIdx, lectureIdx, curriIdx, lectureOrder, progressOrder)\n" +
-                "VALUES (?, ?, ?, ?, ?);";
-
-        // 현재 해당 커리큘럼의 max progressOrder 및 lectureOrder 가져오기
-        String getLastProgressOrder = "SELECT IFNULL(MAX(progressOrder),0)\n" +
-                "FROM Ch_Lecture_Curri as chlc\n" +
-                "LEFT JOIN Curriculum C on C.curriIdx = chlc.curriIdx\n" +
-                "WHERE chlc.curriIdx = ? and ownerIdx = ?;";
-
-        String getLastLectureOrder = "SELECT IFNULL(MAX(lectureOrder),0)\n" +
-                "FROM Ch_Lecture_Curri as chlc\n" +
-                "LEFT JOIN Curriculum C on C.curriIdx = chlc.curriIdx\n" +
-                "WHERE chlc.curriIdx = ? and ownerIdx = ?;";
-
-        String insertDdayQuery = "UPDATE Curriculum SET dDay = ?, dDayAt = ? WHERE curriIdx = ? and ownerIdx = ?;";
-
-        String getChIdxQurey = "SELECT MIN(ch.chIdx)\n" +
-                "FROM Chapter as ch\n" +
-                "JOIN Ch_Lecture_Curri as chlc\n" +
-                "JOIN Lecture as l\n" +
-                "WHERE NOT EXISTS(\n" +
-                "    SELECT chlc.chIdx\n" +
+        // 해당 강의 자료의 정보를 찾아 커리큘럼에 추가하는 쿼리
+        String insertLectureQuery = "INSERT INTO Ch_Lecture_Curri(chIdx, lectureIdx, curriIdx, lectureOrder, progressOrder)\n" +
+                "SELECT\n" +
+                "    chIdx, lectureIdx, c.curriIdx,\n" +
+                "    mo.ml + 1 as ml,\n" +
+                "    ROW_NUMBER() over(order by chIdx) + mo.mp as num\n" +
+                "FROM Chapter as chl\n" +
+                "JOIN (\n" +
+                "    SELECT IFNULL(MAX(progressOrder), 0) as mp,\n" +
+                "           IFNULL(MAX(lectureOrder),0) as ml\n" +
                 "    FROM Ch_Lecture_Curri as chlc\n" +
-                "    WHERE chlc.curriIdx = ? and chlc.lectureIdx = ? and chlc.chIdx = ch.chIdx\n" +
-                "    ) AND ch.lectureIdx = ? AND ch.lectureIdx = l.lectureIdx;\n";
+                "    WHERE chlc.curriIdx = ?\n" +
+                ") mo\n" +
+                "JOIN (\n" +
+                "    SELECT curriIdx\n" +
+                "    FROM Curriculum\n" +
+                "    WHERE curriIdx = ?\n" +
+                ") c\n" +
+                "WHERE chl.lectureIdx = ?;\n";
 
-        String getChNumQurey = "SELECT l.chNumber\n" +
-                "FROM Lecture as l\n" +
-                "WHERE l.lectureIdx = ?;";
-
-        Object[] getLastOrderParams = new Object[]{
+        Object[] insertLectureParameters = new Object[] {
                 postInsertLectureReq.getCurriIdx(),
-                userIdx
+                postInsertLectureReq.getCurriIdx(),
+                postInsertLectureReq.getLectureIdx()
         };
 
-        int lastLectureOrder = this.jdbcTemplate.queryForObject(getLastLectureOrder, int.class, getLastOrderParams);
-        int lastProgressOrder = this.jdbcTemplate.queryForObject(getLastProgressOrder, int.class, getLastOrderParams);
-        int chNum = this.jdbcTemplate.queryForObject(getChNumQurey, int.class, postInsertLectureReq.getLectureIdx());
+        this.jdbcTemplate.update(insertLectureQuery, insertLectureParameters);
 
-        System.out.println(lastLectureOrder);
-        System.out.println(lastProgressOrder);
-        System.out.println(chNum);
-
-        for (int i = 1; i <= chNum; i++){
-
-            Object[] getChIdxParams = new Object[]{
-                    postInsertLectureReq.getCurriIdx(),
-                    postInsertLectureReq.getLectureIdx(),
-                    postInsertLectureReq.getLectureIdx()
-            };
-
-            int chIdx = this.jdbcTemplate.queryForObject(getChIdxQurey, int.class, getChIdxParams);
-
-            System.out.println(chIdx);
-
-            Object[] insertLectureParams = new Object[] {
-                    chIdx,
-                    postInsertLectureReq.getLectureIdx(),
-                    postInsertLectureReq.getCurriIdx(),
-                    lastLectureOrder + 1,
-                    lastProgressOrder + i
-            };
-
-            System.out.println(Arrays.toString(insertLectureParams));
-
-            this.jdbcTemplate.update(insertLectureQuery, insertLectureParams);
-        }
-
-        int f = lastProgressOrder % 3;
-
-        int Dday;
-
-        if (f == 0){
-            float a = (float) chNum / 3;
-            int b = chNum / 3;
-            if(b < a ){
-                Dday = (b + 1) * 7;
-            } else {
-                Dday = b * 7;
-            }
-        } else {
-            int F = chNum - (3 - f);
-            float a = (float) F / 3;
-            int b = F / 3;
-            if(b < a ){
-                Dday = (b + 1) * 7;
-            } else {
-                Dday = b * 7;
-            }
-        }
-
-        System.out.println(Dday);
-
-        int curriIdx = postInsertLectureReq.getCurriIdx();
-
-        String getDdayQurey = "SELECT dDay\n" +
-                "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and ownerIdx = ?;";
+        String getDdayQurey = "SELECT\n" +
+                "    IF(TRUNCATE(chNumber % 3, 0) = 0, TRUNCATE(chNumber / 3, 0) * 7,\n" +
+                "       (TRUNCATE(chNumber / 3, 0) + 1) * 7) as afDay\n" +
+                "FROM Curriculum as c\n" +
+                "LEFT JOIN(\n" +
+                "    SELECT distinct chNumber, l.lectureIdx, chlc.curriIdx\n" +
+                "    FROM Lecture as l\n" +
+                "    LEFT JOIN Ch_Lecture_Curri as chlc on l.lectureIdx = chlc.lectureIdx\n" +
+                "    WHERE l.lectureIdx = ? AND chlc.curriIdx = ?\n" +
+                ") l on l.curriIdx = c.curriIdx\n" +
+                "WHERE c.curriIdx = ? AND ownerIdx = ?;";
 
         Object[] getDdayParams = new Object[]{
+                postInsertLectureReq.getLectureIdx(),
+                postInsertLectureReq.getCurriIdx(),
                 postInsertLectureReq.getCurriIdx(),
                 userIdx
         };
 
-        int beforeDday = this.jdbcTemplate.queryForObject(getDdayQurey, int.class, getDdayParams);
-        int afterDday = beforeDday + Dday;
+        int afterDday = this.jdbcTemplate.queryForObject(getDdayQurey, int.class, getDdayParams);
 
         Timestamp origianl = new Timestamp(retryDate);
         Calendar cal = Calendar.getInstance();
@@ -336,27 +272,21 @@ public class CurriDao {
         Object[] insertDdayParams = new Object[]{
                 afterDday,
                 later,
-                curriIdx,
+                postInsertLectureReq.getCurriIdx(),
                 userIdx
         };
 
-        System.out.println(Arrays.toString(insertDdayParams));
-
+        String insertDdayQuery = "UPDATE Curriculum SET dDay = ?, dDayAt = ? WHERE curriIdx = ? and ownerIdx = ?;";
         int result = this.jdbcTemplate.update(insertDdayQuery, insertDdayParams);
 
         return result != 0;
     }
 
     public List<GetCurriListRes> getList(int userIdx) {
-        String getCurriListQuery = "SELECT distinct c.curriIdx, c.curriName, c.curriAuthor, c.visibleStatus, c.langTag, c.progressRate, c.status, c.curriDesc\n" +
+        String getCurriListQuery = "SELECT distinct c.curriIdx, c.curriName, c.curriAuthor, c.visibleStatus, c.langTag, c.progressRate, c.status, c.curriDesc, UNIX_TIMESTAMP(c.createdAt) as createAt\n" +
                 "FROM Curriculum as c\n" +
                 "JOIN User as u\n" +
                 "WHERE u.userIdx = ? AND u.userIdx = c.ownerIdx AND c.status NOT IN ('DELETE');";
-
-        String getCreatedAtQuery = "SELECT distinct UNIX_TIMESTAMP(c.createdAt)\n" +
-                "FROM Curriculum as c\n" +
-                "JOIN User as u\n" +
-                "WHERE c.curriIdx = ? AND c.status NOT IN ('DELETE');";
 
         return this.jdbcTemplate.query(getCurriListQuery,
                 (rs, rowNum) -> new GetCurriListRes(
@@ -368,7 +298,7 @@ public class CurriDao {
                         rs.getString("langTag"),
                         rs.getFloat("progressRate"),
                         rs.getString("status"),
-                        this.jdbcTemplate.queryForObject(getCreatedAtQuery, int.class, rs.getInt("curriIdx"))
+                        rs.getInt("createAt")
                 ), userIdx);
     }
 
@@ -590,324 +520,170 @@ public class CurriDao {
         return result;
     }
 
-    public List<LectureListInCurriRes> lectureList(int curriIdx, int userIdx, int ownerIdx){
-        LectureListInCurriRes listInCurriRes = null;
-
-        String getLectureCountQuery = "SELECT COUNT(distinct lectureIdx)\n" +
-                "FROM Ch_Lecture_Curri\n" +
-                "WHERE curriIdx = ?;";
-
-        String getLectureIdxQuery = "SELECT distinct lectureIdx\n" +
-                "FROM Ch_Lecture_Curri\n" +
-                "WHERE curriIdx = ?;";
-
-        String getLectureListQurey = "SELECT distinct l.lectureName, l.langTag, l.chNumber, l.pricing, l.type\n" +
-                "FROM Lecture as l\n" +
-                "LEFT JOIN Ch_Lecture_Curri as chlc on l.lectureIdx = chlc.lectureIdx\n" +
-                "WHERE chlc.curriIdx = ? and chlc.lectureIdx = ?;";
-
-        String getLectureScrapStatusQuery = "SELECT\n" +
-                "    CASE\n" +
-                "        WHEN COUNT(status) = 0 THEN 'INACTIVE'\n" +
-                "        WHEN status = 'ACTIVE' THEN 'ACTIVE'\n" +
-                "        ELSE 'INACTIVE'\n" +
-                "    END\n" +
-                "FROM LectureScrap\n" +
-                "WHERE userIdx = ? and lectureIdx = ?;";
-
-        String getLectureLikeStatusQuery = "SELECT\n" +
-                "    CASE\n" +
-                "        WHEN COUNT(status) = 0 THEN 'INACTIVE'\n" +
-                "        WHEN status = 'ACTIVE' THEN 'ACTIVE'\n" +
-                "        ELSE 'INACTIVE'\n" +
-                "    END\n" +
-                "FROM lectureLike\n" +
-                "WHERE userIdx = ? and lectureIdx = ?;";
-
-        String getLectureCurriCountQuery = "SELECT IFNULL(COUNT(distinct lectureIdx, curriIdx),0) as lecturCount\n" +
-                "FROM Ch_Lecture_Curri\n" +
-                "WHERE lectureIdx = ?;";
-
-        String getLecturLikeCountQuery = "SELECT IFNULL(COUNT(status), 0)\n" +
-                "FROM lectureLike\n" +
-                "WHERE lectureIdx = ?;";
-
-        int count = this.jdbcTemplate.queryForObject(getLectureCountQuery, int.class, curriIdx);
-
-        List<LectureIdxList> lectureIdxLists = this.jdbcTemplate.query(getLectureIdxQuery,
-                (rs, rowNum) -> new LectureIdxList(
-                        rs.getInt("lectureIdx")
-                )
-                ,curriIdx);
-
-        List<LectureListInCurriRes> getLectureListResList = new ArrayList<>();
-
-        if (count > 0){
-            for (int i = 0; i < count; i++) {
-                int lectureIdx = lectureIdxLists.get(i).getLectureIdx();
-
-                Object[] getLectureParams = new Object[]{
-                        curriIdx, lectureIdx
-                };
-
-                Object[] getStatusParams = new Object[]{
-                        userIdx,
-                        lectureIdx
-                };
-
-                listInCurriRes = this.jdbcTemplate.queryForObject(getLectureListQurey, ((rs2, rowNum2)
-                        -> new LectureListInCurriRes(
-                        lectureIdx,
-
-                        rs2.getString("lectureName"),
-                        rs2.getString("langTag"),
-                        rs2.getInt("chNumber"),
-                        rs2.getString("pricing"),
-                        rs2.getString("type"),
-
-                        rate(lectureIdx, curriIdx),
-
-                        this.jdbcTemplate.queryForObject(getLectureCurriCountQuery, int.class, lectureIdx),
-
-                        this.jdbcTemplate.queryForObject(getLectureScrapStatusQuery, String.class, getStatusParams),
-
-                        this.jdbcTemplate.queryForObject(getLectureLikeStatusQuery, String.class, getStatusParams),
-
-                        this.jdbcTemplate.queryForObject(getLecturLikeCountQuery, int.class, lectureIdx)
-
-                )), getLectureParams);
-
-                System.out.println(listInCurriRes);
-
-                getLectureListResList.add(i, listInCurriRes);
-            }
-        }
-
-        return getLectureListResList;
-    }
-
-    public List<ChapterListInCurriRes> chapterList(int curriIdx, int c, int ownerIdx){
-        List<ChapterListInCurriRes> getChapterListResList = new ArrayList<>();
-        ChapterListInCurriRes chapterListInCurriRes;
-
-        String getCompleteChNumQurey = "SELECT COUNT(chIdx)\n" +
-                "FROM Ch_Lecture_Curri as chlc\n" +
-                "WHERE chlc.curriIdx = ? and chlc.lectureIdx = ? and chlc.chComplete = 'TRUE';";
-
-        String getChapterListQurey = "SELECT distinct chlc.chIdx, chlc.lectureIdx, c.chName, l.chNumber,l.langTag, chlc.chComplete, chlc.progressOrder, l.lectureIdx\n" +
-                "FROM Ch_Lecture_Curri as chlc\n" +
-                "LEFT JOIN Chapter as c on chlc.chIdx = c.chIdx\n" +
-                "JOIN (SELECT langTag, chNumber, l.lectureIdx\n" +
-                "      FROM Lecture as l\n" +
-                "      JOIN Ch_Lecture_Curri as chlc\n" +
-                "      WHERE chlc.lectureIdx = l.lectureIdx) as l\n" +
-                "LEFT JOIN Curriculum as C2 on chlc.curriIdx = C2.curriIdx\n"+
-                "WHERE chlc.curriIdx = ? and l.lectureIdx = chlc.lectureIdx and chlc.progressOrder = ? and C2.ownerIdx = ?;";
-
-        String chCount = "SELECT COUNT(chIdx)\n" +
-                "FROM Ch_Lecture_Curri\n" +
-                "WHERE curriIdx = ?;";
-
-        int count = this.jdbcTemplate.queryForObject(chCount, int.class, curriIdx);
-
-        Object[] getThisCurriParams = new Object[]{
-                curriIdx,
-                ownerIdx
-        };
-
-        System.out.println(c);
-
-        if (count > 0) {
-            int a = 3;
-            if (count < 3) a = count;
-            else if ((c+2) - count > 0) {
-                a = (c+2) - count;
-            }
-            for (int i = 0; i < a; i++) {
-                Object[] getChapterParams = new Object[]{
-                        curriIdx,
-                        c,
-                        ownerIdx
-                };
-
-                chapterListInCurriRes = this.jdbcTemplate.queryForObject(getChapterListQurey, (rs, rowNum)
-                        -> new ChapterListInCurriRes
-                        (
-                                rs.getInt("chIdx"),
-                                rs.getInt("lectureIdx"),
-                                curriIdx,
-                                rs.getString("chName"),
-                                rs.getInt("chNumber"),
-                                rs.getString("langTag"),
-                                rs.getString("chComplete"),
-                                rs.getInt("progressOrder"),
-                                this.jdbcTemplate.queryForObject(getCompleteChNumQurey, int.class, getThisCurriParams)
-                        ), getChapterParams);
-
-                System.out.println(chapterListInCurriRes);
-
-                getChapterListResList.add(i, chapterListInCurriRes);
-
-                c++;
-            }
-        }
-
-        return getChapterListResList;
-    }
-
     public GetThisCurriRes getThisCurri(int curriIdx, int userIdx) {
-
-        String getCurriOwnerAuthorQuery = "SELECT curriAuthor\n" +
+        // check status
+        String checkStatusQuery = "SELECT COUNT(curriIdx)\n" +
                 "FROM Curriculum\n" +
-                "WHERE curriIdx = ?;";
+                "WHERE curriIdx = ? AND status = 'ACTIVE';";
 
-        String curriAuthor = this.jdbcTemplate.queryForObject(getCurriOwnerAuthorQuery, String.class, curriIdx);
+        int check = this.jdbcTemplate.queryForObject(checkStatusQuery, int.class, curriIdx);
 
-        String getCurriOwnerIdxQuery = "SELECT ownerIdx\n" +
-                "FROM Curriculum\n" +
-                "WHERE curriIdx = ?;";
+        // D - day update
+        if (check > 0) {
+            String upDateDayQuery = "UPDATE Curriculum as C, \n" +
+                    "    ( SELECT DATEDIFF(dDayAt, NOW()) as newDay\n" +
+                    "    FROM Curriculum\n" +
+                    "    WHERE curriIdx = " + curriIdx + " ) as C2\n" +
+                    "SET C.dDay = C2.newDay\n" +
+                    "WHERE curriIdx = ?;";
 
-        String getCurriScrapCountQuery = "SELECT IFNULL(COUNT(scrapIdx), 0)\n" +
-                "FROM CurriScrap\n" +
-                "WHERE curriIdx = ? and status = 'ACTIVE';";
+            this.jdbcTemplate.update(upDateDayQuery, curriIdx);
+        }
 
-        String getCurriScrapStatusQuery = "SELECT\n" +
-                "    CASE\n" +
-                "        WHEN COUNT(status) = 0 THEN 'INACTIVE'\n" +
-                "        WHEN status = 'ACTIVE' THEN 'ACTIVE'\n" +
-                "        ELSE 'INACTIVE'\n" +
-                "    END\n" +
-                "FROM CurriScrap\n" +
-                "WHERE curriIdx = ? AND scrapUserIdx = ?;";
-
-        int ownerIdx = this.jdbcTemplate.queryForObject(getCurriOwnerIdxQuery, int.class, curriIdx);
-
-        String getThisCurriQurey = "SELECT distinct curriIdx, curriName, visibleStatus, langTag, progressRate, status, completeAt, curriAuthor, curriDesc\n" +
-                "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and curriAuthor = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
-
-        String getCreatedAtQuery = "SELECT distinct c.createdAt\n" +
+        String getCurriQuery = "SELECT\n" +
+                "    c.curriIdx, curriName, visibleStatus, langTag,\n" +
+                "    progressRate, c.status, UNIX_TIMESTAMP(completeAt) as completeAt, curriAuthor,\n" +
+                "    dDay, createdAt, curriDesc, cs.cntScrap, cs.scrapIdx,\n" +
+                "    cs.scrapStatus, chlc.cntCh,\n" +
+                "    IF(dDay < 1, (TRUNCATE(cntCh / 7, 0) - 1) * 3,\n" +
+                "        (TRUNCATE((cntCh - dDay) / 7, 0) - 1) * 3) as cusor\n" +
                 "FROM Curriculum as c\n" +
-                "JOIN User as u\n" +
+                "JOIN (\n" +
+                "    SELECT\n" +
+                "        COUNT(cs.curriIdx) as cntScrap,\n" +
+                "        cs2.scrapIdx,\n" +
+                "        cs2.scrapStatus\n" +
+                "    FROM CurriScrap as cs\n" +
+                "JOIN (\n" +
+                "        SELECT\n" +
+                "            IFNULL(scrapIdx, -1) as scrapIdx,\n" +
+                "            IFNULL(status, 'INACTIVE') as scrapStatus\n" +
+                "        FROM CurriScrap as cs2\n" +
+                "        WHERE curriIdx = " + curriIdx + " AND scrapUserIdx = " + userIdx + "\n" +
+                "    ) cs2\n" +
+                "    WHERE cs.status = 'ACTIVE' AND cs.curriIdx = " + curriIdx + "\n" +
+                ") cs\n" +
+                "JOIN (\n" +
+                "    SELECT IF(TRUNCATE(COUNT(chIdx) % 3, 0) = 0, TRUNCATE(COUNT(chIdx) / 3, 0) * 7,\n" +
+                "              (TRUNCATE(COUNT(chIdx) / 3, 0) + 1) * 7) as cntCh\n" +
+                "    FROM Ch_Lecture_Curri\n" +
+                "    WHERE curriIdx = " + curriIdx + "\n" +
+                ") chlc\n" +
                 "WHERE c.curriIdx = ? AND c.status != 'DELETE';";
 
-        String getStatusQurey = "SELECT IFNULL(status, '0') AS RESULT\n" +
-                "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and curriAuthor = ? and status != 'DELETE';";
+        String getLectureQuery = "SELECT\n" +
+                "    l.lectureIdx, l.lectureName, l.langTag, l.chNumber, l.pricing,\n" +
+                "    l.type, COUNT(chlc2.curriIdx) as usedCnt, chlc.cpCnt,\n" +
+                "    (cpCnt / l.chNumber) * 100 as progressRate,\n" +
+                "    chlc.scrapStatus, chlc.likeStatus,\n" +
+                "    IFNULL(llc, 0) as llc\n" +
+                "FROM Lecture as l\n" +
+                "JOIN (\n" +
+                "    SELECT chlc.lectureIdx, COUNT(chI.chIdx) as cpCnt,\n" +
+                "           IFNULL(lScrap.status, 'INACTIVE') as scrapStatus,\n" +
+                "           IFNULL(lLike.status, 'INACTIVE') as likeStatus,\n" +
+                "           llc\n" +
+                "    FROM Ch_Lecture_Curri as chlc\n" +
+                "    LEFT JOIN (\n" +
+                "        SELECT chI.lectureIdx, chI.chIdx\n" +
+                "        FROM Ch_Lecture_Curri as chI\n" +
+                "        WHERE chI.curriIdx = " + curriIdx + " AND chComplete = 'TRUE'\n" +
+                "    ) chI on chI.lectureIdx = chlc.lectureIdx\n" +
+                "    LEFT JOIN (\n" +
+                "        SELECT status, lectureIdx\n" +
+                "        FROM LectureScrap\n" +
+                "        WHERE userIdx = " + userIdx + "\n" +
+                "    ) lScrap on lScrap.lectureIdx = chlc.lectureIdx\n" +
+                "    LEFT JOIN (\n" +
+                "        SELECT status, lectureIdx\n" +
+                "        FROM lectureLike\n" +
+                "        WHERE userIdx = " + userIdx + "\n" +
+                "    ) lLike on lLike.lectureIdx = chlc.lectureIdx\n" +
+                "    LEFT JOIN (\n" +
+                "        SELECT COUNT(status) as llc, lectureIdx\n" +
+                "        FROM lectureLike\n" +
+                "        WHERE status = 'ACTIVE'\n" +
+                "        GROUP BY lectureIdx\n" +
+                "    ) lcLike on lcLike.lectureIdx = chlc.lectureIdx\n" +
+                "    WHERE chlc.curriIdx = " + curriIdx + "\n" +
+                "    GROUP BY lectureIdx\n" +
+                ") chlc\n" +
+                "LEFT JOIN (\n" +
+                "    SELECT curriIdx, lectureIdx\n" +
+                "    FROM Ch_Lecture_Curri\n" +
+                "    GROUP BY curriIdx\n" +
+                ") chlc2 on chlc2.lectureIdx = chlc.lectureIdx\n" +
+                "WHERE status = 'ACTIVE' AND l.lectureIdx = chlc.lectureIdx\n" +
+                "GROUP BY l.lectureIdx;";
 
-        String getDdayNowQurey = "SELECT (TIMESTAMPDIFF(DAY , now(), dDayAt) + 1) AS RESULT\n" +
-                "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and curriAuthor= ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
-
-        String getChangCreatedQurey = "SELECT IFNULL((TIMESTAMPDIFF(DAY , createdAt, statusChangedAt) + 1), 0) AS RESULT\n" +
-                "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and curriAuthor = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
-
-        String getDdayAtQuery = "SELECT IF(dDayAt = '0000-00-00 00:00:00', 0, 1)\n" +
-                "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and curriAuthor = ?;";
-
-        String updateProgressRateQuery = "UPDATE Curriculum SET progressRate = ? WHERE curriIdx = ? and curriAuthor = ?;";
-
-        String getCompleteQuery = "SELECT COUNT(chlc.chIdx)\n" +
+        String getChapterQuery = "SELECT\n" +
+                "    chlc.chIdx, chlc.lectureIdx, chlc.curriIdx, chlc.progressOrder, chlc.chComplete,\n" +
+                "    c.chName, l.chNumber, IFNULL(chlc2.chCnt, 0) as chCnt, l.langTag\n" +
                 "FROM Ch_Lecture_Curri as chlc\n" +
-                "WHERE chlc.curriIdx = ? and chlc.chComplete = 'TRUE';";
+                "LEFT JOIN (\n" +
+                "    SELECT chNumber, lectureIdx, langTag\n" +
+                "    FROM Lecture\n" +
+                ") l on chlc.lectureIdx = l.lectureIdx\n" +
+                "LEFT JOIN (\n" +
+                "    SELECT chIdx, chName\n" +
+                "    FROM Chapter\n" +
+                "    GROUP BY chIdx\n" +
+                ") c on chlc.chIdx = c.chIdx\n" +
+                "LEFT JOIN (\n" +
+                "    SELECT curriIdx, lectureIdx, COUNT(chComplete) as chCnt\n" +
+                "    FROM Ch_Lecture_Curri as  chlc2\n" +
+                "    WHERE chComplete = 'TRUE'\n" +
+                "    GROUP BY lectureIdx\n" +
+                ") chlc2 on chlc.lectureIdx = chlc2.lectureIdx AND chlc.lectureIdx = chlc2.lectureIdx\n" +
+                "WHERE chlc.curriIdx = " + curriIdx + "\n" +
+                "LIMIT ?, 3;";
 
-        String getTotalQuery = "SELECT COUNT(chidx)\n" +
-                "FROM Ch_Lecture_Curri\n" +
-                "WHERE curriIdx = ?;";
+        return this.jdbcTemplate.queryForObject(getCurriQuery,
+                (rs, rowNum) -> new GetThisCurriRes(
+                        rs.getInt("curriIdx"),
+                        rs.getString("curriName"),
+                        rs.getString("visibleStatus"),
+                        rs.getString("langTag"),
+                        rs.getFloat("progressRate"),
+                        rs.getString("status"),
+                        rs.getInt("completeAt"),
+                        rs.getString("curriAuthor"),
+                        rs.getString("curriDesc"),
+                        rs.getInt("dDay"),
+                        rs.getInt("cntCh"),
+                        rs.getTimestamp("createdAt"),
+                        rs.getInt("cntScrap"),
+                        rs.getString("scrapStatus"),
+                        rs.getInt("scrapIdx"),
 
-        int complete = this.jdbcTemplate.queryForObject(getCompleteQuery, int.class, curriIdx);
-        int total = this.jdbcTemplate.queryForObject(getTotalQuery, int.class, curriIdx);
+                        this.jdbcTemplate.query(getLectureQuery,
+                                (rs2, rowNum2) -> new LectureListInCurriRes(
+                                        rs2.getInt("lectureIdx"),
+                                        rs2.getString("lectureName"),
+                                        rs2.getString("langTag"),
+                                        rs2.getInt("chNumber"),
+                                        rs2.getString("pricing"),
+                                        rs2.getString("type"),
+                                        rs2.getFloat("progressRate"),
+                                        rs2.getInt("usedCnt"),
+                                        rs2.getString("scrapStatus"),
+                                        rs2.getString("likeStatus"),
+                                        rs2.getInt("llc")
+                                )),
 
-        if(total != 0) {
-            float progressRate = (float) complete / total * 100;
-
-            Object[] updateProgressRatePramas = new Object[]{
-                    progressRate,
-                    curriIdx,
-                    curriAuthor
-            };
-
-            this.jdbcTemplate.update(updateProgressRateQuery, updateProgressRatePramas);
-        }
-
-        Object[] getThisCurriParams = new Object[]{
-                curriIdx,
-                curriAuthor
-        };
-
-        Object[] getCurriScrapStatusParams = new Object[]{
-                curriIdx,
-                userIdx
-        };
-
-        String Status = this.jdbcTemplate.queryForObject(getStatusQurey, String.class, getThisCurriParams);
-
-        int dDayAt = this.jdbcTemplate.queryForObject(getDdayAtQuery, int.class, getThisCurriParams);
-
-        int dDay;
-        if(dDayAt == 1) {
-            if (Status.equals("ACTIVE")) {
-                dDay = this.jdbcTemplate.queryForObject(getDdayNowQurey, int.class, getThisCurriParams);
-            } else {
-                dDay = this.jdbcTemplate.queryForObject(getChangCreatedQurey, int.class, getThisCurriParams);
-            }
-        } else {
-            dDay = 0;
-        }
-
-        String getTotalDdayQurey = "SELECT dDay\n" +
-                "FROM Curriculum\n" +
-                "WHERE curriIdx = ? and curriAuthor = ?;";
-
-        int totalDday = this.jdbcTemplate.queryForObject(getTotalDdayQurey, int.class,getThisCurriParams);
-        int a = totalDday / 7;
-        int b = dDay / 7;
-        int c;
-
-        if (a != 0) {
-            if (a == b) {
-                c = 1;
-            } else {
-                c = (a - (a - b)) * 3 + 1;
-            }
-        } else {
-            c = 0;
-        }
-
-        System.out.println(totalDday);
-        System.out.println(dDay);
-        System.out.println(c);
-
-        String getScrapIdx = "SELECT CASE WHEN COUNT(scrapIdx) = 0 THEN 0 ELSE scrapIdx END FROM CurriScrap WHERE curriIdx = ? AND scrapUserIdx = ?";
-
-        return this.jdbcTemplate.queryForObject(getThisCurriQurey, (rs, rowNum)
-                -> new GetThisCurriRes (
-                rs.getInt("curriIdx"),
-                rs.getString("curriName"),
-                rs.getString("visibleStatus"),
-                rs.getString("langTag"),
-                rs.getFloat("progressRate"),
-                rs.getString("status"),
-                rs.getInt("completeAt"),
-                rs.getString("curriAuthor"),
-                rs.getString("curriDesc"),
-
-                dDay,
-                totalDday,
-                this.jdbcTemplate.queryForObject(getCreatedAtQuery, Timestamp.class, curriIdx),
-
-                this.jdbcTemplate.queryForObject(getCurriScrapCountQuery, int.class, curriIdx),
-                this.jdbcTemplate.queryForObject(getCurriScrapStatusQuery, String.class, getCurriScrapStatusParams),
-
-                lectureList(curriIdx, userIdx, ownerIdx),
-
-                chapterList(curriIdx, c, ownerIdx),
-
-                this.jdbcTemplate.queryForObject(getScrapIdx, int.class,curriIdx,userIdx)
-
-        ), getThisCurriParams);
+                        this.jdbcTemplate.query(getChapterQuery,
+                                (rs3, rowNum3) -> new ChapterListInCurriRes(
+                                        rs3.getInt("chIdx"),
+                                        rs3.getInt("lectureIdx"),
+                                        rs3.getInt("curriIdx"),
+                                        rs3.getString("chName"),
+                                        rs3.getInt("chNumber"),
+                                        rs3.getString("langTag"),
+                                        rs3.getString("chComplete"),
+                                        rs3.getInt("progressOrder"),
+                                        rs3.getInt("chCnt")
+                                ), rs.getInt("cusor"))
+                ), curriIdx);
     }
 
     public CurriReviewRes createCurriReview(PostCurriReviewReq postCurriReviewReq, int authorIdx){
@@ -929,17 +705,20 @@ public class CurriDao {
         return new CurriReviewRes(currIdx, authorName, content);
     }
 
-    public List<CurriReviewRes> getCurriReviewList(int curriIdx){
-        String getQuery = "SELECT curriIdx, authorName, content\n" +
-                "FROM CurriReview\n" +
-                "WHERE curriIdx = ?;";
+    public GetCurriReviewPageRes getCurriReviewList(int curriIdx, int pageNum){
+        String getQuery = "SELECT curriReviewIdx, curriIdx, authorName, content FROM CurriReview WHERE curriIdx = ? order by curriReviewIdx LIMIT ?, 12;";
+        String countQuery = "SELECT COUNT(curriReviewIdx) FROM CurriReview WHERE curriIdx = ?;";
 
-        return this.jdbcTemplate.query(getQuery,
+        List<CurriReviewRes> reviewList = this.jdbcTemplate.query(getQuery,
                 (rs, rowNum) -> new CurriReviewRes(
                         rs.getInt("curriIdx"),
                         rs.getString("authorName"),
                         rs.getString("content")
-                ), curriIdx);
+                ), curriIdx, pageNum - 1);
+
+        int count = this.jdbcTemplate.queryForObject(countQuery, int.class, curriIdx);
+
+        return new GetCurriReviewPageRes(reviewList, count);
     }
 
     public boolean curriReset(int curriIdx, int userIdx){

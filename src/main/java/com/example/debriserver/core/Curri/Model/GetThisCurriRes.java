@@ -29,10 +29,9 @@ public class GetThisCurriRes {
 
     private int curriLikeCount;
     private String curriLikeStatus;
+    private int scrapIdx;
 
     List<LectureListInCurriRes> lectureListResList;
 
     List<ChapterListInCurriRes> chapterListResList;
-
-    private int scrapIdx;
 }

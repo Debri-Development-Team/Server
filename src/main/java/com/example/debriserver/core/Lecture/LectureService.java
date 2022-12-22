@@ -43,9 +43,9 @@ public class LectureService {
         }
     }
 
-    public List<GetLectureListRes> getLectureList(int userIdx) throws BasicException{
+    public GetLectureListPageRes getLectureList(int userIdx, int pageNum) throws BasicException{
         try{
-            return lectureDao.getLectureList(userIdx);
+            return lectureDao.getLectureList(userIdx, pageNum);
         }catch (Exception exception){
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
@@ -68,11 +68,11 @@ public class LectureService {
         }
     }
 
-    public List<GetLectureSearchListRes> searchLecture(String langTag, String typeTag, String pricing, String keyword, int userIdx) throws BasicException {
+    public GetLectureSearchPageRes searchLecture(String langTag, String typeTag, String pricing, String keyword, int userIdx, int pageNum) throws BasicException {
         try {
             if (!lectureProvider.checkSearchRowExist(langTag, typeTag, pricing, keyword)) throw new BasicException(BasicServerStatus.SEARCH_TARGET_NOT_EXIST);
 
-                return lectureDao.searchLecture(langTag, typeTag, pricing, keyword, userIdx);
+                return lectureDao.searchLecture(langTag, typeTag, pricing, keyword, userIdx, pageNum);
         } catch (BasicException exception) {
             throw new BasicException(exception.getStatus());
         } catch (Exception exception) {
@@ -106,10 +106,10 @@ public class LectureService {
         }
     }
 
-    public List<LectureReviewRes> getLectureReviewList(int lectureIdx) throws BasicException{
+    public GetLectureReviewPageRes getLectureReviewList(int lectureIdx, int pageNum) throws BasicException{
 
         try{
-            return lectureDao.getLectureReviewList(lectureIdx);
+            return lectureDao.getLectureReviewList(lectureIdx, pageNum);
         }catch (Exception exception){
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
@@ -137,6 +137,16 @@ public class LectureService {
         try{
             return lectureDao.deleteLectureLike(lectureIdx, userIdx);
         }catch (Exception exception){
+            throw new BasicException(BasicServerStatus.DB_ERROR);
+        }
+    }
+
+    public PostRoadmapCopyRes copyRoadmap(PostRoadmapCopyReq postRoadmapCopyReq, int userIdx) throws BasicException{
+
+        try{
+            return lectureDao.copyRoadmap(postRoadmapCopyReq, userIdx);
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
     }

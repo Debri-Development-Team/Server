@@ -37,8 +37,8 @@ public class LectureController {
      * 7.1 전체 강의 리스트 조회 API
      * [GET] 127.0.0.1/api/lecture/getLectureList
      * */
-    @GetMapping("/getLectureList")
-    public BasicResponse<List<GetLectureListRes>> getLectureList(){
+    @GetMapping("/getLectureList/{pageNum}")
+    public BasicResponse<GetLectureListPageRes> getLectureList(@PathVariable("pageNum") int pageNum){
         try{
             String jwtToken = jwt.getJwt();
 
@@ -46,7 +46,7 @@ public class LectureController {
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            return new BasicResponse<>(lectureService.getLectureList(userIdx));
+            return new BasicResponse<>(lectureService.getLectureList(userIdx, pageNum));
 
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
@@ -156,7 +156,8 @@ public class LectureController {
      * [GET] 127.0.0.1:8521/api/lecture/search
      * */
     @GetMapping("/search")
-    public BasicResponse<List<GetLectureSearchListRes>> searchLecture(@RequestParam("lang") String langTag, @RequestParam("type") String typeTag, @RequestParam("price") String pricing, @RequestParam("key") String keyword){
+    public BasicResponse<GetLectureSearchPageRes>
+    searchLecture(@RequestParam("lang") String langTag, @RequestParam("type") String typeTag, @RequestParam("price") String pricing, @RequestParam("key") String keyword, @RequestParam("pageNum") int pageNum){
         try{
             String jwtToken = jwt.getJwt();
 
@@ -164,7 +165,7 @@ public class LectureController {
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            return new BasicResponse<>(lectureService.searchLecture(langTag, typeTag, pricing, keyword, userIdx));
+            return new BasicResponse<>(lectureService.searchLecture(langTag, typeTag, pricing, keyword, userIdx, pageNum));
 
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
@@ -236,14 +237,14 @@ public class LectureController {
      * 7.6.1 강의 리뷰 조회 api
      * GET	api/lecture/review/get
      * */
-    @GetMapping("/review/get")
-    public BasicResponse<List<LectureReviewRes>> getLectureReviewList(@RequestParam int lectureIdx) {
+    @GetMapping("/review/get/{pageNum}")
+    public BasicResponse<GetLectureReviewPageRes> getLectureReviewList(@PathVariable("pageNum") int pageNum, @RequestParam int lectureIdx) {
         try{
             String jwtToken = jwt.getJwt();
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            return new BasicResponse<>(lectureService.getLectureReviewList(lectureIdx));
+            return new BasicResponse<>(lectureService.getLectureReviewList(lectureIdx, pageNum));
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
         }
@@ -286,6 +287,27 @@ public class LectureController {
             if(lectureService.lectureExist(lectureIdx)) throw new BasicException(BasicServerStatus.LECTURE_NOT_EXIST);
 
             return new BasicResponse<>(lectureService.deleteLectureLike(lectureIdx, userIdx));
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 7.5.2 로드맵 복사
+     * POST api/lecture/roadmap/copy
+     * */
+    @PostMapping("/roadmap/copy")
+    public BasicResponse<PostRoadmapCopyRes> copyRoadmap(@RequestBody PostRoadmapCopyReq postRoadmapCopyReq) {
+
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            return new BasicResponse<>(lectureService.copyRoadmap(postRoadmapCopyReq, userIdx));
+
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
         }

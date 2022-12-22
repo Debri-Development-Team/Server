@@ -1,13 +1,20 @@
 package com.example.debriserver.core.Lecture;
 
 import com.example.debriserver.basicModels.BasicResponse;
+import com.example.debriserver.core.Curri.Model.PostInsertLectureReq;
 import com.example.debriserver.core.Lecture.Model.*;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.Array;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,11 +30,12 @@ public class LectureDao {
     /**
      * 전체 강의 리스트 조회
      */
-    public List<GetLectureListRes> getLectureList(int userIdx) {
-        String getQuery = "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture WHERE status = 'ACTIVE';";
+    public GetLectureListPageRes getLectureList(int userIdx, int pageNum) {
+        String getQuery = "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture WHERE status = 'ACTIVE' order by lectureIdx LIMIT ?, 12;";
         String scrapStatusQuery = "SELECT COUNT(status) FROM LectureScrap WHERE userIdx = ? and lectureIdx = ? and status = 'ACTIVE';";
+        String lectuerCountQuery = "SELECT COUNT(lectureIdx) FROM Lecture WHERE status = 'ACTIVE'";
 
-        return this.jdbcTemplate.query(getQuery, (rs, rowNum) -> new GetLectureListRes(
+        List<GetLectureListRes> lectuerList = this.jdbcTemplate.query(getQuery, (rs, rowNum) -> new GetLectureListRes(
                         rs.getInt("lectureIdx"),
                         rs.getString("lectureName"),
                         rs.getInt("chNumber"),
@@ -35,8 +43,12 @@ public class LectureDao {
                         rs.getString("pricing"),
                         rs.getString("type"),
                 Objects.requireNonNull(this.jdbcTemplate.queryForObject(scrapStatusQuery, int.class, userIdx, rs.getInt("lectureIdx"))) != 0
-                )
+                ), pageNum - 1
         );
+
+        int lectureCount = this.jdbcTemplate.queryForObject(lectuerCountQuery, int.class);
+
+        return new GetLectureListPageRes(lectuerList, lectureCount);
     }
 
     /**
@@ -145,7 +157,7 @@ public class LectureDao {
     /**
      * 강의 검색
      * */
-    public List<GetLectureSearchListRes> searchLecture(String langTag, String typeTag, String pricing, String keyword, int userIdx) {
+    public GetLectureSearchPageRes searchLecture(String langTag, String typeTag, String pricing, String keyword, int userIdx, int pageNum) {
         String getQuery =
                 "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture\n" +
                 "WHERE\n" +
@@ -158,7 +170,7 @@ public class LectureDao {
                 "(CASE WHEN STRCMP('무료', ?) = 0 THEN pricing = '무료' WHEN STRCMP('유료', ?) = 0 THEN pricing = '유료' ELSE (pricing = '무료' or pricing = '유료') END)\n" +
                 "and\n" +
                 "lectureName LIKE" + "'%" + keyword + "%'\n" +
-                "and status = 'ACTIVE';";
+                "and status = 'ACTIVE' order by lectureIdx LIMIT ?, 12;";
 
         String scrapStatusQuery = "SELECT COUNT(status) FROM LectureScrap WHERE userIdx = ? and lectureIdx = ? and status = 'ACTIVE';";
         String scrapCountQuery = "SELECT COUNT(*) FROM LectureScrap WHERE lectureIdx = ? and status = 'ACTIVE';";
@@ -166,6 +178,19 @@ public class LectureDao {
         String likeCountQuery = "SELECT COUNT(*) FROM lectureLike WHERE lectureIdx = ? and status = 'ACTIVE';";
         String checkLikeQuery = "SELECT EXISTS(SELECT * FROM lectureLike WHERE lectureIdx = ? and userIdx = ? and status = 'ACTIVE');";
 
+        String countQuery =
+                "SELECT COUNT(lectureIdx) FROM Lecture\n" +
+                "WHERE\n" +
+                "(CASE WHEN STRCMP('Front', ?) = 0 THEN langTag = 'Front' WHEN STRCMP('Back', ?) = 0 THEN langTag = 'Back'\n" +
+                "WHEN STRCMP('Python', ?) = 0 THEN langTag = 'Python' WHEN STRCMP('C 언어', ?) = 0 THEN langTag = 'C 언어'\n" +
+                "ELSE (langTag = 'Front' or langTag = 'Back' or langTag = 'Python' or langTag = 'C 언어') END)\n" +
+                "and\n" +
+                "(CASE WHEN STRCMP('서적', ?) = 0 THEN type = '서적' WHEN STRCMP('영상', ?) = 0 THEN type = '영상' ELSE (type = '서적' or type = '영상') END)\n" +
+                "and\n" +
+                "(CASE WHEN STRCMP('무료', ?) = 0 THEN pricing = '무료' WHEN STRCMP('유료', ?) = 0 THEN pricing = '유료' ELSE (pricing = '무료' or pricing = '유료') END)\n" +
+                "and\n" +
+                "lectureName LIKE" + "'%" + keyword + "%'\n" +
+                "and status = 'ACTIVE';";
         Object[] parameters = new Object[]{
                 langTag,
                 langTag,
@@ -174,10 +199,11 @@ public class LectureDao {
                 typeTag,
                 typeTag,
                 pricing,
-                pricing
+                pricing,
+                pageNum - 1
         };
 
-        return this.jdbcTemplate.query(getQuery,
+        List<GetLectureSearchListRes> lectureList =  this.jdbcTemplate.query(getQuery,
                 (rs, rowNum) -> new GetLectureSearchListRes(
                         rs.getInt("lectureIdx"),
                         rs.getString("lectureName"),
@@ -191,6 +217,21 @@ public class LectureDao {
                         this.jdbcTemplate.queryForObject(likeCountQuery, int.class, rs.getInt("lectureIdx")),
                         this.jdbcTemplate.queryForObject(checkLikeQuery, int.class, rs.getInt("lectureIdx"), userIdx) == 1
                 ), parameters);
+
+        parameters = new Object[]{
+                langTag,
+                langTag,
+                langTag,
+                langTag,
+                typeTag,
+                typeTag,
+                pricing,
+                pricing
+        };
+
+        int count = this.jdbcTemplate.queryForObject(countQuery, int.class, parameters);
+
+        return new GetLectureSearchPageRes(lectureList, count);
     }
 
     /**
@@ -389,15 +430,25 @@ public class LectureDao {
         return new LectureReviewRes(lectureIdx, authorName, content);
     }
 
-    public List<LectureReviewRes> getLectureReviewList(int lectureIdx) {
-        String getQuery = "SELECT lectureIdx, authorName, content FROM lectureReview WHERE lectureidx = ?;";
+    public GetLectureReviewPageRes getLectureReviewList(int lectureIdx, int pageNum) {
+        String getQuery = "SELECT reviewIdx, lectureIdx, authorName, content FROM lectureReview WHERE lectureidx = ? order by reviewIdx LIMIT ?, 12;";
+        String countQuery = "SELECT COUNT(reviewIdx) FROM lectureReview WHERE lectureidx = ?;";
 
-        return this.jdbcTemplate.query(getQuery,
+        Object[] queryParams = new Object[] {
+                lectureIdx,
+                pageNum - 1
+        };
+
+        List<LectureReviewRes> reviewList = this.jdbcTemplate.query(getQuery,
                 (rs, rowNum) -> new LectureReviewRes(
                         rs.getInt("lectureIdx"),
                         rs.getString("authorName"),
                         rs.getString("content")
-                ), lectureIdx);
+                ), queryParams);
+
+        int count = this.jdbcTemplate.queryForObject(countQuery, int.class, lectureIdx);
+
+        return new GetLectureReviewPageRes(reviewList, count);
     }
 
     public boolean lectureExist(int lectureIdx) {
@@ -426,5 +477,112 @@ public class LectureDao {
         this.jdbcTemplate.update(updateQuery, lectureIdx, userIdx);
 
         return new LectureLikeRes(true);
+    }
+
+    public PostRoadmapCopyRes copyRoadmap(PostRoadmapCopyReq postRoadmapCopyReq, int userIdx) throws SQLException {
+        // Curri 테이블에 데이터 저장
+        String insertQuery = "INSERT\n" +
+                "INTO Curriculum(curriName, curriAuthor, visibleStatus, langTag, curriDesc, ownerIdx)\n" +
+                "VALUES (?, ?, ?, ?, ?, ?);";
+
+        String getCurriIdxQurey = "SELECT MAX(curriIdx) FROM Curriculum where ownerIdx = ? and (status = 'ACTIVE' OR status = 'INACTIVE');";
+
+        Object[] insertParams = new Object[] {
+                postRoadmapCopyReq.getRoadmapName(),
+                "Debri Team",
+                "INACTIVE",
+                postRoadmapCopyReq.getLangTag(),
+                postRoadmapCopyReq.getRoadmapExplain(),
+                userIdx
+        };
+
+        this.jdbcTemplate.update(insertQuery, insertParams);
+
+        int curriIdx = this.jdbcTemplate.queryForObject(getCurriIdxQurey, int.class, userIdx);
+
+        String getLectuerListQuery = "select lectureIdx from Roadmap_Child where roadmapIdx = ?;";
+
+        List<LectuerIndex> list = this.jdbcTemplate.query(getLectuerListQuery,
+                (rs, rowNum) -> new LectuerIndex(
+                        rs.getInt("lectureIdx")
+                ), postRoadmapCopyReq.getRoadmapIdx());
+
+        for(LectuerIndex lecture: list){
+            boolean result = insertLecture(curriIdx, userIdx, lecture.getLectuerIdx());
+            System.out.println(result);
+        }
+
+        return new PostRoadmapCopyRes(curriIdx);
+    }
+
+    public boolean insertLecture(int curriIdx, int userIdx, int lectureIdx){
+        long retryDate = System.currentTimeMillis();
+
+        // 해당 강의 자료의 정보를 찾아 커리큘럼에 추가하는 쿼리
+        String insertLectureQuery = "INSERT INTO Ch_Lecture_Curri(chIdx, lectureIdx, curriIdx, lectureOrder, progressOrder)\n" +
+                "SELECT\n" +
+                "    chIdx, lectureIdx, c.curriIdx,\n" +
+                "    mo.ml + 1 as ml,\n" +
+                "    ROW_NUMBER() over(order by chIdx) + mo.mp as num\n" +
+                "FROM Chapter as chl\n" +
+                "JOIN (\n" +
+                "    SELECT IFNULL(MAX(progressOrder), 0) as mp,\n" +
+                "           IFNULL(MAX(lectureOrder),0) as ml\n" +
+                "    FROM Ch_Lecture_Curri as chlc\n" +
+                "    WHERE chlc.curriIdx = ?\n" +
+                ") mo\n" +
+                "JOIN (\n" +
+                "    SELECT curriIdx\n" +
+                "    FROM Curriculum\n" +
+                "    WHERE curriIdx = ?\n" +
+                ") c\n" +
+                "WHERE chl.lectureIdx = ?;\n";
+
+        Object[] insertLectureParameters = new Object[] {
+                curriIdx,
+                curriIdx,
+                lectureIdx
+        };
+
+        this.jdbcTemplate.update(insertLectureQuery, insertLectureParameters);
+
+        String getDdayQurey = "SELECT\n" +
+                "    IF(TRUNCATE(chNumber % 3, 0) = 0, TRUNCATE(chNumber / 3, 0) * 7,\n" +
+                "       (TRUNCATE(chNumber / 3, 0) + 1) * 7) as afDay\n" +
+                "FROM Curriculum as c\n" +
+                "LEFT JOIN(\n" +
+                "    SELECT distinct chNumber, l.lectureIdx, chlc.curriIdx\n" +
+                "    FROM Lecture as l\n" +
+                "    LEFT JOIN Ch_Lecture_Curri as chlc on l.lectureIdx = chlc.lectureIdx\n" +
+                "    WHERE l.lectureIdx = ? AND chlc.curriIdx = ?\n" +
+                ") l on l.curriIdx = c.curriIdx\n" +
+                "WHERE c.curriIdx = ? AND ownerIdx = ?;";
+
+        Object[] getDdayParams = new Object[]{
+                lectureIdx,
+                curriIdx,
+                curriIdx,
+                userIdx
+        };
+
+        int afterDday = this.jdbcTemplate.queryForObject(getDdayQurey, int.class, getDdayParams);
+
+        Timestamp origianl = new Timestamp(retryDate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(origianl.getTime());
+        cal.add(Calendar.DAY_OF_MONTH, afterDday);
+        Timestamp later = new Timestamp(cal.getTime().getTime());
+
+        Object[] insertDdayParams = new Object[]{
+                afterDday,
+                later,
+                curriIdx,
+                userIdx
+        };
+
+        String insertDdayQuery = "UPDATE Curriculum SET dDay = ?, dDayAt = ? WHERE curriIdx = ? and ownerIdx = ?;";
+        int result = this.jdbcTemplate.update(insertDdayQuery, insertDdayParams);
+
+        return result != 0;
     }
 }
