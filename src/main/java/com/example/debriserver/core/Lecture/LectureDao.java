@@ -157,7 +157,7 @@ public class LectureDao {
     /**
      * 강의 검색
      * */
-    public List<GetLectureSearchListRes> searchLecture(String langTag, String typeTag, String pricing, String keyword, int userIdx) {
+    public GetLectureSearchPageRes searchLecture(String langTag, String typeTag, String pricing, String keyword, int userIdx, int pageNum) {
         String getQuery =
                 "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture\n" +
                 "WHERE\n" +
@@ -170,7 +170,7 @@ public class LectureDao {
                 "(CASE WHEN STRCMP('무료', ?) = 0 THEN pricing = '무료' WHEN STRCMP('유료', ?) = 0 THEN pricing = '유료' ELSE (pricing = '무료' or pricing = '유료') END)\n" +
                 "and\n" +
                 "lectureName LIKE" + "'%" + keyword + "%'\n" +
-                "and status = 'ACTIVE';";
+                "and status = 'ACTIVE' order by lectureIdx LIMIT ?, 12;";
 
         String scrapStatusQuery = "SELECT COUNT(status) FROM LectureScrap WHERE userIdx = ? and lectureIdx = ? and status = 'ACTIVE';";
         String scrapCountQuery = "SELECT COUNT(*) FROM LectureScrap WHERE lectureIdx = ? and status = 'ACTIVE';";
@@ -178,6 +178,19 @@ public class LectureDao {
         String likeCountQuery = "SELECT COUNT(*) FROM lectureLike WHERE lectureIdx = ? and status = 'ACTIVE';";
         String checkLikeQuery = "SELECT EXISTS(SELECT * FROM lectureLike WHERE lectureIdx = ? and userIdx = ? and status = 'ACTIVE');";
 
+        String countQuery =
+                "SELECT COUNT(lectureIdx) FROM Lecture\n" +
+                "WHERE\n" +
+                "(CASE WHEN STRCMP('Front', ?) = 0 THEN langTag = 'Front' WHEN STRCMP('Back', ?) = 0 THEN langTag = 'Back'\n" +
+                "WHEN STRCMP('Python', ?) = 0 THEN langTag = 'Python' WHEN STRCMP('C 언어', ?) = 0 THEN langTag = 'C 언어'\n" +
+                "ELSE (langTag = 'Front' or langTag = 'Back' or langTag = 'Python' or langTag = 'C 언어') END)\n" +
+                "and\n" +
+                "(CASE WHEN STRCMP('서적', ?) = 0 THEN type = '서적' WHEN STRCMP('영상', ?) = 0 THEN type = '영상' ELSE (type = '서적' or type = '영상') END)\n" +
+                "and\n" +
+                "(CASE WHEN STRCMP('무료', ?) = 0 THEN pricing = '무료' WHEN STRCMP('유료', ?) = 0 THEN pricing = '유료' ELSE (pricing = '무료' or pricing = '유료') END)\n" +
+                "and\n" +
+                "lectureName LIKE" + "'%" + keyword + "%'\n" +
+                "and status = 'ACTIVE';";
         Object[] parameters = new Object[]{
                 langTag,
                 langTag,
@@ -186,10 +199,11 @@ public class LectureDao {
                 typeTag,
                 typeTag,
                 pricing,
-                pricing
+                pricing,
+                pageNum - 1
         };
 
-        return this.jdbcTemplate.query(getQuery,
+        List<GetLectureSearchListRes> lectureList =  this.jdbcTemplate.query(getQuery,
                 (rs, rowNum) -> new GetLectureSearchListRes(
                         rs.getInt("lectureIdx"),
                         rs.getString("lectureName"),
@@ -203,6 +217,21 @@ public class LectureDao {
                         this.jdbcTemplate.queryForObject(likeCountQuery, int.class, rs.getInt("lectureIdx")),
                         this.jdbcTemplate.queryForObject(checkLikeQuery, int.class, rs.getInt("lectureIdx"), userIdx) == 1
                 ), parameters);
+
+        parameters = new Object[]{
+                langTag,
+                langTag,
+                langTag,
+                langTag,
+                typeTag,
+                typeTag,
+                pricing,
+                pricing
+        };
+
+        int count = this.jdbcTemplate.queryForObject(countQuery, int.class, parameters);
+
+        return new GetLectureSearchPageRes(lectureList, count);
     }
 
     /**

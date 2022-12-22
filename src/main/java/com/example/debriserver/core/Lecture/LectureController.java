@@ -156,7 +156,8 @@ public class LectureController {
      * [GET] 127.0.0.1:8521/api/lecture/search
      * */
     @GetMapping("/search")
-    public BasicResponse<List<GetLectureSearchListRes>> searchLecture(@RequestParam("lang") String langTag, @RequestParam("type") String typeTag, @RequestParam("price") String pricing, @RequestParam("key") String keyword){
+    public BasicResponse<GetLectureSearchPageRes>
+    searchLecture(@RequestParam("lang") String langTag, @RequestParam("type") String typeTag, @RequestParam("price") String pricing, @RequestParam("key") String keyword, @RequestParam("pageNum") int pageNum){
         try{
             String jwtToken = jwt.getJwt();
 
@@ -164,7 +165,7 @@ public class LectureController {
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            return new BasicResponse<>(lectureService.searchLecture(langTag, typeTag, pricing, keyword, userIdx));
+            return new BasicResponse<>(lectureService.searchLecture(langTag, typeTag, pricing, keyword, userIdx, pageNum));
 
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
