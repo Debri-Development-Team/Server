@@ -1,4 +1,4 @@
-package com.example.debriserver.core.Lecture.Model;
+package com.example.debriserver.core.Curri.Model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetLectureListPageRes {
-    private List<GetLectureListRes> lectureList;
-    private int lectureCount;
+public class GetCurriReviewPageRes {
+    private List<CurriReviewRes> reviewList;
+    private int reviewCount;
 }

@@ -51,9 +51,9 @@ public class CommentService {
         }
     }
 
-    public List<GetCommentRes> getComment(int postIdx, int userIdx, int pageNum) throws BasicException{
+    public List<GetCommentRes> getComment(int postIdx, int userIdx) throws BasicException{
         try{
-            List<GetCommentRes> getCommentRes = commentDao.getComment(postIdx, userIdx, pageNum);
+            List<GetCommentRes> getCommentRes = commentDao.getComment(postIdx, userIdx);
 
             return getCommentRes;
         }catch (Exception exception){
