@@ -193,18 +193,17 @@ public class CommentDao {
 
     }
 
-    public List<GetCommentRes> getComment(int postIdx, int userIdx, int pageNum){
+    public List<GetCommentRes> getComment(int postIdx, int userIdx){
         String getListQuery =
                 "SELECT Comment.commentIdx, userIdx, postIdx, authorName, class, commentOrder, groupNum, commentContent\n" +
                         "FROM Comment LEFT JOIN ReportedComment RC on Comment.commentIdx = RC.commentIdx\n" +
                         "WHERE postIdx = ? and Comment.status = 'ACTIVE' and (reportUserIdx != ? or reportUserIdx is null)\n" +
-                        "order by commentIdx DESC LIMIT ?, 12;";
+                        "order by commentIdx";
 
         String getTimeQuery = "SELECT TIMESTAMPDIFF(minute, (SELECT createdAt FROM Comment WHERE commentIdx = ?), CURRENT_TIMESTAMP);";
         String checkLikeStatusQuery = "SELECT exists(SELECT * FROM CommentLike WHERE userIdx = ? and commentIdx = ? and status = 'ACTIVE');";
         String likeNumberCountQuery = "SELECT COUNT(*) FROM CommentLike WHERE commentIdx = ? and status = 'ACTIVE';";
 
-        pageNum = (pageNum - 1) * 12;
 
         return this.jdbcTemplate.query
                 (
@@ -222,7 +221,7 @@ public class CommentDao {
                                         rs.getString("authorName"),
                                         this.jdbcTemplate.queryForObject(checkLikeStatusQuery, int.class, userIdx, rs.getInt("commentIdx")) == 1,
                                         this.jdbcTemplate.queryForObject(likeNumberCountQuery, int.class, rs.getInt("commentIdx"))
-                                ), postIdx, userIdx, pageNum
+                                ), postIdx, userIdx
                 );
     }
 

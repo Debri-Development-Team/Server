@@ -705,17 +705,20 @@ public class CurriDao {
         return new CurriReviewRes(currIdx, authorName, content);
     }
 
-    public List<CurriReviewRes> getCurriReviewList(int curriIdx){
-        String getQuery = "SELECT curriIdx, authorName, content\n" +
-                "FROM CurriReview\n" +
-                "WHERE curriIdx = ?;";
+    public GetCurriReviewPageRes getCurriReviewList(int curriIdx, int pageNum){
+        String getQuery = "SELECT curriReviewIdx, curriIdx, authorName, content FROM CurriReview WHERE curriIdx = ? order by curriReviewIdx LIMIT ?, 12;";
+        String countQuery = "SELECT COUNT(curriReviewIdx) FROM CurriReview WHERE curriIdx = ?;";
 
-        return this.jdbcTemplate.query(getQuery,
+        List<CurriReviewRes> reviewList = this.jdbcTemplate.query(getQuery,
                 (rs, rowNum) -> new CurriReviewRes(
                         rs.getInt("curriIdx"),
                         rs.getString("authorName"),
                         rs.getString("content")
-                ), curriIdx);
+                ), curriIdx, pageNum - 1);
+
+        int count = this.jdbcTemplate.queryForObject(countQuery, int.class, curriIdx);
+
+        return new GetCurriReviewPageRes(reviewList, count);
     }
 
     public boolean curriReset(int curriIdx, int userIdx){

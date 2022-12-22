@@ -213,9 +213,9 @@ public class CurriService {
         }
     }
 
-    public List<CurriReviewRes> getCurriReviewList(int curriIdx) throws BasicException{
+    public GetCurriReviewPageRes getCurriReviewList(int curriIdx, int pageNum) throws BasicException{
         try{
-            return curriDao.getCurriReviewList(curriIdx);
+            return curriDao.getCurriReviewList(curriIdx, pageNum);
         } catch (Exception exception){
             System.out.println(exception.getMessage());
             throw new BasicException(DB_ERROR);
