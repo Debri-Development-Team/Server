@@ -450,19 +450,10 @@ public class CurriDao {
     }
 
     public boolean checkChapterExist(PatchChapterStatuReq patchChapterStatuReq) {
-        String checkChapterExistQuery = "SELECT exists(\n" +
-                "    SELECT chlc.chIdx, chlc.lectureIdx, chlc.curriIdx\n" +
-                "    FROM Ch_Lecture_Curri as chlc\n" +
-                "    JOIN (SELECT c.chIdx\n" +
-                "          FROM Chapter as c\n" +
-                "          RIGHT JOIN Ch_Lecture as chl on chl.chIdx = c.chIdx\n" +
-                "          LEFT JOIN Lecture as l on l.lectureIdx = chl.lectureIdx) as ch\n" +
-                "    JOIN (SELECT l.lectureIdx\n" +
-                "          FROM Lecture as l\n" +
-                "          RIGHT JOIN Ch_Lecture as chl on l.lectureIdx = chl.lectureIdx\n" +
-                "          RIGHT JOIN Ch_Lecture_Curri as chlc on l.lectureIdx = chlc.lectureIdx) as l\n" +
-                "    JOIN Curriculum as c\n" +
-                "    WHERE chlc.chIdx = ? and chlc.lectureIdx = ? and chlc.curriIdx = ? and ch.chIdx = chlc.chIdx and l.lectureIdx = chlc.lectureIdx and c.curriIdx = chlc.curriIdx);";
+        String checkChapterExistQuery = "SELECT \n" +
+                "    COUNT(chIdx)\n" +
+                "FROM Ch_Lecture_Curri\n" +
+                "WHERE chIdx = ? AND lectureIdx = ? AND curriIdx = ?";
 
         Object[] checkChapterExistParams = new Object[]{
                 patchChapterStatuReq.getChIdx(),
