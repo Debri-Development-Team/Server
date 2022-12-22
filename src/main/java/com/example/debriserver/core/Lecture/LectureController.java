@@ -290,4 +290,25 @@ public class LectureController {
             return new BasicResponse<>((exception.getStatus()));
         }
     }
+
+    /**
+     * 7.5.2 로드맵 복사
+     * POST api/lecture/roadmap/copy
+     * */
+    @PostMapping("/roadmap/copy")
+    public BasicResponse<PostRoadmapCopyRes> copyRoadmap(@RequestBody PostRoadmapCopyReq postRoadmapCopyReq) {
+
+        try{
+            String jwtToken = jwt.getJwt();
+
+            if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
+
+            int userIdx = jwt.getUserIdx(jwtToken);
+
+            return new BasicResponse<>(lectureService.copyRoadmap(postRoadmapCopyReq, userIdx));
+
+        }catch (BasicException exception){
+            return new BasicResponse<>((exception.getStatus()));
+        }
+    }
 }
