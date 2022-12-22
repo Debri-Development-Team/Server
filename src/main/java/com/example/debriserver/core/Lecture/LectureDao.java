@@ -23,11 +23,12 @@ public class LectureDao {
     /**
      * 전체 강의 리스트 조회
      */
-    public List<GetLectureListRes> getLectureList(int userIdx) {
-        String getQuery = "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture WHERE status = 'ACTIVE';";
+    public GetLectureListPageRes getLectureList(int userIdx, int pageNum) {
+        String getQuery = "SELECT lectureIdx, lectureName, chNumber, langTag, pricing, type FROM Lecture WHERE status = 'ACTIVE' order by lectureIdx LIMIT ?, 12;";
         String scrapStatusQuery = "SELECT COUNT(status) FROM LectureScrap WHERE userIdx = ? and lectureIdx = ? and status = 'ACTIVE';";
+        String lectuerCountQuery = "SELECT COUNT(lectureIdx) FROM Lecture WHERE status = 'ACTIVE'";
 
-        return this.jdbcTemplate.query(getQuery, (rs, rowNum) -> new GetLectureListRes(
+        List<GetLectureListRes> lectuerList = this.jdbcTemplate.query(getQuery, (rs, rowNum) -> new GetLectureListRes(
                         rs.getInt("lectureIdx"),
                         rs.getString("lectureName"),
                         rs.getInt("chNumber"),
@@ -35,8 +36,12 @@ public class LectureDao {
                         rs.getString("pricing"),
                         rs.getString("type"),
                 Objects.requireNonNull(this.jdbcTemplate.queryForObject(scrapStatusQuery, int.class, userIdx, rs.getInt("lectureIdx"))) != 0
-                )
+                ), pageNum - 1
         );
+
+        int lectureCount = this.jdbcTemplate.queryForObject(lectuerCountQuery, int.class);
+
+        return new GetLectureListPageRes(lectuerList, lectureCount);
     }
 
     /**
@@ -389,15 +394,25 @@ public class LectureDao {
         return new LectureReviewRes(lectureIdx, authorName, content);
     }
 
-    public List<LectureReviewRes> getLectureReviewList(int lectureIdx) {
-        String getQuery = "SELECT lectureIdx, authorName, content FROM lectureReview WHERE lectureidx = ?;";
+    public GetLectureReviewPageRes getLectureReviewList(int lectureIdx, int pageNum) {
+        String getQuery = "SELECT reviewIdx, lectureIdx, authorName, content FROM lectureReview WHERE lectureidx = ? order by reviewIdx LIMIT ?, 12;";
+        String countQuery = "SELECT COUNT(reviewIdx) FROM lectureReview WHERE lectureidx = ?;";
 
-        return this.jdbcTemplate.query(getQuery,
+        Object[] queryParams = new Object[] {
+                lectureIdx,
+                pageNum - 1
+        };
+
+        List<LectureReviewRes> reviewList = this.jdbcTemplate.query(getQuery,
                 (rs, rowNum) -> new LectureReviewRes(
                         rs.getInt("lectureIdx"),
                         rs.getString("authorName"),
                         rs.getString("content")
-                ), lectureIdx);
+                ), queryParams);
+
+        int count = this.jdbcTemplate.queryForObject(countQuery, int.class, lectureIdx);
+
+        return new GetLectureReviewPageRes(reviewList, count);
     }
 
     public boolean lectureExist(int lectureIdx) {

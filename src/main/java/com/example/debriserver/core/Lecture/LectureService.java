@@ -43,9 +43,9 @@ public class LectureService {
         }
     }
 
-    public List<GetLectureListRes> getLectureList(int userIdx) throws BasicException{
+    public GetLectureListPageRes getLectureList(int userIdx, int pageNum) throws BasicException{
         try{
-            return lectureDao.getLectureList(userIdx);
+            return lectureDao.getLectureList(userIdx, pageNum);
         }catch (Exception exception){
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }
@@ -106,10 +106,10 @@ public class LectureService {
         }
     }
 
-    public List<LectureReviewRes> getLectureReviewList(int lectureIdx) throws BasicException{
+    public GetLectureReviewPageRes getLectureReviewList(int lectureIdx, int pageNum) throws BasicException{
 
         try{
-            return lectureDao.getLectureReviewList(lectureIdx);
+            return lectureDao.getLectureReviewList(lectureIdx, pageNum);
         }catch (Exception exception){
             throw new BasicException(BasicServerStatus.DB_ERROR);
         }

@@ -37,8 +37,8 @@ public class LectureController {
      * 7.1 전체 강의 리스트 조회 API
      * [GET] 127.0.0.1/api/lecture/getLectureList
      * */
-    @GetMapping("/getLectureList")
-    public BasicResponse<List<GetLectureListRes>> getLectureList(){
+    @GetMapping("/getLectureList/{pageNum}")
+    public BasicResponse<GetLectureListPageRes> getLectureList(@PathVariable("pageNum") int pageNum){
         try{
             String jwtToken = jwt.getJwt();
 
@@ -46,7 +46,7 @@ public class LectureController {
 
             int userIdx = jwt.getUserIdx(jwtToken);
 
-            return new BasicResponse<>(lectureService.getLectureList(userIdx));
+            return new BasicResponse<>(lectureService.getLectureList(userIdx, pageNum));
 
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
@@ -236,14 +236,14 @@ public class LectureController {
      * 7.6.1 강의 리뷰 조회 api
      * GET	api/lecture/review/get
      * */
-    @GetMapping("/review/get")
-    public BasicResponse<List<LectureReviewRes>> getLectureReviewList(@RequestParam int lectureIdx) {
+    @GetMapping("/review/get/{pageNum}")
+    public BasicResponse<GetLectureReviewPageRes> getLectureReviewList(@PathVariable("pageNum") int pageNum, @RequestParam int lectureIdx) {
         try{
             String jwtToken = jwt.getJwt();
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            return new BasicResponse<>(lectureService.getLectureReviewList(lectureIdx));
+            return new BasicResponse<>(lectureService.getLectureReviewList(lectureIdx, pageNum));
         }catch (BasicException exception){
             return new BasicResponse<>((exception.getStatus()));
         }
