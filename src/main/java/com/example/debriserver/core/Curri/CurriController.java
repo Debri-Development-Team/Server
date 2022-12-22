@@ -450,13 +450,13 @@ public class CurriController {
      */
     @ResponseBody
     @GetMapping("/review/getList/{curriIdx}")
-    public BasicResponse<List<CurriReviewRes>> getCurriReviewList(@PathVariable ("curriIdx") int curriIdx){
+    public BasicResponse<GetCurriReviewPageRes> getCurriReviewList(@PathVariable ("curriIdx") int curriIdx, @RequestParam int pageNum){
         try{
             String jwtToken = jwt.getJwt();
 
             if(jwt.isJwtExpired(jwtToken)) throw new BasicException(BasicServerStatus.EXPIRED_TOKEN);
 
-            List<CurriReviewRes> curriReviewList = curriService.getCurriReviewList(curriIdx);
+            GetCurriReviewPageRes curriReviewList = curriService.getCurriReviewList(curriIdx, pageNum);
 
             return new BasicResponse<>(curriReviewList);
         } catch (BasicException exception){
