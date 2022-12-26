@@ -30,6 +30,7 @@ public class GetThisCurriRes {
     private int curriLikeCount;
     private String curriLikeStatus;
     private int scrapIdx;
+    private int scrapCount;
 
     List<LectureListInCurriRes> lectureListResList;
 

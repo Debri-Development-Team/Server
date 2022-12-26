@@ -537,7 +537,8 @@ public class CurriDao {
                 "    dDay, createdAt, curriDesc, cs.cntScrap, cs.scrapIdx,\n" +
                 "    cs.scrapStatus, chlc.cntCh,\n" +
                 "    IF(dDay < 1, (TRUNCATE(cntCh / 7, 0) - 1) * 3,\n" +
-                "        (TRUNCATE((cntCh - dDay) / 7, 0) - 1) * 3) as cusor\n" +
+                "        (TRUNCATE((cntCh - dDay) / 7, 0) - 1) * 3) as cusor,\n" +
+                "    IFNULL(cs2.cntSc, 0) as cntSc\n" +
                 "FROM Curriculum as c\n" +
                 "JOIN (\n" +
                 "    SELECT\n" +
@@ -560,6 +561,12 @@ public class CurriDao {
                 "    FROM Ch_Lecture_Curri\n" +
                 "    WHERE curriIdx = " + curriIdx + "\n" +
                 ") chlc\n" +
+                "LEFT JOIN (\n" +
+                "    SELECT curriIdx, COUNT(scrapIdx) as cntSc\n" +
+                "    FROM CurriScrap\n" +
+                "    WHERE status = 'ACTIVE'\n" +
+                "    GROUP BY curriIdx\n" +
+                ") cs2 on c.curriIdx = cs2.curriIdx" +
                 "WHERE c.curriIdx = ? AND c.status != 'DELETE';";
 
         String getLectureQuery = "SELECT\n" +
@@ -646,6 +653,7 @@ public class CurriDao {
                         rs.getInt("cntScrap"),
                         rs.getString("scrapStatus"),
                         rs.getInt("scrapIdx"),
+                        rs.getInt("cntSc"),
 
                         this.jdbcTemplate.query(getLectureQuery,
                                 (rs2, rowNum2) -> new LectureListInCurriRes(
