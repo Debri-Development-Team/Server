@@ -450,19 +450,10 @@ public class CurriDao {
     }
 
     public boolean checkChapterExist(PatchChapterStatuReq patchChapterStatuReq) {
-        String checkChapterExistQuery = "SELECT exists(\n" +
-                "    SELECT chlc.chIdx, chlc.lectureIdx, chlc.curriIdx\n" +
-                "    FROM Ch_Lecture_Curri as chlc\n" +
-                "    JOIN (SELECT c.chIdx\n" +
-                "          FROM Chapter as c\n" +
-                "          RIGHT JOIN Ch_Lecture as chl on chl.chIdx = c.chIdx\n" +
-                "          LEFT JOIN Lecture as l on l.lectureIdx = chl.lectureIdx) as ch\n" +
-                "    JOIN (SELECT l.lectureIdx\n" +
-                "          FROM Lecture as l\n" +
-                "          RIGHT JOIN Ch_Lecture as chl on l.lectureIdx = chl.lectureIdx\n" +
-                "          RIGHT JOIN Ch_Lecture_Curri as chlc on l.lectureIdx = chlc.lectureIdx) as l\n" +
-                "    JOIN Curriculum as c\n" +
-                "    WHERE chlc.chIdx = ? and chlc.lectureIdx = ? and chlc.curriIdx = ? and ch.chIdx = chlc.chIdx and l.lectureIdx = chlc.lectureIdx and c.curriIdx = chlc.curriIdx);";
+        String checkChapterExistQuery = "SELECT \n" +
+                "    COUNT(chIdx)\n" +
+                "FROM Ch_Lecture_Curri\n" +
+                "WHERE chIdx = ? AND lectureIdx = ? AND curriIdx = ?";
 
         Object[] checkChapterExistParams = new Object[]{
                 patchChapterStatuReq.getChIdx(),
@@ -545,8 +536,10 @@ public class CurriDao {
                 "    progressRate, c.status, UNIX_TIMESTAMP(completeAt) as completeAt, curriAuthor,\n" +
                 "    dDay, createdAt, curriDesc, cs.cntScrap, cs.scrapIdx,\n" +
                 "    cs.scrapStatus, chlc.cntCh,\n" +
-                "    IF(dDay < 1, (TRUNCATE(cntCh / 7, 0) - 1) * 3,\n" +
-                "        (TRUNCATE((cntCh - dDay) / 7, 0) - 1) * 3) as cusor\n" +
+                "    IF((cntCh - dDay) < 7, 0,\n" +
+                "        IF(dDay < 1, (TRUNCATE(cntCh / 7, 0) - 1) * 3,\n" +
+                "        (TRUNCATE((cntCh - dDay) / 7, 0) - 1) * 3)) as cusor,\n" +
+                "    IFNULL(cs2.cntSc, 0) as cntSc\n" +
                 "FROM Curriculum as c\n" +
                 "JOIN (\n" +
                 "    SELECT\n" +
@@ -569,6 +562,12 @@ public class CurriDao {
                 "    FROM Ch_Lecture_Curri\n" +
                 "    WHERE curriIdx = " + curriIdx + "\n" +
                 ") chlc\n" +
+                "LEFT JOIN (\n" +
+                "    SELECT curriIdx, COUNT(scrapIdx) as cntSc\n" +
+                "    FROM CurriScrap\n" +
+                "    WHERE status = 'ACTIVE'\n" +
+                "    GROUP BY curriIdx\n" +
+                ") cs2 on c.curriIdx = cs2.curriIdx\n" +
                 "WHERE c.curriIdx = ? AND c.status != 'DELETE';";
 
         String getLectureQuery = "SELECT\n" +
@@ -655,6 +654,7 @@ public class CurriDao {
                         rs.getInt("cntScrap"),
                         rs.getString("scrapStatus"),
                         rs.getInt("scrapIdx"),
+                        rs.getInt("cntSc"),
 
                         this.jdbcTemplate.query(getLectureQuery,
                                 (rs2, rowNum2) -> new LectureListInCurriRes(
