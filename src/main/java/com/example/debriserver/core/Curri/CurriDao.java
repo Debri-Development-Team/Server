@@ -283,10 +283,18 @@ public class CurriDao {
     }
 
     public List<GetCurriListRes> getList(int userIdx) {
-        String getCurriListQuery = "SELECT distinct c.curriIdx, c.curriName, c.curriAuthor, c.visibleStatus, c.langTag, c.progressRate, c.status, c.curriDesc, UNIX_TIMESTAMP(c.createdAt) as createAt\n" +
-                "FROM Curriculum as c\n" +
-                "JOIN User as u\n" +
-                "WHERE u.userIdx = ? AND u.userIdx = c.ownerIdx AND c.status NOT IN ('DELETE');";
+        String getCurriListQuery = "SELECT distinct\n" +
+                "    c.curriIdx, c.curriName, c.curriAuthor, c.visibleStatus, c.langTag,\n" +
+                "    c.progressRate, c.status, c.curriDesc, UNIX_TIMESTAMP(c.createdAt) as createAt,\n" +
+                "    IFNULL(cs.scCnt, 0) as scCnt\n" +
+                "FROM Curriculum c\n" +
+                "LEFT JOIN (\n" +
+                "    SELECT curriIdx, COUNT(scrapIdx) as scCnt\n" +
+                "    FROM CurriScrap\n" +
+                "    WHERE status = 'ACTIVE'\n" +
+                "    GROUP BY curriIdx\n" +
+                ") cs on c.curriIdx = cs.curriIdx\n" +
+                "WHERE c.ownerIdx = ? AND c.status != 'DELETE';";
 
         return this.jdbcTemplate.query(getCurriListQuery,
                 (rs, rowNum) -> new GetCurriListRes(
@@ -298,7 +306,8 @@ public class CurriDao {
                         rs.getString("langTag"),
                         rs.getFloat("progressRate"),
                         rs.getString("status"),
-                        rs.getInt("createAt")
+                        rs.getInt("createAt"),
+                        rs.getInt("scCnt")
                 ), userIdx);
     }
 

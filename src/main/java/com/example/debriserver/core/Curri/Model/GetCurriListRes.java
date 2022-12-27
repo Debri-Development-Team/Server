@@ -19,4 +19,5 @@ public class GetCurriListRes {
     private Float progressRate;
     private String status;
     private int createdAt;
+    private int scrapCount;
 }
