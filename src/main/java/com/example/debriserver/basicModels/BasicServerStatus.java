@@ -76,6 +76,7 @@ public enum BasicServerStatus {
 
     BOARD_SEARCH_LIST_NOT_EXIST(false, 3067, "검색 결과가 존재하지 않습니다."),
 
+    EMAIL_EXIST_ERROR(false, 3070, "이미 존재하는 이메일입니다."),
     /**
      * 4000 : Response 오류
      * */
