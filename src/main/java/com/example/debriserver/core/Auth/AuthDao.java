@@ -57,4 +57,10 @@ public class AuthDao {
 
         return result;
     }
+
+    public boolean checkEmailExist(String email){
+        String queryString = "select COUNT(userId) from User where userId = ?;";
+
+        return this.jdbcTemplate.queryForObject(queryString, int.class, email) < 1;
+    }
 }

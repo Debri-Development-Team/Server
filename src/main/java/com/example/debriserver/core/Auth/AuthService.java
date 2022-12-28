@@ -57,6 +57,10 @@ public class AuthService {
 
     public PostAuthEmailRes authEmail(String email) throws BasicException
     {
+        if(!authDao.checkEmailExist(email)){
+            throw new BasicException(BasicServerStatus.EMAIL_EXIST_ERROR);
+        }
+
         SimpleMailMessage msg = new SimpleMailMessage();
 
         // 유효시간 => 300000(msc) = 5(min)
