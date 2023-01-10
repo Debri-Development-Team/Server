@@ -587,7 +587,7 @@ public class CurriDao {
                 "    IFNULL(llc, 0) as llc\n" +
                 "FROM Lecture as l\n" +
                 "JOIN (\n" +
-                "    SELECT chlc.lectureIdx, COUNT(chI.chIdx) as cpCnt,\n" +
+                "    SELECT chlc.lectureIdx, COUNT(DISTINCT chI.chIdx) as cpCnt,\n" +
                 "           IFNULL(lScrap.status, 'INACTIVE') as scrapStatus,\n" +
                 "           IFNULL(lLike.status, 'INACTIVE') as likeStatus,\n" +
                 "           llc\n" +
