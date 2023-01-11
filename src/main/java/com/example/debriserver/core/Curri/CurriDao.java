@@ -528,6 +528,27 @@ public class CurriDao {
 
         int check = this.jdbcTemplate.queryForObject(checkStatusQuery, int.class, curriIdx);
 
+        String updateRateQuery = "UPDATE Curriculum\n" +
+                "SET progressRate = (\n" +
+                "    SELECT ((cpCnt / totalCnt) * 100) as nRate\n" +
+                "    FROM Ch_Lecture_Curri\n" +
+                "    JOIN (\n" +
+                "        SELECT COUNT(DISTINCT chI.chIdx) as cpCnt,\n" +
+                "               COUNT(chlc.chIdx) as totalCnt\n" +
+                "        FROM Ch_Lecture_Curri as chlc\n" +
+                "            LEFT JOIN (\n" +
+                "            SELECT chI.lectureIdx, chI.chIdx\n" +
+                "            FROM Ch_Lecture_Curri as chI\n" +
+                "            WHERE chI.curriIdx = " + curriIdx + " AND chComplete = 'TRUE'\n" +
+                "            ) chI on chI.lectureIdx = chlc.lectureIdx\n" +
+                "        WHERE chlc.curriIdx = " + curriIdx + "\n" +
+                "    ) as chlc\n" +
+                "    GROUP BY nRate\n" +
+                ")\n" +
+                "WHERE curriIdx = ?;";
+
+        this.jdbcTemplate.update(updateRateQuery, curriIdx);
+
         // D - day update
         if (check > 0) {
             String upDateDayQuery = "UPDATE Curriculum as C, \n" +
@@ -587,7 +608,7 @@ public class CurriDao {
                 "    IFNULL(llc, 0) as llc\n" +
                 "FROM Lecture as l\n" +
                 "JOIN (\n" +
-                "    SELECT chlc.lectureIdx, COUNT(chI.chIdx) as cpCnt,\n" +
+                "    SELECT chlc.lectureIdx, COUNT(DISTINCT chI.chIdx) as cpCnt,\n" +
                 "           IFNULL(lScrap.status, 'INACTIVE') as scrapStatus,\n" +
                 "           IFNULL(lLike.status, 'INACTIVE') as likeStatus,\n" +
                 "           llc\n" +
