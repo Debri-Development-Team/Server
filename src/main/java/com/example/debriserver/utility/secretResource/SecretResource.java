@@ -1,4 +1,4 @@
-package com.example.debriserver.secretResource;
+package com.example.debriserver.utility.secretResource;
 
 /**
  * Secret Resource Class

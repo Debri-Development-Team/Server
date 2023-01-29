@@ -2,7 +2,7 @@ package com.example.debriserver.utility;
 
 import com.example.debriserver.basicModels.BasicException;
 import com.example.debriserver.basicModels.BasicServerStatus;
-import com.example.debriserver.secretResource.SecretResource;
+import com.example.debriserver.utility.secretResource.SecretResource;
 import com.example.debriserver.utility.Model.RefreshJwtRes;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Service;

@@ -385,7 +385,7 @@ public class CurriDao {
 
         int result = this.jdbcTemplate.update(deleteCurriQuery, deleteCurriParams);
 
-        System.out.println(result);
+        // System.out.println(result);
 
         return result;
     }
@@ -472,7 +472,7 @@ public class CurriDao {
 
         int result = this.jdbcTemplate.queryForObject(checkChapterExistQuery, int.class, checkChapterExistParams);
 
-        System.out.println(result);
+        // System.out.println(result);
 
         return result > 0;
     }
@@ -530,7 +530,7 @@ public class CurriDao {
 
         String updateRateQuery = "UPDATE Curriculum\n" +
                 "SET progressRate = (\n" +
-                "    SELECT ((cpCnt / totalCnt) * 100) as nRate\n" +
+                "    SELECT IFNULL(((cpCnt / totalCnt) * 100), 0) as nRate\n" +
                 "    FROM Ch_Lecture_Curri\n" +
                 "    JOIN (\n" +
                 "        SELECT COUNT(DISTINCT chI.chIdx) as cpCnt,\n" +
@@ -659,7 +659,7 @@ public class CurriDao {
                 "    GROUP BY chIdx\n" +
                 ") c on chlc.chIdx = c.chIdx\n" +
                 "LEFT JOIN (\n" +
-                "    SELECT curriIdx, lectureIdx, COUNT(chComplete) as chCnt\n" +
+                "    SELECT curriIdx, lectureIdx, COUNT(DISTINCT chComplete) as chCnt\n" +
                 "    FROM Ch_Lecture_Curri as  chlc2\n" +
                 "    WHERE chComplete = 'TRUE'\n" +
                 "    GROUP BY lectureIdx\n" +
